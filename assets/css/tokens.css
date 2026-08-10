@@ -1,0 +1,19 @@
+/* Design tokens échantillonnés sur les exports Figma (FCCT, Siméon Dubuis).
+   Point unique de re-skin : ajuster ici couleurs et typo pour toute la page. */
+:root {
+  /* Couleurs */
+  --c-bg: #ffbfff; /* fond de page rose clair */
+  --c-bar: #ffc8ff; /* barre de navigation, légèrement plus claire */
+  --c-ink: #f414ec; /* magenta vif : titres et texte courant */
+  --c-ink-soft: #fa7cf3; /* rose moyen : crédits, liens e-mail */
+  --c-cloud: #fb5dfd; /* nuage « Appel à projet » */
+  --c-cloud-ink: #ffb0fb; /* texte du nuage */
+
+  /* Typo — Quicksand approxime la sans arrondie du design ; à remplacer
+     quand la vraie police sera confirmée (voir aussi nuxt.config.ts). */
+  --font-sans: "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+
+  /* Mise en page */
+  --content-max: 61rem; /* ~976px de colonne de texte (design 1019px) */
+  --pad-x: clamp(0.8rem, 4vw, 2.5rem);
+}

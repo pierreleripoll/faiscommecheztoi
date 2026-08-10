@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Worker statique (aucun code serveur) : `npm run generate` prerend tout le
+  // site — y compris les images /_ipx/ — dans .output/public.
+  // Déploiement : npx wrangler deploy (une fois le domaine/compte configuré).
+  "name": "faiscommecheztoi",
+  "compatibility_date": "2026-08-10",
+  "assets": {
+    "directory": ".output/public"
+  }
+}

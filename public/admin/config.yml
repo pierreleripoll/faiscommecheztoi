@@ -1,0 +1,114 @@
+# Sveltia CMS — backend GitHub avec OAuth via le worker sveltia-cms-auth
+# (le même que pour mariaclaracastioni ; il faut ajouter ce repo aux origines
+# autorisées du worker pour que la connexion fonctionne).
+backend:
+  name: github
+  repo: pierreleripoll/faiscommecheztoi
+  branch: dev
+  base_url: https://sveltia-cms-auth.pierreripoll13-d89.workers.dev
+
+# Préview GitHub Pages pour l'instant ; passer à https://faiscommecheztoi.ch
+# une fois le domaine branché sur Cloudflare.
+site_url: https://pierreleripoll.github.io/faiscommecheztoi
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: "pages"
+    label: "Sections de la page"
+    files:
+      - name: "hero"
+        label: "Intro (haut de page)"
+        file: "content/hero.md"
+        fields:
+          - label: "Texte d'intro"
+            name: "body"
+            widget: "markdown"
+          - label: "Photo"
+            name: "photo"
+            widget: "object"
+            fields:
+              - { label: "Image", name: "src", widget: "image" }
+              - { label: "Texte alternatif", name: "alt", widget: "string", required: false }
+
+      - name: "appel"
+        label: "Nuage « Appel à projet »"
+        file: "content/appel.md"
+        fields:
+          - { label: "Visible", name: "visible", widget: "boolean", default: true }
+          - { label: "Texte", name: "label", widget: "string" }
+          - label: "Lien"
+            name: "url"
+            widget: "string"
+            hint: "URL ou ancre (ex. #participer, https://…, mailto:…)"
+
+      - name: "infos"
+        label: "Infos pratiques"
+        file: "content/infos.md"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Texte", name: "body", widget: "markdown" }
+
+      - name: "participer"
+        label: "Participer"
+        file: "content/participer.md"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Texte", name: "body", widget: "markdown" }
+
+      - name: "team"
+        label: "Contact & Team"
+        file: "content/team.md"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Texte", name: "body", widget: "markdown" }
+
+      - name: "soutiens"
+        label: "Soutiens (logos)"
+        file: "content/soutiens.md"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - label: "Logos"
+            name: "logos"
+            widget: "list"
+            collapsed: true
+            summary: "{{fields.alt}}"
+            fields:
+              - { label: "Image", name: "src", widget: "image" }
+              - { label: "Nom", name: "alt", widget: "string" }
+              - { label: "Lien", name: "url", widget: "string", required: false }
+
+  - name: "artistes"
+    label: "Artistes (par année)"
+    folder: "content/artistes"
+    create: true
+    slug: "{{year}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "year"
+    summary: "{{year}}"
+    sortable_fields: ["year"]
+    fields:
+      - { label: "Année", name: "year", widget: "string" }
+      - label: "Affiches"
+        name: "posters"
+        widget: "list"
+        collapsed: true
+        summary: "{{fields.credit}}"
+        fields:
+          - { label: "Affiche", name: "src", widget: "image" }
+          - { label: "Crédit (graphiste)", name: "credit", widget: "string", required: false }
+
+  - name: "partenariats"
+    label: "Partenariats"
+    folder: "content/partenariats"
+    create: true
+    slug: "{{order}}.{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    summary: "{{title}}"
+    fields:
+      - { label: "Nom", name: "title", widget: "string" }
+      - { label: "Ordre", name: "order", widget: "number", value_type: "int", default: 1 }
+      - { label: "Texte", name: "body", widget: "markdown" }
