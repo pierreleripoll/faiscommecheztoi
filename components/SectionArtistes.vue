@@ -125,9 +125,16 @@ const posters = computed(() =>
 }
 
 @media (max-width: 720px) {
+  /* La maquette mobile centre le titre et les années, qui passent alors
+     sur deux lignes. */
   .artistes__head {
     justify-content: center;
     text-align: center;
+  }
+
+  .artistes__years {
+    justify-content: center;
+    width: 100%;
   }
 
   .artistes__grid {
