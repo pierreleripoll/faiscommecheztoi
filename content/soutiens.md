@@ -4,52 +4,52 @@ logos:
   - src: /uploads/logo-spot.png
     alt: Le Spot Sion
     url: 'https://spot-sion.ch'
-    width: 86
-    height: 65
-    ratio: 1.323076923076923
-    thumbhash: NHcKBYCXmJeId3ePd3aHdFh3gIn4
-    thumbhashRatio: 1.4
+    width: 500
+    height: 262
+    ratio: 1.9083969465648856
+    thumbhash: NQgOBICnqJeHd3iPdnhYd1CgBw==
+    thumbhashRatio: 1.75
   - src: /uploads/logo-culture-valais.png
     alt: La Culture du Valais — Etat du Valais
-    width: 68
-    height: 84
-    ratio: 0.8095238095238095
-    thumbhash: +YYCBgJ4x5l4d/iHWIaIiGdoeXlvaAg=
-    thumbhashRatio: 0.8571428571428571
+    width: 500
+    height: 450
+    ratio: 1.1111111111111112
+    thumbhash: /hcCDoKX9aqId4h/l3WHuHeHl4iPdgc=
+    thumbhashRatio: 1.1666666666666667
   - src: /uploads/logo-sion.png
     alt: Ville de Sion
-    width: 94
-    height: 62
-    ratio: 1.5161290322580645
-    thumbhash: +YYCDYKph6d4h3dvhmeIhZp4X2YI
-    thumbhashRatio: 1.4
+    width: 500
+    height: 248
+    ratio: 2.0161290322580645
+    thumbhash: /hcCDISqhqd4eHhvhoeqeF91CA==
+    thumbhashRatio: 1.75
   - src: /uploads/logo-loterie-romande.png
     alt: Loterie Romande
-    width: 122
-    height: 62
-    ratio: 1.967741935483871
-    thumbhash: +JYCDIR2l6l4d4iPh3d2eJ94CA==
-    thumbhashRatio: 1.75
+    width: 500
+    height: 224
+    ratio: 2.232142857142857
+    thumbhash: vTcCC4Z2p6l3d/h4dnefiAg=
+    thumbhashRatio: 2.3333333333333335
   - src: /uploads/logo-fondation-gianadda.png
     alt: Fondation Léonard Gianadda Mécénat
-    width: 146
-    height: 65
-    ratio: 2.246153846153846
-    thumbhash: +YYCA4C3iId2iPhot4aPlAc=
-    thumbhashRatio: 2.3333333333333335
+    width: 500
+    height: 177
+    ratio: 2.824858757062147
+    thumbhash: /wcCAoLXiId2ifho13aPkgg=
+    thumbhashRatio: 3.5
   - src: /uploads/logo-fiduciaire-bender.png
     alt: Fiduciaire Bender SA
-    width: 98
-    height: 87
-    ratio: 1.1264367816091954
-    thumbhash: +YYCBoKYp4iYd3iPhnaGWYeJqJdvhQY=
-    thumbhashRatio: 1.1666666666666667
+    width: 500
+    height: 307
+    ratio: 1.6286644951140066
+    thumbhash: /hcCDIKZtoa2Z3mfh3eZtm+WBA==
+    thumbhashRatio: 1.75
   - src: /uploads/logo-ferme-asile.png
     alt: Ferme-Asile
-    width: 156
-    height: 62
-    ratio: 2.5161290322580645
-    thumbhash: NncKA4B2Zpd3ePeIqZhgdfY=
-    thumbhashRatio: 2.3333333333333335
+    width: 500
+    height: 124
+    ratio: 4.032258064516129
+    thumbhash: NwgKAoB2ZaZ1ePd3qnkA1xQ=
+    thumbhashRatio: 3.5
 ---
 

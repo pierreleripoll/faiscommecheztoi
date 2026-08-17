@@ -8,7 +8,11 @@
       <AppelCloud v-if="appel?.visible" :appel="appel" variant="hero" />
     </header>
     <figure v-if="hero?.photo?.src" class="hero__photo">
-      <ThumbhashImage :image="hero.photo" sizes="100vw sm:100vw lg:1024px xl:1280px" priority />
+      <ThumbhashImage
+        :image="hero.photo"
+        sizes="100vw sm:100vw lg:1280px xl:1440px"
+        priority
+      />
     </figure>
 
     <div class="page">
@@ -34,7 +38,10 @@
       <section id="participer" class="section section--participer">
         <h2 class="section__title">{{ participer?.title }}</h2>
         <ContentRenderer v-if="participer" :value="participer" />
-        <AppelCloud v-if="appel?.visible" :appel="appel" variant="participer" />
+        <template v-if="appel?.visible">
+          <AppelCloud :appel="appel" variant="participer" :scale="0.75" />
+          <AppelCloud variant="puff" :scale="0.375" decorative />
+        </template>
       </section>
 
       <section id="contact" class="section section--team">
@@ -53,7 +60,7 @@
             class="soutiens__logo"
           >
             <img
-              :src="img(logo.src, { quality: 85 })"
+              :src="img(logo.src, { quality: 90 })"
               :alt="logo.alt || ''"
               :width="logo.width"
               :height="logo.height"
@@ -96,23 +103,25 @@ const { data: soutiens } = await useAsyncData("soutiens", () =>
 </script>
 
 <style scoped>
-/* Hero */
+/* Hero ---------------------------------------------------------------------- */
 .hero {
   position: relative;
-  padding-top: 1.6rem;
-  padding-bottom: 1.6rem;
+  /* 15 px au-dessus / 25 px en dessous du texte dans la maquette. */
+  padding-top: 15px;
+  padding-bottom: 25px;
 }
 
 .hero__text {
-  font-size: clamp(1.35rem, 0.7rem + 2.6vw, 2.55rem);
-  font-weight: 700;
-  line-height: 1.25;
+  font-size: var(--fs-h1);
 }
 
 .hero__photo {
   margin: 0;
-  /* Pleine largeur d'écran, comme la maquette desktop. */
   width: 100%;
+  position: relative;
+  /* Sans isolation, le plus-lighter du calque de teinte se mélangerait aussi
+     au fond de page et déborderait de la photo. */
+  isolation: isolate;
 }
 
 .hero__photo :deep(img) {
@@ -121,48 +130,80 @@ const { data: soutiens } = await useAsyncData("soutiens", () =>
   display: block;
 }
 
-@media (max-width: 640px) {
-  /* La maquette mobile ne montre pas la photo : hero texte → Artistes. */
+/* Deux calques se superposent à la photo, dans cet ordre :
+   1. la teinte magenta, mélangée à l'image ;
+   2. la lueur des bords, posée par-dessus.
+   Un box-shadow: inset ne conviendrait pas : il serait peint sous l'image. */
+.hero__photo::after,
+.hero__photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* La photo source est neutre ; le design la teinte d'un magenta additif à
+   28 %. En plus-lighter, la lueur des projecteurs reste lumineuse au lieu
+   d'être noyée sous un voile opaque. */
+.hero__photo::after {
+  z-index: 1;
+  background: var(--c-ink);
+  opacity: 0.28;
+  mix-blend-mode: plus-lighter;
+}
+
+/* Lueur projetée par les blocs roses au-dessus et en dessous de la photo. */
+.hero__photo::before {
+  z-index: 2;
+  background: linear-gradient(
+      to bottom,
+      var(--glow-photo),
+      transparent 35px
+    ),
+    linear-gradient(to top, var(--glow-photo), transparent 35px);
+}
+
+@media (max-width: 720px) {
+  /* La maquette mobile enchaîne directement l'intro et la section Artistes. */
   .hero__photo {
     display: none;
   }
 }
 
-/* Partenariats */
+/* Partenariats -------------------------------------------------------------- */
 .partenaire {
-  margin-bottom: 1.6em;
+  margin-bottom: 25px;
+}
+
+.partenaire:last-child {
+  margin-bottom: 0;
 }
 
 .partenaire__title {
   text-transform: uppercase;
-  font-weight: 500;
   font-size: 1em;
-  letter-spacing: 0.02em;
 }
 
-/* Participer : le nuage se superpose au texte, comme la maquette. */
+/* Participer : les nuages se superposent au texte, comme dans la maquette. */
 .section--participer {
   position: relative;
 }
 
-/* Team : e-mails en rose plus doux */
-.section--team :deep(a) {
-  color: var(--c-ink-soft);
-}
-
-/* Soutiens */
+/* Soutiens ------------------------------------------------------------------ */
 .soutiens {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.4rem 2rem;
+  gap: 20px 25px;
   flex-wrap: wrap;
-  padding: 1rem 0 3rem;
+  padding-top: 25px;
+  padding-bottom: 50px;
 }
 
 .soutiens__logo img {
   display: block;
-  height: clamp(2.2rem, 1.6rem + 2vw, 3.4rem);
+  /* Rangée de 82 px de haut dans la maquette, les logos y sont centrés. */
+  height: clamp(38px, 4.5vw, 61px);
   width: auto;
 }
 </style>

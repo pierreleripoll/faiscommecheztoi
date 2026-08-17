@@ -18,7 +18,7 @@
 
     <div class="artistes__grid">
       <figure v-for="p in posters" :key="p.src" class="artistes__poster">
-        <ThumbhashImage :image="p" sizes="92vw sm:45vw lg:320px" />
+        <ThumbhashImage :image="p" sizes="90vw sm:45vw lg:385px" />
         <figcaption v-if="p.credit" class="artistes__credit">
           {{ p.credit }}
         </figcaption>
@@ -49,20 +49,22 @@ const posters = computed(() =>
 <style scoped>
 .artistes__head {
   display: flex;
-  align-items: baseline;
-  gap: 1.6em;
+  align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 1.4rem;
+  /* 40 px séparent le titre des années dans la maquette. */
+  gap: 10px 40px;
+  padding: 5px 0;
+  margin-bottom: 20px;
 }
 
 .artistes__title {
   text-transform: uppercase;
-  font-size: clamp(1.4rem, 1rem + 1.8vw, 2.1rem);
+  font-size: var(--fs-h1);
 }
 
 .artistes__years {
   display: flex;
-  gap: 0.9em;
+  gap: 25px;
   flex-wrap: wrap;
 }
 
@@ -71,21 +73,22 @@ const posters = computed(() =>
   background: none;
   padding: 0;
   font: inherit;
-  font-weight: 700;
-  font-size: clamp(1.2rem, 0.9rem + 1.3vw, 1.7rem);
+  font-size: var(--fs-body);
+  line-height: 1;
   color: var(--c-ink);
   cursor: pointer;
 }
 
 .artistes__year--active {
   text-decoration: underline;
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.16em;
 }
 
 .artistes__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  /* 13.4 px entre les colonnes sur les 1180 px de colonne utile. */
+  gap: 13px;
 }
 
 .artistes__poster {
@@ -93,21 +96,21 @@ const posters = computed(() =>
   min-width: 0;
 }
 
-/* Le wrapper ThumbhashImage est pensé pour des boîtes à hauteur fixe
-   (height: 100%). Ici la hauteur doit découler de la largeur de colonne via
-   l'aspect-ratio, sinon le min-content gonfle les pistes de la grille. */
+/* ThumbhashImage est prévu pour des boîtes à hauteur fixe (height: 100%). Ici
+   la hauteur doit découler de la largeur via l'aspect-ratio, sinon le
+   min-content gonfle les pistes de la grille. */
 .artistes__poster :deep(.thumbhash-image) {
   height: auto;
 }
 
 .artistes__credit {
   text-align: right;
-  font-size: clamp(0.8rem, 0.65rem + 0.5vw, 1rem);
-  color: var(--c-ink-soft);
-  margin-top: 0.35em;
+  font-size: var(--fs-legend);
+  line-height: 1.3;
+  margin-top: 3px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .artistes__head {
     justify-content: center;
     text-align: center;
@@ -115,7 +118,7 @@ const posters = computed(() =>
 
   .artistes__grid {
     grid-template-columns: 1fr;
-    gap: 1.2rem;
+    gap: 25px;
   }
 }
 </style>

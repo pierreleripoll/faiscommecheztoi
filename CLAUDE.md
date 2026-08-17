@@ -6,7 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Site du festival **Fais comme chez toi** — Rencontres des artistes émergent·es valaisan·nes (Le Spot, Sion). One-pager **Nuxt 3 statique** piloté par le contenu : les sections sont des fichiers Markdown dans `content/`, éditables via Sveltia CMS (`/admin`). Architecture reprise de `pierreleripoll/mariaclaracastioni` (branche `staging`).
 
-Design : maquette Figma de Siméon Dubuis (rose `#ffbfff`, magenta `#f414ec`, sans arrondie). Les tokens sont centralisés dans `assets/css/tokens.css` — c'est le point unique de re-skin.
+Design : maquette Figma de Siméon Dubuis, dessinée sur deux gabarits — **desktop 1280 px** et **mobile 375 px**. Les valeurs (couleurs, tailles, espacements) ont été extraites du fichier Figma via le MCP Figma, pas échantillonnées à l'œil : fond `#ffbfff`, nav `#ffc8ff`, texte `#ff00ff`, nuage `#ff7dff`. Tout est centralisé dans `assets/css/tokens.css` — c'est le point unique de re-skin, et les tailles y interpolent linéairement entre les deux gabarits.
+
+Le fichier Figma d'origine est un **Figma Sites** (`/site/`), que le MCP Figma ne sait pas lire ; une copie en fichier *Design* classique existe et c'est celle-là qu'il faut interroger.
+
+Police : **Vevey Positive**, sous licence et donc non versionnée — voir `public/fonts/README.md`. À défaut, repli automatique sur Quicksand.
 
 ## Commands
 

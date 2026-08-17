@@ -1,19 +1,50 @@
-/* Design tokens échantillonnés sur les exports Figma (FCCT, Siméon Dubuis).
-   Point unique de re-skin : ajuster ici couleurs et typo pour toute la page. */
-:root {
-  /* Couleurs */
-  --c-bg: #ffbfff; /* fond de page rose clair */
-  --c-bar: #ffc8ff; /* barre de navigation, légèrement plus claire */
-  --c-ink: #f414ec; /* magenta vif : titres et texte courant */
-  --c-ink-soft: #fa7cf3; /* rose moyen : crédits, liens e-mail */
-  --c-cloud: #fb5dfd; /* nuage « Appel à projet » */
-  --c-cloud-ink: #ffb0fb; /* texte du nuage */
+/* Design tokens extraits du fichier Figma « FCCT » (Siméon Dubuis) via le MCP
+   Figma — valeurs exactes, pas d'approximation à la pipette.
+   Point unique de re-skin : ajuster ici pour toute la page.
 
-  /* Typo — Quicksand approxime la sans arrondie du design ; à remplacer
-     quand la vraie police sera confirmée (voir aussi nuxt.config.ts). */
-  --font-sans: "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+   La maquette est dessinée sur deux gabarits : desktop 1280 px et mobile
+   375 px. Toutes les tailles ci-dessous interpolent linéairement entre ces
+   deux points, puis se figent en dehors. */
+
+/* Vevey Positive est la police du design. Elle est sous licence : déposer
+   simplement les fichiers dans public/fonts/ suffit à l'activer — tant qu'ils
+   sont absents, le navigateur retombe silencieusement sur Quicksand. */
+@font-face {
+  font-family: "Vevey";
+  src: url("/fonts/vevey-positive.woff2") format("woff2"),
+       url("/fonts/vevey-positive.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Couleurs (échantillonnées sur le rendu Figma) */
+  --c-bg: #ffbfff; /* fond de page */
+  --c-bar: #ffc8ff; /* barre de navigation */
+  --c-ink: #ff00ff; /* texte et titres : magenta pur */
+  --c-cloud: #ff7dff; /* corps du nuage « Appel à projet » */
+  --c-cloud-ink: #ffc8ff; /* texte et croix du nuage */
+
+  /* Lueurs magenta (ombres portées du design) */
+  --glow-nav: 0 7px 10px rgba(255, 0, 255, 0.35);
+  --glow-photo: rgba(255, 0, 255, 0.5);
+  --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
+
+  /* Typo */
+  --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+
+  /* Échelle de corps : mobile @375 → desktop @1280 */
+  --fs-h1: clamp(37px, calc(32.86px + 1.105vw), 47px); /* 37 → 47 */
+  --fs-body: clamp(22px, calc(15.78px + 1.657vw), 37px); /* 22 → 37 */
+  --fs-nav: 20px; /* constant dans les deux gabarits */
+  --fs-legend: 17px; /* crédits d'affiche */
 
   /* Mise en page */
-  --content-max: 61rem; /* ~976px de colonne de texte (design 1019px) */
-  --pad-x: clamp(0.8rem, 4vw, 2.5rem);
+  --content-max: 1280px;
+  --pad-x: clamp(15px, calc(0.5px + 3.867vw), 50px); /* 15 → 50 */
+
+  /* Le nuage se met à l'échelle d'un bloc : 249.83 → 490 px de large.
+     Tout ce qu'il contient est dimensionné en proportion de cette largeur. */
+  --cloud-w: clamp(249.83px, calc(150.31px + 26.538vw), 490px);
 }

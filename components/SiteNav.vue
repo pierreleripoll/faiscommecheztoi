@@ -17,18 +17,20 @@
   top: 0;
   z-index: 20;
   background: var(--c-bar);
+  box-shadow: var(--glow-nav);
 }
 
 .site-nav__inner {
   display: flex;
-  gap: 1.4em;
+  gap: 20px;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem var(--pad-x);
-  font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.05rem);
-  font-weight: 700;
-  /* Sur mobile la nav reste sur une ligne et défile horizontalement,
-     comme sur la maquette. */
+  /* 20 px de padding vertical + 26 px de ligne = les 66 px de la maquette. */
+  padding: 20px var(--pad-x);
+  font-size: var(--fs-nav);
+  line-height: 1.3;
+  /* Sur mobile la maquette laisse la nav déborder sur une seule ligne :
+     on la rend défilable horizontalement plutôt que de la faire passer à la ligne. */
   overflow-x: auto;
   white-space: nowrap;
   scrollbar-width: none;
@@ -38,24 +40,26 @@
   display: none;
 }
 
-@media (max-width: 720px) {
-  /* Centré + overflow coupe le début de la ligne : sur mobile on aligne à
-     gauche et la nav défile horizontalement. */
-  .site-nav__inner {
-    justify-content: flex-start;
-  }
-}
-
 .site-nav a {
   text-decoration: none;
-  color: var(--c-ink);
+  /* Les entrées de nav sont à 50 % d'opacité dans le design. */
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
 }
 
-.site-nav a:hover {
-  text-decoration: underline;
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  opacity: 1;
 }
 
 .site-nav__brand {
   text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  /* Centrer une ligne plus large que l'écran en couperait le début. */
+  .site-nav__inner {
+    justify-content: flex-start;
+  }
 }
 </style>

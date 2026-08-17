@@ -6,8 +6,8 @@
 
 html {
   scroll-behavior: smooth;
-  /* La nav sticky masque le haut des sections ciblées par les ancres. */
-  scroll-padding-top: 4rem;
+  /* La nav sticky (66 px) masquerait le haut des sections ciblées par les ancres. */
+  scroll-padding-top: 66px;
 }
 
 body {
@@ -15,22 +15,23 @@ body {
   background: var(--c-bg);
   color: var(--c-ink);
   font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(1.05rem, 0.6rem + 1.5vw, 1.45rem);
-  line-height: 1.55;
+  font-size: var(--fs-body);
+  /* Les styles Figma sont en interligne 100 % ; on desserre très légèrement
+     pour que les accents et les points médians restent lisibles à l'écran. */
+  line-height: 1.12;
 }
 
 a {
-  color: var(--c-ink);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
+  color: inherit;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
 }
 
 h1,
 h2,
 h3 {
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: 400;
+  line-height: 1;
   margin: 0;
 }
 
@@ -48,29 +49,29 @@ p:last-child {
   padding: 0 var(--pad-x);
 }
 
-/* Sections */
+/* Sections ------------------------------------------------------------------
+   Dans la maquette les sections sont collées les unes aux autres : c'est leur
+   rythme interne qui aère la page (titre de 71 px, puis 25 px avant le corps). */
 .section {
-  padding: 3.5rem 0 1rem;
+  padding-top: 25px;
+  padding-bottom: 25px;
 }
 
 .section__title {
   text-align: center;
   text-transform: uppercase;
-  font-size: clamp(1.4rem, 1rem + 1.8vw, 2.1rem);
-  letter-spacing: 0.02em;
-  margin-bottom: 1.6em;
+  font-size: var(--fs-h1);
+  /* Le bloc titre fait 71 px de haut pour 61 px de texte dans la maquette. */
+  padding: 5px 0;
+  margin-bottom: 25px;
 }
 
-/* Corps markdown : listes à puces magenta, liens doux pour les e-mails */
+/* Corps markdown */
 .section ul {
-  padding-left: 2.2em;
+  padding-left: 1.5em;
   margin: 0 0 1em;
 }
 
 .section li {
-  margin-bottom: 0.15em;
-}
-
-.section li::marker {
-  color: var(--c-ink);
+  margin-bottom: 0.1em;
 }
