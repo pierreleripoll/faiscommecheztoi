@@ -17,10 +17,12 @@
   >
     <svg class="cloud__shape" viewBox="0 0 490 355" aria-hidden="true">
       <defs>
+        <!-- La zone du filtre est exprimée dans le repère du <g>, donc après
+             son translate(31 49) : elle part de 0,0 et non de 31,49. -->
         <filter
           :id="`cloud-inner-${uid}`"
-          x="31"
-          y="49"
+          x="0"
+          y="0"
           width="428"
           height="267"
           filterUnits="userSpaceOnUse"

@@ -18,7 +18,14 @@
 
     <div class="artistes__grid">
       <figure v-for="p in posters" :key="p.src" class="artistes__poster">
-        <ThumbhashImage :image="p" sizes="90vw sm:45vw lg:385px" />
+        <!-- Les affiches n'ont pas toutes exactement le même ratio ; la
+             maquette les cale sur une même hauteur (385 × 547), ce qui aligne
+             les crédits d'une colonne à l'autre. -->
+        <ThumbhashImage
+          :image="p"
+          :aspect-ratio="385 / 547"
+          sizes="90vw sm:45vw lg:385px"
+        />
         <figcaption v-if="p.credit" class="artistes__credit">
           {{ p.credit }}
         </figcaption>
@@ -101,6 +108,13 @@ const posters = computed(() =>
    min-content gonfle les pistes de la grille. */
 .artistes__poster :deep(.thumbhash-image) {
   height: auto;
+}
+
+/* ThumbhashImage letterboxe par défaut (object-fit: contain) ; sur une boîte
+   au ratio imposé, il faut recadrer pour ne pas laisser de liseré. L'écart de
+   ratio entre les affiches est inférieur à 1 %, le recadrage est invisible. */
+.artistes__poster :deep(.thumbhash-image__img) {
+  object-fit: cover;
 }
 
 .artistes__credit {
