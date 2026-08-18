@@ -16,6 +16,8 @@
     </figure>
 
     <div class="page">
+      <SectionProgramme :artistes="programme || []" />
+
       <SectionArtistes :years="years || []" />
 
       <section id="infos" class="section">
@@ -82,6 +84,11 @@ const { data: hero } = await useAsyncData("hero", () =>
 const { data: appel } = await useAsyncData("appel", () =>
   queryContent("/appel").findOne()
 );
+// $numeric est indispensable : sans lui queryContent compare les nombres comme
+// des chaînes et classe 1, 10, 11, 12, 2, 3…
+const { data: programme } = await useAsyncData("programme", () =>
+  queryContent("/programme").sort({ order: 1, $numeric: true }).find()
+);
 const { data: years } = await useAsyncData("artistes", () =>
   queryContent("/artistes").sort({ year: -1 }).find()
 );
@@ -89,7 +96,7 @@ const { data: infos } = await useAsyncData("infos", () =>
   queryContent("/infos").findOne()
 );
 const { data: partenaires } = await useAsyncData("partenariats", () =>
-  queryContent("/partenariats").sort({ order: 1 }).find()
+  queryContent("/partenariats").sort({ order: 1, $numeric: true }).find()
 );
 const { data: participer } = await useAsyncData("participer", () =>
   queryContent("/participer").findOne()

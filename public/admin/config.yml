@@ -100,6 +100,69 @@ collections:
           - { label: "Affiche", name: "src", widget: "image" }
           - { label: "Crédit (graphiste)", name: "credit", widget: "string", required: false }
 
+  # Un fichier par artiste de l'édition en cours. Les champs machine de la photo
+  # (width/height/ratio/thumbhash) ne sont pas déclarés : le script
+  # update-images les ajoute après coup et Sveltia préserve les clés inconnues.
+  - name: "programme"
+    label: "Programme 2026"
+    folder: "content/programme"
+    create: true
+    slug: "{{order}}.{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "name"
+    summary: "{{order}}. {{name}} — {{title}}"
+    sortable_fields: ["order", "name"]
+    fields:
+      - { label: "Artiste", name: "name", widget: "string" }
+      - label: "Ordre"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+        default: 1
+        hint: "Ordre d'affichage — les artistes sont classés par première représentation."
+      - { label: "Titre du spectacle", name: "title", widget: "string" }
+      - { label: "Durée", name: "duration", widget: "string", hint: "Ex. 35’" }
+      - { label: "Format", name: "format", widget: "string", hint: "Ex. étape de travail/work in progress" }
+      - label: "Collaboration"
+        name: "collaboration"
+        widget: "string"
+        required: false
+        hint: "Ex. Collaboration avec L'Oblique. Laisser vide si le projet ne vient pas d'un partenariat."
+      - label: "Avec"
+        name: "with"
+        widget: "string"
+        required: false
+        hint: "Le reste de l'équipe, sans le mot « Avec »."
+      - { label: "Lieu", name: "venue", widget: "string", hint: "Ex. Sion, Théâtre de Valère" }
+      - label: "Horaires"
+        name: "dates"
+        widget: "list"
+        field: { label: "Date", name: "date", widget: "string" }
+        hint: "Ex. Je 08.10, 19:05"
+      - { label: "École", name: "school", widget: "string" }
+      - label: "Joué aussi ailleurs"
+        name: "also"
+        widget: "object"
+        required: false
+        collapsed: true
+        fields:
+          - { label: "Festival", name: "festival", widget: "string" }
+          - { label: "Lieu", name: "venue", widget: "string" }
+          - label: "Horaires"
+            name: "dates"
+            widget: "list"
+            field: { label: "Date", name: "date", widget: "string" }
+      - label: "Portrait"
+        name: "photo"
+        widget: "object"
+        required: false
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - { label: "Texte alternatif", name: "alt", widget: "string", required: false }
+          - { label: "Crédit photo", name: "credit", widget: "string", required: false }
+      - { label: "Biographie", name: "body", widget: "markdown" }
+
   - name: "partenariats"
     label: "Partenariats"
     folder: "content/partenariats"

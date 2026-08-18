@@ -25,7 +25,7 @@ Pas de tests ni de linter configurés.
 
 ## Architecture
 
-- **One-pager.** `pages/index.vue` assemble les sections en interrogeant `content/` via `queryContent` : hero (`hero.md`), nuage « Appel à projet » (`appel.md`, fermable, état partagé `useState`), Artistes par année (`artistes/<year>.md`, affiches + crédit, filtre par année), Infos (`infos.md`), Partenariats (`partenariats/*.md`, triés par `order`), Participer (`participer.md`), Contact & Team (`team.md`), Soutiens (`soutiens.md`, liste de logos). La nav sticky (`components/SiteNav.vue`) pointe sur les ancres de section.
+- **One-pager.** `pages/index.vue` assemble les sections en interrogeant `content/` via `queryContent` : hero (`hero.md`), nuage « Appel à projet » (`appel.md`, fermable, état partagé `useState`), Programme de l'édition en cours (`programme/*.md`, une fiche par artiste, triées par `order`), Artistes par année (`artistes/<year>.md`, affiches + crédit, filtre par année), Infos (`infos.md`), Partenariats (`partenariats/*.md`, triés par `order`), Participer (`participer.md`), Contact & Team (`team.md`), Soutiens (`soutiens.md`, liste de logos). La nav sticky (`components/SiteNav.vue`) pointe sur les ancres de section.
 
 - **Images.** `scripts/updateImageDimensions.mjs` parcourt tout `content/` et complète les champs machine (`width`, `height`, `ratio`, `thumbhash`) de toute entrée d'image (`images[]`, `posters[]`, `logos[]`, `photo`, `image`). **Ne pas éditer ces champs à la main** — lancer `npm run update-images` après tout ajout d'image. `components/ThumbhashImage.vue` (copié de mariaclaracastioni) affiche le placeholder thumbhash puis l'image responsive via `NuxtPicture`.
 
@@ -41,4 +41,7 @@ Pas de tests ni de linter configurés.
 
 - Les images de contenu vivent dans `public/uploads/`.
 - Après ajout/changement d'images, toujours lancer `npm run update-images` (ou `npm run generate`).
-- Les fichiers `content/partenariats/` gardent leur préfixe numérique (ordre d'affichage, doublé par le champ `order`).
+- Les fichiers `content/partenariats/` et `content/programme/` gardent leur préfixe numérique (ordre d'affichage, doublé par le champ `order`). Pour `programme/`, l'ordre est celui de la première représentation.
+- Tout tri `queryContent` sur un champ numérique doit passer `$numeric: true` — sinon les valeurs sont comparées comme des chaînes et 10 se retrouve entre 1 et 2.
+- Une fiche artiste porte son portrait dans un `photo:` **à la racine** du frontmatter : `updateImageDimensions.mjs` ne descend pas dans les objets imbriqués, un portrait rangé ailleurs serait ignoré en silence.
+- Les réponses brutes des artistes (tableurs, photos originales) vivent dans `formulaires/`, hors dépôt (200 Mo, ignoré par git).
