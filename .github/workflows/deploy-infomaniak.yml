@@ -61,17 +61,29 @@ jobs:
       - run: cp public/.htaccess .output/public/.htaccess
 
       - name: Configurer la clé SSH
+        env:
+          SSH_KEY: ${{ secrets.INFOMANIAK_SSH_KEY }}
+          SSH_HOST: ${{ secrets.INFOMANIAK_SSH_HOST }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.INFOMANIAK_SSH_KEY }}" > ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.INFOMANIAK_SSH_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$(printf '%s' "$SSH_HOST" | xargs)" >> ~/.ssh/known_hosts
 
       # --delete : le dossier distant devient le miroir exact du build,
       # tout fichier étranger dans INFOMANIAK_SITE_PATH sera supprimé.
+      # Les secrets passent par xargs pour tolérer un espace ou un saut de
+      # ligne collé par accident dans leur valeur (vécu au premier run).
       - name: Déployer via rsync
+        env:
+          SSH_USER: ${{ secrets.INFOMANIAK_SSH_USER }}
+          SSH_HOST: ${{ secrets.INFOMANIAK_SSH_HOST }}
+          SITE_PATH: ${{ secrets.INFOMANIAK_SITE_PATH }}
         run: |
+          USER_T="$(printf '%s' "$SSH_USER" | xargs)"
+          HOST_T="$(printf '%s' "$SSH_HOST" | xargs)"
+          PATH_T="$(printf '%s' "$SITE_PATH" | xargs)"
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key" \
             .output/public/ \
-            "${{ secrets.INFOMANIAK_SSH_USER }}@${{ secrets.INFOMANIAK_SSH_HOST }}:${{ secrets.INFOMANIAK_SITE_PATH }}/"
+            "$USER_T@$HOST_T:$PATH_T/"
