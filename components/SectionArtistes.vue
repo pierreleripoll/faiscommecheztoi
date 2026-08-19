@@ -111,6 +111,12 @@ const cartes = computed(() =>
   /* Flex plutôt que grid : une piste de grille de 323 px ne rétrécit pas et
      déborderait sous 353 px de large. */
   display: flex;
+  /* Le décalage ci-dessous doit s'aligner sur le nombre réel de colonnes, qui
+     dépend de la largeur utile, pas de celle de la fenêtre : les deux ne
+     coïncident pas (padding, barre de défilement) et une media query laissait
+     une bande d'une quarantaine de pixels où l'on décalait trois colonnes
+     alors que deux seulement tenaient. */
+  container-type: inline-size;
   flex-wrap: wrap;
   justify-content: space-between;
   /* Pas vertical de la pile mobile dans la maquette : 458,45 − 437,45. */
@@ -125,8 +131,9 @@ const cartes = computed(() =>
 /* Dans la maquette les cartes ne sont pas alignées : chaque colonne est décalée
    vers le bas (col. 1 +133 px, col. 3 +275 px par rapport à celle du milieu).
    Un translate plutôt qu'une marge, sinon le décalage s'accumulerait d'une
-   rangée à l'autre ; le padding rattrape la hauteur ainsi débordée. */
-@media (min-width: 1080px) {
+   rangée à l'autre ; le padding rattrape la hauteur ainsi débordée.
+   1011 px = 3 × 323 + 2 × 21, soit exactement le seuil de la 3e colonne. */
+@container (min-width: 1011px) {
   .artistes__cartes {
     padding-bottom: 275px;
   }
