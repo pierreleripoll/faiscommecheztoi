@@ -1,0 +1,32 @@
+# Servi par l'hébergement mutualisé Infomaniak (Apache).
+# Redirections 301 depuis les URLs de l'ancien site WordPress vers les
+# ancres du one-pager. Inventaire tiré des sitemaps WP (août 2026) :
+# pages /les-artistes/, /contact/, /media/, /diffusion/, /staff/ et posts
+# /nos-soutiens/, /artistes-2021/ à /artistes-2025/, ~45 fiches artistes.
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Anciennes pages « artistes » (liste + éditions par année) → section Artistes.
+RewriteRule ^(les-artistes|artistes-20[0-9]{2})/?$ /#artistes [R=301,L,NE]
+
+# Contact et équipe vivent dans la même section du one-pager.
+RewriteRule ^(contact|staff)/?$ /#contact [R=301,L,NE]
+
+RewriteRule ^nos-soutiens/?$ /#soutiens [R=301,L,NE]
+
+# Tout le reste de l'ancien site (fiches artistes individuelles, /media/,
+# /diffusion/…) n'a pas d'équivalent : renvoi vers l'accueil. Les fichiers
+# et dossiers réels du build ne sont pas touchés.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . / [R=301,L]
+</IfModule>
+
+# Les JS/CSS du build sont fingerprintés (/_nuxt/) et les fontes ne changent
+# jamais : cache long. Le HTML, lui, reste revalidé à chaque visite.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|otf|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
