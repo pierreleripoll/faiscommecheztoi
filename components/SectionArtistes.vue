@@ -52,13 +52,17 @@
          maquette de base (/page) ne porte aucune carte, seules
          /artistes_avant et /artistes_dos en montrent, dans un cadre nommé
          d'après l'année. -->
-    <div v-if="cartes.length" class="artistes__scene">
+    <div
+      class="artistes__scene"
+      :class="{ 'artistes__scene--repliee': !rangs.size }"
+    >
       <div class="artistes__cartes">
         <ArtisteCard
-          v-for="(a, i) in cartes"
+          v-for="a in artistes"
+          v-show="rangs.has(a._path)"
           :key="a._path"
           :artiste="a"
-          :style="eparpillement(i)"
+          :style="eparpillement(rangs.get(a._path) ?? 0)"
         />
       </div>
     </div>
@@ -88,12 +92,23 @@ const posters = computed(() =>
   )
 );
 
-// Tant qu'aucune année n'est choisie, la section s'en tient aux affiches.
-const cartes = computed(() =>
-  selected.value
-    ? props.artistes.filter((a) => String(a.year) === selected.value)
-    : []
-);
+// Rang de chaque fiche parmi celles de l'année choisie, ou rien si elle n'en est
+// pas : toutes restent montées dans le DOM et se masquent en CSS. Les monter au
+// clic paraissait plus propre, mais le prérendu ne fabrique les dérivées
+// d'image que pour les URL présentes dans le HTML généré, et sur un
+// hébergement statique personne n'est là pour les transformer à la demande —
+// les douze portraits partaient en 404 sur GitHub Pages alors que les affiches,
+// elles, passaient. Le rang porte l'éparpillement : il compte parmi les cartes
+// visibles, pas dans la liste entière, sinon le cycle sauterait des valeurs dès
+// qu'une autre année aura ses fiches.
+const rangs = computed(() => {
+  const m = new Map();
+  if (!selected.value) return m;
+  props.artistes
+    .filter((a) => String(a.year) === selected.value)
+    .forEach((a, i) => m.set(a._path, i));
+  return m;
+});
 
 // Dans la maquette les cartes ne sont pas alignées : chacune est posée plus
 // haut ou plus bas que sa voisine (0, 133 et 275 px dans le mock à cinq cartes
@@ -193,6 +208,12 @@ function eparpillement(i) {
    le calque de cartes positionné à son tour pour trancher.
    pointer-events: none, car il couvre toute la cellule et intercepterait sinon
    les clics sur les affiches qu'il laisse pourtant voir entre les cartes. */
+/* Repliée, la scène sort de la grille : ses cartes sont masquées une à une,
+   mais son padding de rattrapage occuperait encore 275 px de vide. */
+.artistes__scene--repliee {
+  display: none;
+}
+
 .artistes__scene {
   position: relative;
   z-index: 1;
