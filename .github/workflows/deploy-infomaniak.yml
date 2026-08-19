@@ -1,0 +1,77 @@
+name: Deploy to Infomaniak
+
+# Production sur l'hébergement web Infomaniak (mutualisé), via SSH + rsync.
+# Se déclenche sur dev : chaque édition Sveltia CMS (qui committe sur dev)
+# reconstruit le site et le met en ligne.
+#
+# Secrets à configurer dans GitHub (Settings → Secrets and variables → Actions) :
+#   INFOMANIAK_SSH_HOST   hôte SSH de l'hébergement, ex. xxxx.ftp.infomaniak.com
+#   INFOMANIAK_SSH_USER   utilisateur SSH/FTP (SSH activé dans le Manager)
+#   INFOMANIAK_SSH_KEY    clé privée SSH dont la clé publique est déclarée côté Infomaniak
+#   INFOMANIAK_SITE_PATH  dossier du site — d'abord le staging
+#                         ex. /home/clients/xxxxxxxx/sites/nouveau.faiscommecheztoi.ch,
+#                         puis, à la bascule, celui pointé par faiscommecheztoi.ch
+#                         (la bascule se fait dans le Manager en repointant le site
+#                         du dossier WordPress vers ce dossier — rollback instantané)
+#
+# Tant que ces secrets ne sont pas définis, le job se saute sans faire échouer le CI.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: infomaniak
+  cancel-in-progress: true
+
+jobs:
+  # Le contexte `secrets` n'est pas lisible dans un `if` de job : on passe
+  # par un job témoin dont la sortie dit si le déploiement est configuré.
+  check-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        run: echo "configured=${{ secrets.INFOMANIAK_SSH_HOST != '' }}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: check-secrets
+    if: needs.check-secrets.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Servi à la racine du domaine : pas de NUXT_APP_BASE_URL, et le provider
+      # d'images reste IPX (variantes générées par sharp au build — hébergement
+      # 100 % statique, ne pas mettre NUXT_IMAGE_PROVIDER=cloudflare ici).
+      - run: npm run generate
+
+      # Garantit la présence du .htaccess (redirections 301 depuis l'ancien
+      # WordPress) même si la copie des dotfiles de public/ changeait.
+      - run: cp public/.htaccess .output/public/.htaccess
+
+      - name: Configurer la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.INFOMANIAK_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.INFOMANIAK_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      # --delete : le dossier distant devient le miroir exact du build,
+      # tout fichier étranger dans INFOMANIAK_SITE_PATH sera supprimé.
+      - name: Déployer via rsync
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            .output/public/ \
+            "${{ secrets.INFOMANIAK_SSH_USER }}@${{ secrets.INFOMANIAK_SSH_HOST }}:${{ secrets.INFOMANIAK_SITE_PATH }}/"

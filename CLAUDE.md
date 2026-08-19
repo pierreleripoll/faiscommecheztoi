@@ -35,7 +35,8 @@ Pas de tests ni de linter configurés.
 
 - **Déploiements.**
   - GitHub Pages (préview) : `.github/workflows/deploy-pages.yml`, déclenché par `dev` — build avec `NUXT_APP_BASE_URL=/faiscommecheztoi/` → https://pierreleripoll.github.io/faiscommecheztoi/
-  - Cloudflare Workers (prod, plus tard) : `wrangler.jsonc` sert `.output/public` en static assets.
+  - Infomaniak (prod) : `.github/workflows/deploy-infomaniak.yml`, déclenché par `dev` — `npm run generate` puis rsync de `.output/public` via SSH vers l'hébergement mutualisé qui porte déjà le WordPress actuel et le domaine (secrets `INFOMANIAK_*` dans GitHub ; le job se saute tant qu'ils manquent). Cible d'abord le site de staging `nouveau.faiscommecheztoi.ch`, la bascule se faisant dans le Manager en repointant `faiscommecheztoi.ch` vers ce dossier (rollback = repointer le dossier WordPress). Servi à la racine, provider d'images IPX (build-time) — ne pas mettre `NUXT_IMAGE_PROVIDER=cloudflare`. `public/.htaccess` porte les 301 depuis les anciennes URLs WordPress.
+  - Cloudflare Workers (alternative, non utilisée) : `wrangler.jsonc` sert `.output/public` en static assets.
 
 - **CMS.** `public/admin/` : Sveltia CMS, backend GitHub sur la branche `dev`, OAuth via le worker `sveltia-cms-auth` (le repo doit être autorisé dans le worker). Les images uploadées vont dans `public/uploads/`.
 
