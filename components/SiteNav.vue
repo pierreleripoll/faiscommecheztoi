@@ -2,7 +2,6 @@
   <nav class="site-nav">
     <div class="site-nav__inner">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
-      <a href="#programme">Programme</a>
       <a href="#artistes">Artistes</a>
       <a href="#infos">Infos</a>
       <a href="#partenariats">Partenariats</a>

@@ -16,9 +16,7 @@
     </figure>
 
     <div class="page">
-      <SectionProgramme :artistes="programme || []" />
-
-      <SectionArtistes :years="years || []" />
+      <SectionArtistes :years="years || []" :artistes="artistes || []" />
 
       <section id="infos" class="section">
         <h2 class="section__title">{{ infos?.title }}</h2>
@@ -84,9 +82,10 @@ const { data: hero } = await useAsyncData("hero", () =>
 const { data: appel } = await useAsyncData("appel", () =>
   queryContent("/appel").findOne()
 );
+// Les fiches artistes de l'édition, affichées dans la section Artistes.
 // $numeric est indispensable : sans lui queryContent compare les nombres comme
 // des chaînes et classe 1, 10, 11, 12, 2, 3…
-const { data: programme } = await useAsyncData("programme", () =>
+const { data: artistes } = await useAsyncData("artistes-fiches", () =>
   queryContent("/programme").sort({ order: 1, $numeric: true }).find()
 );
 const { data: years } = await useAsyncData("artistes", () =>

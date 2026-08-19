@@ -44,6 +44,22 @@
   --content-max: 1280px;
   --pad-x: clamp(15px, calc(0.5px + 3.867vw), 50px); /* 15 → 50 */
 
+  /* Carte artiste (« VAL-VERSO » dans le Figma) : une carte à deux faces,
+     323 × 437 px dans les DEUX gabarits — c'est le seul bloc du design qui ne
+     s'interpole pas, seul le nombre de colonnes change. */
+  --card-w: 323px;
+  --card-ratio: 323 / 437;
+  --card-radius: 10.65px;
+  --card-pad: 12.4px 6.2px;
+  --fs-card: 19.5px;
+  --c-card-bg: #fffcff;
+  --c-card-border: rgba(255, 0, 255, 0.75);
+  /* La photo du recto est recouverte d'un aplat magenta à 25 % (fondu normal,
+     contrairement au plus-lighter de la photo du hero). */
+  --card-tint: 0.25;
+  --glow-card: 2.33px 2.33px 7px 2.33px rgba(255, 0, 255, 0.5);
+  --glow-card-inset: inset 0 0 21px 7px rgba(255, 0, 255, 0.25);
+
   /* Le nuage se met à l'échelle d'un bloc : 249.83 → 490 px de large.
      Tout ce qu'il contient est dimensionné en proportion de cette largeur. */
   --cloud-w: clamp(249.83px, calc(150.31px + 26.538vw), 490px);

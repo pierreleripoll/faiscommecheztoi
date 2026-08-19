@@ -13,7 +13,7 @@ import sharp from "sharp";
 const contentDir = path.resolve("content");
 
 // Frontmatter keys that may hold images.
-const ARRAY_KEYS = ["images", "posters", "logos"];
+const ARRAY_KEYS = ["images", "posters", "logos", "photos"];
 const OBJECT_KEYS = ["photo", "image"];
 
 function getImagePath(src) {

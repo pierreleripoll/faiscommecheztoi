@@ -16,6 +16,12 @@
       </div>
     </div>
 
+    <!-- Les fiches de l'édition : dans le Figma elles vivent ici, sous les
+         onglets d'année, pas dans une section « Programme » à part. -->
+    <div v-if="cartes.length" class="artistes__cartes">
+      <ArtisteCard v-for="a in cartes" :key="a._path" :artiste="a" />
+    </div>
+
     <div class="artistes__grid">
       <figure v-for="p in posters" :key="p.src" class="artistes__poster">
         <!-- Les affiches n'ont pas toutes exactement le même ratio ; la
@@ -37,9 +43,10 @@
 <script setup>
 const props = defineProps({
   years: { type: Array, default: () => [] },
+  artistes: { type: Array, default: () => [] },
 });
 
-// Année sélectionnée : filtre les affiches ; re-cliquer désélectionne.
+// Année sélectionnée : filtre les affiches ET les fiches ; re-cliquer désélectionne.
 const selected = ref(null);
 
 function toggle(year) {
@@ -50,6 +57,12 @@ const posters = computed(() =>
   props.years
     .filter((y) => !selected.value || y.year === selected.value)
     .flatMap((y) => y.posters || [])
+);
+
+const cartes = computed(() =>
+  props.artistes.filter(
+    (a) => !selected.value || String(a.year) === selected.value
+  )
 );
 </script>
 
@@ -91,6 +104,43 @@ const posters = computed(() =>
   text-underline-offset: 0.16em;
 }
 
+/* Fiches --------------------------------------------------------------------
+   La carte fait 323 px dans les deux gabarits du Figma : c'est le nombre de
+   colonnes qui change, pas la carte. */
+.artistes__cartes {
+  /* Flex plutôt que grid : une piste de grille de 323 px ne rétrécit pas et
+     déborderait sous 353 px de large. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  /* Pas vertical de la pile mobile dans la maquette : 458,45 − 437,45. */
+  gap: 21px;
+  margin-bottom: 25px;
+}
+
+.artistes__cartes > * {
+  flex: 0 1 var(--card-w);
+}
+
+/* Dans la maquette les cartes ne sont pas alignées : chaque colonne est décalée
+   vers le bas (col. 1 +133 px, col. 3 +275 px par rapport à celle du milieu).
+   Un translate plutôt qu'une marge, sinon le décalage s'accumulerait d'une
+   rangée à l'autre ; le padding rattrape la hauteur ainsi débordée. */
+@media (min-width: 1080px) {
+  .artistes__cartes {
+    padding-bottom: 275px;
+  }
+
+  .artistes__cartes > :nth-child(3n + 1) {
+    transform: translateY(133px);
+  }
+
+  .artistes__cartes > :nth-child(3n + 3) {
+    transform: translateY(275px);
+  }
+}
+
+/* Affiches ------------------------------------------------------------------ */
 .artistes__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -135,6 +185,11 @@ const posters = computed(() =>
   .artistes__years {
     justify-content: center;
     width: 100%;
+  }
+
+  /* Une seule colonne de cartes, centrée dans les 345 px utiles. */
+  .artistes__cartes {
+    justify-content: center;
   }
 
   .artistes__grid {

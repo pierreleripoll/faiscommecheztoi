@@ -100,11 +100,12 @@ collections:
           - { label: "Affiche", name: "src", widget: "image" }
           - { label: "Crédit (graphiste)", name: "credit", widget: "string", required: false }
 
-  # Un fichier par artiste de l'édition en cours. Les champs machine de la photo
+  # Un fichier par artiste. Ces fiches s'affichent dans la section « Artistes »,
+  # filtrées par l'année. Les champs machine des photos
   # (width/height/ratio/thumbhash) ne sont pas déclarés : le script
   # update-images les ajoute après coup et Sveltia préserve les clés inconnues.
   - name: "programme"
-    label: "Programme 2026"
+    label: "Artistes de l'édition"
     folder: "content/programme"
     create: true
     slug: "{{order}}.{{slug}}"
@@ -121,6 +122,11 @@ collections:
         value_type: "int"
         default: 1
         hint: "Ordre d'affichage — les artistes sont classés par première représentation."
+      - label: "Année"
+        name: "year"
+        widget: "string"
+        default: "2026"
+        hint: "L'édition à laquelle la fiche appartient — elle apparaît sous cet onglet dans la section Artistes."
       - { label: "Titre du spectacle", name: "title", widget: "string" }
       - { label: "Durée", name: "duration", widget: "string", hint: "Ex. 35’" }
       - { label: "Format", name: "format", widget: "string", hint: "Ex. étape de travail/work in progress" }
@@ -153,10 +159,13 @@ collections:
             name: "dates"
             widget: "list"
             field: { label: "Date", name: "date", widget: "string" }
-      - label: "Portrait"
-        name: "photo"
-        widget: "object"
+      - label: "Photos"
+        name: "photos"
+        widget: "list"
         required: false
+        collapsed: true
+        summary: "{{fields.src}}"
+        hint: "La première photo est celle qui s'affiche ; les suivantes se feuillettent sur la carte."
         fields:
           - { label: "Image", name: "src", widget: "image" }
           - { label: "Texte alternatif", name: "alt", widget: "string", required: false }
