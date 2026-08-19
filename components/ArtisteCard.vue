@@ -6,7 +6,10 @@
     /artistes_avant et /artistes_dos du fichier de design sont la même page avec
     toutes les cartes retournées — d'où le pivot plutôt qu'un fondu.
   -->
-  <div class="carte" :class="{ 'carte--retournee': verso }">
+  <div
+    class="carte"
+    :class="{ 'carte--retournee': verso, 'carte--tronquee': tronquee }"
+  >
     <div class="carte__pivot">
       <!-- RECTO ------------------------------------------------------------ -->
       <div class="carte__face carte__face--recto">
@@ -27,7 +30,7 @@
           class="carte__bascule"
           type="button"
           :aria-label="`Voir les infos de ${artiste.name}`"
-          @click="verso = true"
+          @click="retourner"
         />
 
         <template v-if="photos.length > 1">
@@ -83,8 +86,12 @@
       </div>
 
       <!-- VERSO ------------------------------------------------------------ -->
-      <div class="carte__face carte__face--verso">
-        <div class="carte__texte">
+      <div
+        ref="face"
+        class="carte__face carte__face--verso"
+        :style="hauteurVerso ? { height: `${hauteurVerso}px` } : null"
+      >
+        <div ref="texte" class="carte__texte">
           <p class="carte__nom carte__nom--verso">{{ artiste.name }}</p>
 
           <p v-if="artiste.title">{{ artiste.title }}</p>
@@ -113,7 +120,7 @@
           class="carte__fermer"
           type="button"
           aria-label="Revenir à la photo"
-          @click="verso = false"
+          @click="refermer"
         >
           <svg viewBox="0 0 29.25 29.25" aria-hidden="true">
             <path
@@ -144,6 +151,49 @@ const props = defineProps({
 
 const verso = ref(false);
 const index = ref(0);
+const face = ref(null);
+const texte = ref(null);
+
+// Hauteur du verso une fois déployé, en pixels : la fiche s'agrandit vers le bas
+// pour montrer tout son texte d'un coup. Elle grandit en absolu, sans toucher au
+// flux : les fiches sont un calque flottant au-dessus des affiches, et les faire
+// bouger déplacerait tout le mur à chaque clic.
+const hauteurVerso = ref(null);
+// Vrai quand, même déployée, la fiche reste plus courte que son texte (bio très
+// longue, ou petit écran) : elle garde alors son défilement et son dégradé.
+const tronquee = ref(false);
+
+// Ce qu'on laisse respirer sous une fiche qui touche le bas de la fenêtre.
+const MARGE_ECRAN = 40;
+// Mi-parcours du pivot : la carte est sur la tranche, donc invisible.
+const MI_PIVOT = 250;
+
+function retourner() {
+  const cadre = face.value?.offsetHeight;
+  const el = texte.value;
+  if (cadre && el) {
+    // Le bloc de texte est calé en inset: 0 dans le cadre : leur différence de
+    // hauteur, ce sont les bordures. Son scrollHeight donne donc la hauteur qu'il
+    // faudrait au cadre — jamais moins que celle de départ, une fiche courte ne
+    // rétrécit pas.
+    const bord = cadre - el.clientHeight;
+    const besoin = Math.max(Math.ceil(el.scrollHeight) + bord, cadre);
+    const plafond = Math.max(window.innerHeight - MARGE_ECRAN, cadre);
+    hauteurVerso.value = Math.min(besoin, plafond);
+    tronquee.value = besoin > plafond;
+  }
+  verso.value = true;
+}
+
+function refermer() {
+  verso.value = false;
+  tronquee.value = false;
+  // Le cadre ne reprend sa taille qu'à mi-pivot : d'ici là le verso est encore
+  // face à nous, et le voir rapetisser pendant qu'il tourne ferait un à-coup.
+  setTimeout(() => {
+    if (!verso.value) hauteurVerso.value = null;
+  }, MI_PIVOT);
+}
 
 const photos = computed(() => props.artiste.photos || []);
 // Bornée : le nombre de photos peut diminuer (édition dans le CMS) alors que
@@ -198,6 +248,13 @@ const representationAilleurs = computed(() => {
   transform: rotateY(180deg);
 }
 
+/* Déployée, la fiche empiète sur ses voisines — au mieux 21 px les séparent une
+   fois l'éparpillement appliqué. Elle passe donc au-dessus des autres. Le
+   z-index porte sur un élément flex, pas besoin de le positionner. */
+.carte--retournee {
+  z-index: 2;
+}
+
 /* Le cadre du Figma, identique sur les deux faces. */
 .carte__face {
   position: absolute;
@@ -230,6 +287,13 @@ const representationAilleurs = computed(() => {
 
 .carte__face--verso {
   transform: rotateY(180deg);
+  /* Hauteur du cadre au repos, que le style en ligne remplace à l'ouverture.
+     Sur-contrainte avec top et bottom à 0 : c'est bottom qui cède, la fiche
+     s'agrandit donc vers le bas. Elle change d'un coup et n'est pas animée :
+     Chrome fige toute transition de height dont une extrémité est un
+     pourcentage — et de toute façon le saut tombe au moment où la carte est sur
+     la tranche, où il n'y a rien à voir. */
+  height: 100%;
 }
 
 /* La lueur interne est peinte par-dessus l'image : un box-shadow inset sur la
@@ -373,8 +437,14 @@ const representationAilleurs = computed(() => {
   font-size: var(--fs-card);
   line-height: 1.15;
   color: var(--c-ink);
-  /* Les fiches 2026 portent plus de champs que la maquette 2025 (titre, durée,
-     école) : au-delà du cadre le texte défile plutôt que d'être coupé. */
+  /* Masqué et non défilant par défaut : la fiche se dimensionne sur son texte,
+     et la mesure au clic doit se faire sans barre de défilement — présente, elle
+     rétrécirait la colonne de texte et fausserait la hauteur calculée. */
+  overflow: hidden;
+}
+
+/* Seul cas restant : un texte plus haut que la fenêtre. */
+.carte--tronquee .carte__texte {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -404,10 +474,9 @@ const representationAilleurs = computed(() => {
   margin-top: 1em;
 }
 
-/* Dix des douze fiches 2026 sont plus longues que le cadre : un dégradé vers le
-   fond de la carte signale qu'il reste du texte. Sur une fiche courte il se
-   fond dans le fond et ne se voit pas — pas besoin de le conditionner en JS. */
-.carte__face--verso::after {
+/* Un dégradé vers le fond de la carte signale qu'il reste du texte — seulement
+   quand la fiche déployée n'a pas pu tout montrer. */
+.carte--tronquee .carte__face--verso::after {
   content: "";
   position: absolute;
   z-index: 2;
