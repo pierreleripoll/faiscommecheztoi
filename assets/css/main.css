@@ -43,6 +43,16 @@ p:last-child {
   margin-bottom: 0;
 }
 
+/* Les cartes artistes s'étendent sur toute la largeur d'écran via un
+   calc(50% - 50vw) ; or 100vw compte la barre de défilement, d'où un
+   débordement de quelques pixels à rogner. Sur main et non sur body : posé sur
+   body il remonterait à la zone d'affichage au lieu de rogner ici. Et clip
+   plutôt que hidden, qui ferait de main un conteneur de défilement et
+   briserait la nav sticky. */
+main {
+  overflow-x: clip;
+}
+
 .page {
   max-width: var(--content-max);
   margin: 0 auto;
