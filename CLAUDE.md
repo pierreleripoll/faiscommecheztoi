@@ -10,7 +10,7 @@ Design : maquette Figma de Siméon Dubuis, dessinée sur deux gabarits — **des
 
 Le fichier Figma d'origine est un **Figma Sites** (`/site/`), que le MCP Figma ne sait pas lire ; une copie en fichier *Design* classique existe et c'est celle-là qu'il faut interroger.
 
-Police : **Vevey Positive**, sous licence et donc non versionnée — voir `public/fonts/README.md`. À défaut, repli automatique sur Quicksand.
+Police : **Vevey**, servie en OTF depuis `public/fonts/` — *Positive* est le romain, *HumanKind* l'italique, les deux déclarés sous la même famille dans `tokens.css`. Repli automatique sur Quicksand si les fichiers manquent. Le disclaimer livré avec la fonte la dit *free for non-commercial use only* : à valider avec le designer avant la mise en ligne.
 
 ## Commands
 

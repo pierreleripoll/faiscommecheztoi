@@ -6,15 +6,27 @@
    375 px. Toutes les tailles ci-dessous interpolent linéairement entre ces
    deux points, puis se figent en dehors. */
 
-/* Vevey Positive est la police du design. Elle est sous licence : déposer
-   simplement les fichiers dans public/fonts/ suffit à l'activer — tant qu'ils
-   sont absents, le navigateur retombe silencieusement sur Quicksand. */
+/* Vevey est la police du design, en deux fichiers (Siméon, 17.08.2026) :
+   Positive est le romain, HumanKind l'italique. Les deux sont déclarés sous la
+   même famille, donc un *italique* écrit dans le CMS tire HumanKind au lieu
+   d'une oblique synthétisée par le navigateur.
+   Les OTF sont servis tels quels : 60 Ko chacun, aucun outil de conversion
+   nécessaire. Pour gagner ~40 % de poids, convertir en woff2 et ajouter la
+   source avant l'OTF — le navigateur prend la première qu'il sait lire. Si les
+   fichiers disparaissent, tout retombe silencieusement sur Quicksand. */
 @font-face {
   font-family: "Vevey";
-  src: url("/fonts/vevey-positive.woff2") format("woff2"),
-       url("/fonts/vevey-positive.woff") format("woff");
+  src: url("/fonts/vevey-positive.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vevey";
+  src: url("/fonts/vevey-humankind.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
   font-display: swap;
 }
 

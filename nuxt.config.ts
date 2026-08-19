@@ -2,10 +2,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxt/content", "@nuxt/image"],
 
-  // Quicksand is self-hosted via @fontsource so builds never depend on an
-  // external fonts CDN. It approximates the rounded sans of the Figma design —
-  // swap these imports (and --font-sans in tokens.css) once the real typeface
-  // is confirmed by the designer.
+  // Vevey Positive (la police du design) est déclarée dans tokens.css et servie
+  // depuis public/fonts/. Quicksand, self-hébergée via @fontsource, ne sert plus
+  // que de repli — aucun build ne dépend d'un CDN de polices.
   css: [
     "@fontsource/quicksand/500.css",
     "@fontsource/quicksand/700.css",
