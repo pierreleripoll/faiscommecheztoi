@@ -207,7 +207,9 @@ const representationAilleurs = computed(() => {
   border-radius: var(--card-radius);
   background: var(--c-card-bg);
   box-shadow: var(--glow-card);
-  opacity: 0.9;
+  /* Le cadre du Figma est à 90 % d'opacité, mais rien n'est posé derrière lui
+     dans la maquette : la translucidité n'y est donc jamais visible. Sur le mur
+     d'affiches elle l'est, et l'affiche transparaît au travers de la photo. */
   backface-visibility: hidden;
   /* La face cachée reste focusable tant qu'elle est seulement retournée ;
      on la retire de l'arbre le temps que le pivot finisse sa rotation. */
