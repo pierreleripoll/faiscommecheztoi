@@ -1,0 +1,230 @@
+/* Animation d'ouverture — les deux frames « animation_ouverture » du Figma.
+
+   Le designer l'a documentée en deux états, sans images-clés : deux panneaux
+   couleur de la barre de nav couvrent la fenêtre, « FAIS COMME CHEZ TOI »
+   écrit en travers, coupé net par la couture ; puis les panneaux s'écartent
+   comme un rideau de théâtre et découvrent la page. Les valeurs reprises du
+   Figma sont les rapports mesurés entre les deux frames :
+
+     panneaux    737 × 1626  →  958.1 × 2113.8   = ×1.3 exactement
+     titre       512.7 large →  666.5            = ×1.3 exactement
+     contenu     1216 large  →  1280             = ×0.95 au départ
+     navigation  y = -63.5   →  y = 0            = cachée d'une hauteur de nav
+
+   Les panneaux grandissent donc en sortant : ils passent devant le regard au
+   lieu de simplement glisser. Le minutage, lui, n'est pas dans le Figma (les
+   deux frames sont statiques) — il est fixé ici.
+
+   L'animation est en CSS pur et rendue par le serveur : elle démarre au
+   premier peint, sans attendre l'hydratation, et se termine même si JS est
+   absent — la dernière image-clé découvre la page. JS ne sert qu'à ne pas la
+   rejouer à chaque visite (voir le script inline dans nuxt.config.ts). */
+
+:root {
+  /* Le temps de lire le titre avant que le rideau ne parte. */
+  --rideau-delai: 800ms;
+  /* Sortie des panneaux, puis remise à l'échelle de la page. La scène finit
+     un peu avant les panneaux : la page est déjà à sa taille pleine quand les
+     derniers pixels de rideau quittent les bords. */
+  --rideau-duree: 1150ms;
+  --rideau-duree-scene: 1000ms;
+
+  --rideau-echelle: 1.3; /* agrandissement des panneaux (Figma) */
+  --rideau-echelle-scene: 0.95; /* échelle de départ du contenu (Figma) */
+
+  /* Départ et arrivée lents, milieu rapide : le rideau se décolle, file, puis
+     se pose — plutôt qu'un glissement à vitesse constante. */
+  --rideau-courbe: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --c-rideau: var(--c-bar); /* les panneaux ont la couleur de la nav */
+  --c-rideau-lisere: var(--c-ink); /* le trait magenta de la couture */
+}
+
+/* Hors de .scene, donc jamais sous une transformation : un ancêtre transformé
+   ferait du rideau un fixed relatif à lui, et non à la fenêtre. */
+.rideau {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  /* Les panneaux agrandis débordent : on les rogne ici plutôt que de laisser
+     apparaître des barres de défilement. */
+  overflow: hidden;
+  /* Le rideau se regarde, il ne s'attrape pas — un clic pressé sur la page
+     traverse au lieu d'être avalé. */
+  pointer-events: none;
+}
+
+.rideau__panneau {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  /* C'est ce rognage qui coupe le titre à la couture : chaque panneau porte le
+     titre entier, mais n'en montre que sa moitié. */
+  overflow: hidden;
+  background: var(--c-rideau);
+  animation-duration: var(--rideau-duree);
+  animation-timing-function: var(--rideau-courbe);
+  animation-delay: var(--rideau-delai);
+  /* both, et pas seulement backwards : backwards tient bien le panneau fermé
+     pendant le délai, mais à la dernière image-clé le style reviendrait à sa
+     base — le rideau se refermerait d'un coup, le temps que le composant le
+     retire du DOM. forwards le laisse là où l'animation l'a mené, dehors.
+     (Sur .scene et .site-nav plus bas, backwards suffit : leur état d'arrivée
+     est précisément leur style de base, revenir dessus ne se voit pas.) */
+  animation-fill-mode: both;
+  will-change: transform;
+}
+
+/* Le liséré de la couture. En pseudo-élément et non en bordure : une bordure
+   entrerait dans le box-sizing et décalerait de 2 px le centrage du titre,
+   donc la coupe. */
+.rideau__panneau::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--c-rideau-lisere);
+}
+
+.rideau__panneau--gauche {
+  left: 0;
+  /* Origine sur le bord intérieur : l'agrandissement ne déplace pas la
+     couture, seule la translation le fait. */
+  transform-origin: right center;
+  animation-name: rideau-gauche;
+}
+
+.rideau__panneau--gauche::after {
+  right: 0;
+}
+
+.rideau__panneau--droite {
+  left: 50%;
+  transform-origin: left center;
+  animation-name: rideau-droite;
+}
+
+.rideau__panneau--droite::after {
+  left: 0;
+}
+
+/* -100 % = la largeur du panneau, soit la moitié de la fenêtre : le bord
+   intérieur passe de la couture au bord de l'écran. */
+@keyframes rideau-gauche {
+  from {
+    transform: translateX(0) scale(1);
+  }
+  to {
+    transform: translateX(-100%) scale(var(--rideau-echelle));
+  }
+}
+
+@keyframes rideau-droite {
+  from {
+    transform: translateX(0) scale(1);
+  }
+  to {
+    transform: translateX(100%) scale(var(--rideau-echelle));
+  }
+}
+
+/* Le titre est posé dans un bloc large comme la fenêtre (200 % d'un panneau
+   qui en fait la moitié) et centré dedans : les deux moitiés se rejoignent
+   donc exactement à la couture, quelle que soit la largeur du texte rendu. */
+.rideau__titre {
+  position: absolute;
+  top: 50%;
+  width: 200%;
+  transform: translateY(-50%);
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  /* 89.18 px sur les 1280 px de la maquette, soit 6.97vw. Le corps est déduit
+     des métriques de Vevey Positive et non estimé à l'œil : le titre encre
+     1029.45 px dans le Figma (113.35 → 1142.80) pour 11.544 em d'encre, d'où
+     1029.45 / 11.544 ≈ 89.18 px. Deux recoupements tombent juste : le centre
+     d'encre du Figma (628.08) est exactement sur la couture (628), et
+     l'intervalle de 13.63 px entre les deux moitiés vaut rsb(M) + lsb(E) —
+     la coupe tombe donc entre le M et le E de COMME, ce que ce centrage
+     reproduit de lui-même.
+     Le plafond est la valeur du gabarit, atteinte à 1280 px : au-delà le titre
+     se fige, comme le reste de la page qui s'arrête à --content-max. */
+  font-size: clamp(24px, 6.97vw, 89px);
+  line-height: 1;
+  color: var(--c-ink);
+  /* Même demi-opacité que les entrées de nav : le titre est en retrait, il
+     n'est pas le titre de la page. */
+  opacity: 0.5;
+}
+
+.rideau__panneau--gauche .rideau__titre {
+  left: 0;
+}
+
+/* Le bloc du titre commence une demi-fenêtre avant ce panneau-ci, pour
+   retomber sur le bord gauche de l'écran. */
+.rideau__panneau--droite .rideau__titre {
+  left: -100%;
+}
+
+/* La page derrière le rideau : elle grandit de 0.95 à 1 pendant l'ouverture.
+   L'origine est le centre de la fenêtre — pas celui de la page, qui fait
+   plusieurs milliers de pixels de haut. */
+.scene {
+  transform-origin: 50% 50vh;
+  animation: scene-ouverture var(--rideau-duree-scene) ease-out
+    var(--rideau-delai) backwards;
+}
+
+@keyframes scene-ouverture {
+  from {
+    transform: scale(var(--rideau-echelle-scene));
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* La nav est cachée d'exactement une hauteur de nav au-dessus du bord dans la
+   frame fermée, et à sa place dans la frame ouverte : elle descend. */
+.scene .site-nav {
+  animation: rideau-nav var(--rideau-duree-scene) var(--rideau-courbe)
+    var(--rideau-delai) backwards;
+}
+
+@keyframes rideau-nav {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Le rideau ne doit pas se jouer (ancre, rechargement, vu il y a moins de
+   24 h, animations réduites) : la classe est posée sur <html> par le script
+   inline du <head>, donc avant le premier peint — le rideau n'apparaît pas
+   une image pour disparaître ensuite. */
+html.sans-rideau .rideau {
+  display: none;
+}
+
+html.sans-rideau .scene,
+html.sans-rideau .scene .site-nav {
+  animation: none;
+}
+
+/* Doublon volontaire de la condition du script inline : sans JS, c'est cette
+   règle-ci qui respecte le réglage système. */
+@media (prefers-reduced-motion: reduce) {
+  .rideau {
+    display: none;
+  }
+
+  .scene,
+  .scene .site-nav {
+    animation: none;
+  }
+}

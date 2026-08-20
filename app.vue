@@ -1,7 +1,12 @@
 <template>
-  <div id="top">
-    <SiteNav />
-    <NuxtPage />
+  <div>
+    <!-- .scene grandit de 0.95 à 1 pendant l'ouverture du rideau ; le rideau
+         lui reste dehors, un ancêtre transformé le décrocherait de la fenêtre. -->
+    <div id="top" class="scene">
+      <SiteNav />
+      <NuxtPage />
+    </div>
+    <RideauOuverture />
   </div>
 </template>
 

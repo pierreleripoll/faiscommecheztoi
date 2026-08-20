@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@fontsource/quicksand/700.css",
     "~/assets/css/tokens.css",
     "~/assets/css/main.css",
+    "~/assets/css/rideau.css",
   ],
 
   image: {
@@ -43,6 +44,49 @@ export default defineNuxtConfig({
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
       htmlAttrs: { lang: "fr" },
+      link: [
+        // Le rideau d'ouverture affiche le titre du festival dès le premier
+        // peint : sans préchargement, il s'écrirait en Quicksand puis
+        // basculerait en Vevey sous les yeux du visiteur (font-display: swap).
+        {
+          rel: "preload",
+          as: "font",
+          type: "font/otf",
+          href: "/fonts/vevey-positive.otf",
+          crossorigin: "anonymous",
+        },
+      ],
+      script: [
+        {
+          // Décide AVANT le premier peint si le rideau se joue, et marque
+          // <html> sinon : le CSS ne montre alors jamais les panneaux, au lieu
+          // de les laisser clignoter le temps que Vue s'hydrate.
+          //
+          // Quatre raisons de ne pas le jouer :
+          //  - une ancre (#infos, #grille…) : on arrive d'un lien partagé, vers
+          //    un point précis de la page ; un rideau plein écran suivi d'un
+          //    saut en plein milieu du document désoriente plus qu'il n'accueille ;
+          //  - un rechargement (ou un retour arrière) : ce n'est jamais une
+          //    première arrivée, et le navigateur va restaurer la position de
+          //    défilement — le rideau s'ouvrirait sur un milieu de page ;
+          //  - joué il y a moins de 24 h : « la première fois aujourd'hui »
+          //    plutôt que « la première fois dans cet onglet », qui rejouerait
+          //    l'animation à chaque onglet ouvert en parallèle ;
+          //  - le système demande moins d'animations.
+          //
+          // L'horodatage n'est réécrit que quand le rideau se joue vraiment
+          // (voir RideauOuverture.vue) : la fenêtre court depuis la dernière
+          // ouverture, elle ne se repousse pas à chaque visite.
+          innerHTML: `try{
+  var h=location.hash,
+      n=(performance.getEntriesByType('navigation')[0]||{}).type,
+      t=+localStorage.getItem('fcct-rideau')||0;
+  if(h||n==='reload'||n==='back_forward'||Date.now()-t<864e5||matchMedia('(prefers-reduced-motion: reduce)').matches)
+    document.documentElement.classList.add('sans-rideau');
+}catch(e){}`,
+          tagPosition: "head",
+        },
+      ],
     },
   },
 
