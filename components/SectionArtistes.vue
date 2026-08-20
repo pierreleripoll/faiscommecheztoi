@@ -1,7 +1,7 @@
 <template>
   <section id="artistes" class="section artistes">
     <div class="artistes__colonne">
-      <div class="artistes__head">
+      <div ref="head" class="artistes__head">
         <h2 class="artistes__title">Artistes</h2>
         <div class="artistes__years">
           <button
@@ -55,6 +55,7 @@
     <div
       class="artistes__scene"
       :class="{ 'artistes__scene--repliee': !rangs.size }"
+      :style="{ '--head-h': `${hauteurHead}px` }"
     >
       <div class="artistes__cartes">
         <ArtisteCard
@@ -77,6 +78,34 @@ const props = defineProps({
 
 // Année sélectionnée : décide quelles fiches flottent ; re-cliquer désélectionne.
 const selected = ref(null);
+
+// Hauteur du bandeau titre + années. Le calque de cartes couvre toute la section
+// (voir plus bas), titre compris : sans ce décalage la première fiche — celle de
+// rang 0, que l'éparpillement ne descend pas — se pose pile sous le titre et les
+// années, qui lui passent devant. Son nom, calé en haut de la photo, devenait
+// illisible, et les premières lignes du verso se superposaient au texte de la
+// section. La hauteur se mesure au lieu de se calculer : les tailles
+// interpolent en clamp() et le bandeau passe sur deux lignes en mobile. Mesurer
+// après coup ne fait pas sauter la mise en page — la scène est repliée tant
+// qu'aucune année n'est choisie.
+const head = ref(null);
+const hauteurHead = ref(0);
+let observateur = null;
+
+onMounted(() => {
+  if (!head.value) return;
+  const mesurer = () => {
+    const el = head.value;
+    if (!el) return;
+    const bas = parseFloat(getComputedStyle(el).marginBottom) || 0;
+    hauteurHead.value = Math.ceil(el.offsetHeight + bas);
+  };
+  mesurer();
+  observateur = new ResizeObserver(mesurer);
+  observateur.observe(head.value);
+});
+
+onBeforeUnmount(() => observateur?.disconnect());
 
 function toggle(year) {
   selected.value = selected.value === year ? null : year;
@@ -242,6 +271,10 @@ function eparpillement(i) {
    tomber en silence tout ce qui vise .artistes__cartes. */
 .artistes__scene {
   container-type: inline-size;
+  /* Les cartes commencent sous le bandeau titre, dont la hauteur est mesurée au
+     montage. Le calque continue de couvrir toute la section — le titre reste
+     au-dessus et cliquable, mais plus aucune carte ne vient sous son texte. */
+  padding-top: var(--head-h, 0px);
 }
 
 .artistes__cartes {

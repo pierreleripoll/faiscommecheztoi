@@ -17,11 +17,11 @@ logos:
     thumbhash: /hcCDoKX9aqId4h/l3WHuHeHl4iPdgc=
     thumbhashRatio: 1.1666666666666667
   - src: /uploads/logo-sion.png
-    alt: Ville de Sion
+    alt: Sion Capitale suisse des Alpes
     width: 500
-    height: 248
-    ratio: 2.0161290322580645
-    thumbhash: /hcCDISqhqd4eHhvhoeqeF91CA==
+    height: 252
+    ratio: 1.9841269841269842
+    thumbhash: PAgGDIS3qHd4h4ePdYdLd7B0Bw==
     thumbhashRatio: 1.75
   - src: /uploads/logo-loterie-romande.png
     alt: Loterie Romande
@@ -36,6 +36,13 @@ logos:
     height: 177
     ratio: 2.824858757062147
     thumbhash: /wcCAoLXiId2ifho13aPkgg=
+    thumbhashRatio: 3.5
+  - src: /uploads/logo-ernst-gohner.png
+    alt: Ernst Göhner Stiftung
+    width: 500
+    height: 174
+    ratio: 2.8735632183908044
+    thumbhash: t+cJCoKliKh4d/dppXhfivc=
     thumbhashRatio: 3.5
   - src: /uploads/logo-fiduciaire-bender.png
     alt: Fiduciaire Bender SA
