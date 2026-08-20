@@ -29,8 +29,8 @@
 
     <p class="grille__note">
       Entrée libre, sans réservation en amont. Pour le Petithéâtre uniquement,
-      les places sont à réserver le soir de la représentation au stand
-      information sur la place des théâtres.
+      les places sont à réserver le soir de la représentation à l'entrée du
+      théâtre.
     </p>
   </section>
 </template>
