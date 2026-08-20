@@ -18,6 +18,8 @@
     <div class="page">
       <SectionArtistes :years="years || []" :artistes="artistes || []" />
 
+      <SectionGrille :artistes="artistes || []" :annee="anneeCourante" />
+
       <section id="infos" class="section">
         <h2 class="section__title">{{ infos?.title }}</h2>
         <ContentRenderer v-if="infos" :value="infos" />
@@ -91,6 +93,11 @@ const { data: artistes } = await useAsyncData("artistes-fiches", () =>
 const { data: years } = await useAsyncData("artistes", () =>
   queryContent("/artistes").sort({ year: -1 }).find()
 );
+// La grille horaire ne concerne que l'édition en cours : les archives n'ont pas
+// d'horaires exploitables. `years` est trié décroissant, la première entrée est
+// donc l'édition la plus récente — pas d'année en dur à mettre à jour chaque an.
+const anneeCourante = computed(() => years.value?.[0]?.year || "");
+
 const { data: infos } = await useAsyncData("infos", () =>
   queryContent("/infos").findOne()
 );
