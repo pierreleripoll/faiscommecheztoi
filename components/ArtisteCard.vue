@@ -351,6 +351,22 @@ const representationAilleurs = computed(() => {
   pointer-events: none;
 }
 
+/* Le magenta du nom se perd sur les photos claires — celle de Tibère Dewier est
+   un mur blanc pile là où le nom se pose, et la teinte à 25 % n'y change rien :
+   on tombe à 2,1:1 de contraste. Un voile aux couleurs de la carte, fondu vers
+   le bas, ramène le nom à la lisibilité du verso (magenta sur fond de carte),
+   qui est celle que le design assume déjà. Le voile ne vaut que pour le recto :
+   au verso le nom est déjà sur ce fond. */
+.carte__face--recto .carte__nom {
+  padding-bottom: 28px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 252, 255, 0.92) 0%,
+    rgba(255, 252, 255, 0.85) 60%,
+    rgba(255, 252, 255, 0) 100%
+  );
+}
+
 .carte__bascule {
   position: absolute;
   inset: 0;

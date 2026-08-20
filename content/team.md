@@ -19,7 +19,7 @@ Eli Membrez, Naomi Meyer\
 et toute l'équipe du Spot
 
 Graphisme:\
-Siméon Dubuis (site web) et Alice Gillioz (affiche)
+Siméon Dubuis (site web) et Alice Gillioz (visuel 2026)
 
 Photo\
 Fi'Ni studio
