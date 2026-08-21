@@ -392,26 +392,31 @@ function eparpillement(i) {
   box-shadow: var(--glow-invite);
   opacity: 0;
   pointer-events: none;
-  animation: invitation-lueur 4.5s ease-in-out infinite;
+  animation: invitation-lueur 2.7s ease-in-out infinite;
 }
 
 /* Déphasées, sinon les trois affiches pulsent en chœur. Delay négatif : le
-   cycle est déjà entamé au chargement, pas d'attente à froid. */
+   cycle est déjà entamé au chargement, pas d'attente à froid. Un tiers de
+   cycle chacune. */
 .artistes__poster:nth-child(3n + 2) .artistes__affiche::after {
-  animation-delay: -1.5s;
+  animation-delay: -0.9s;
 }
 
 .artistes__poster:nth-child(3n) .artistes__affiche::after {
-  animation-delay: -3s;
+  animation-delay: -1.8s;
 }
 
+/* La lueur monte vite, se tient un instant au sommet, puis retombe : à pulsation
+   symétrique elle ne passait qu'un éclair par son maximum et se remarquait à
+   peine. */
 @keyframes invitation-lueur {
   0%,
   100% {
     opacity: 0;
   }
-  50% {
-    opacity: 0.85;
+  40%,
+  60% {
+    opacity: 1;
   }
 }
 

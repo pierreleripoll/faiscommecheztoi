@@ -43,8 +43,10 @@
   --glow-photo: rgba(255, 0, 255, 0.5);
   --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
   /* Invitation au clic (hors Figma) : halo symétrique, plus large que
-     --glow-card, qui respire sur les affiches et s'allume au survol. */
-  --glow-invite: 0 0 18px 5px rgba(255, 0, 255, 0.55);
+     --glow-card, qui respire sur les affiches et s'allume au survol. Assez
+     dense pour se détacher du fond rose de la page — à 0.55 sur 18 px il s'y
+     noyait. */
+  --glow-invite: 0 0 26px 8px rgba(255, 0, 255, 0.75);
 
   /* Typo */
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;
