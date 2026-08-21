@@ -314,6 +314,12 @@ const representationAilleurs = computed(() => {
 .carte__photo {
   position: absolute;
   inset: 0;
+  /* Tant que la photo n'est pas peinte (chargement différé, image manquante),
+     le navigateur affiche son texte alternatif — le nom de l'artiste — à la
+     taille du corps de page, soit 37 px en desktop : un nom géant en travers
+     de la carte. La carte porte déjà ce nom dans .carte__nom, ce repli n'a
+     donc pas à crier. */
+  font-size: var(--fs-legend);
 }
 
 .carte__photo :deep(.thumbhash-image__img) {

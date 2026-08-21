@@ -370,6 +370,14 @@ function eparpillement(i) {
   /* Ancre de la lueur d'invitation, et léger grossissement au survol. */
   position: relative;
   transition: transform 0.4s ease;
+  /* Le z-index de la lueur ci-dessous doit rester enfermé ici. Sans ce
+     contexte d'empilement il remonte jusqu'à la section — même piège que le
+     z-index de l'image dans ThumbhashImage, déjà documenté plus bas — et la
+     lueur de l'affiche vient alors se peindre PAR-DESSUS les cartes, qui ne
+     sont qu'à z-index 1 : on croit voir les affiches au travers des cartes.
+     isolation plutôt qu'un z-index, pour ne pas déplacer le bouton dans
+     l'ordre d'empilement de la section. */
+  isolation: isolate;
 }
 
 /* Rien dans le design ne dit que les affiches se cliquent : leur lueur

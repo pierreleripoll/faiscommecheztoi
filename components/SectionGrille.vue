@@ -31,12 +31,16 @@
                généré (voir le même arbitrage dans SectionArtistes). -->
           <div class="creneau__fiche">
             <div class="creneau__fiche-cadre">
-              <ThumbhashImage
-                v-if="creneau.photo"
-                :image="creneau.photo"
-                class="creneau__photo"
-                sizes="90vw sm:45vw lg:280px"
-              />
+              <!-- Le cadre impose le format ; la photo le remplit en cover.
+                   Sans lui, ThumbhashImage pose en ligne le ratio réel de
+                   l'image, qui l'emporte sur la feuille de style. -->
+              <div v-if="creneau.photo" class="creneau__portrait">
+                <ThumbhashImage
+                  :image="creneau.photo"
+                  class="creneau__photo"
+                  sizes="90vw sm:45vw lg:280px"
+                />
+              </div>
               <!-- Les mêmes lignes que le verso de la carte artiste, moins ce
                    que la plaque affiche déjà (heure, titre, durée · format,
                    lieu) : collaboration, autre festival, présentation, puis
@@ -218,13 +222,38 @@ function ailleurs(creneau) {
   margin-top: 12.4px;
 }
 
-/* Portrait « pas trop grand » : une bande recadrée, pas la photo entière. */
+/* Portrait « pas trop grand » : un cadre recadré, pas la photo entière. La
+   hauteur découle du format et non d'un nombre de pixels — une bande de 180 px
+   de haut occupait toute la largeur de l'écran en mobile, soit un panorama de
+   345 × 180 dans lequel le visage passait à la trappe. */
+.creneau__portrait {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
 .creneau__photo {
-  height: 180px;
+  position: absolute;
+  inset: 0;
+  /* Même repli que la carte : sans cela le texte alternatif de l'image,
+     c'est-à-dire le nom de l'artiste, s'affiche à 37 px le temps du
+     chargement. */
+  font-size: var(--fs-legend);
 }
 
 .creneau__photo :deep(.thumbhash-image__img) {
   object-fit: cover;
+  /* Les portraits sont cadrés large et le visage se tient dans le haut de
+     l'image : on recadre au tiers supérieur plutôt qu'au centre. */
+  object-position: 50% 30%;
+}
+
+.creneau__photo :deep(.thumbhash-image__placeholder) {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  background-size: cover;
 }
 
 .creneau__photo :deep(.thumbhash-image__placeholder) {
@@ -338,6 +367,13 @@ function ailleurs(creneau) {
     grid-template-columns: 1fr;
     /* Les soirées s'empilent : il leur faut plus d'air pour rester distinctes. */
     gap: 50px;
+  }
+
+  /* La plaque occupe toute la largeur : un format paysage y devient une bande
+     panoramique où l'on ne distingue plus le visage. Le carré tient le portrait
+     sans manger tout l'écran. */
+  .creneau__portrait {
+    aspect-ratio: 1 / 1;
   }
 }
 </style>
