@@ -30,7 +30,7 @@
           class="carte__bascule"
           type="button"
           :aria-label="`Voir les infos de ${artiste.name}`"
-          @click="retourner"
+          @click="emit('ouvrir')"
         />
 
         <template v-if="photos.length > 1">
@@ -86,10 +86,15 @@
       </div>
 
       <!-- VERSO ------------------------------------------------------------ -->
+      <!-- Le verso entier se reclique pour revenir à la photo : la croix reste
+           le repère visible et le relais clavier, mais on n'a pas à la viser.
+           Sur le conteneur plutôt que sur un calque de bouton, pour ne pas
+           bloquer le défilement d'une fiche trop longue. -->
       <div
         ref="face"
         class="carte__face carte__face--verso"
         :style="hauteurVerso ? { height: `${hauteurVerso}px` } : null"
+        @click="emit('fermer')"
       >
         <div ref="texte" class="carte__texte">
           <p class="carte__nom carte__nom--verso">{{ artiste.name }}</p>
@@ -120,7 +125,7 @@
           class="carte__fermer"
           type="button"
           aria-label="Revenir à la photo"
-          @click="refermer"
+          @click.stop="emit('fermer')"
         >
           <svg viewBox="0 0 29.25 29.25" aria-hidden="true">
             <path
@@ -147,9 +152,14 @@
 <script setup>
 const props = defineProps({
   artiste: { type: Object, required: true },
+  // La fiche ne décide plus seule d'être retournée : c'est la section qui
+  // tient l'état, pour qu'ouvrir une carte remette les autres de face.
+  ouverte: { type: Boolean, default: false },
 });
 
-const verso = ref(false);
+const emit = defineEmits(["ouvrir", "fermer"]);
+
+const verso = computed(() => props.ouverte);
 const index = ref(0);
 const face = ref(null);
 const texte = ref(null);
@@ -168,30 +178,34 @@ const MARGE_ECRAN = 40;
 // Mi-parcours du pivot : la carte est sur la tranche, donc invisible.
 const MI_PIVOT = 250;
 
-function retourner() {
+// La mesure se fait à l'ouverture, avant que le pivot ne tourne : le watcher
+// s'exécute avant le rendu, le cadre est donc encore à sa taille de repos.
+watch(
+  () => props.ouverte,
+  (o) => (o ? mesurer() : ranger())
+);
+
+function mesurer() {
   const cadre = face.value?.offsetHeight;
   const el = texte.value;
-  if (cadre && el) {
-    // Le bloc de texte est calé en inset: 0 dans le cadre : leur différence de
-    // hauteur, ce sont les bordures. Son scrollHeight donne donc la hauteur qu'il
-    // faudrait au cadre — jamais moins que celle de départ, une fiche courte ne
-    // rétrécit pas.
-    const bord = cadre - el.clientHeight;
-    const besoin = Math.max(Math.ceil(el.scrollHeight) + bord, cadre);
-    const plafond = Math.max(window.innerHeight - MARGE_ECRAN, cadre);
-    hauteurVerso.value = Math.min(besoin, plafond);
-    tronquee.value = besoin > plafond;
-  }
-  verso.value = true;
+  if (!cadre || !el) return;
+  // Le bloc de texte est calé en inset: 0 dans le cadre : leur différence de
+  // hauteur, ce sont les bordures. Son scrollHeight donne donc la hauteur qu'il
+  // faudrait au cadre — jamais moins que celle de départ, une fiche courte ne
+  // rétrécit pas.
+  const bord = cadre - el.clientHeight;
+  const besoin = Math.max(Math.ceil(el.scrollHeight) + bord, cadre);
+  const plafond = Math.max(window.innerHeight - MARGE_ECRAN, cadre);
+  hauteurVerso.value = Math.min(besoin, plafond);
+  tronquee.value = besoin > plafond;
 }
 
-function refermer() {
-  verso.value = false;
+function ranger() {
   tronquee.value = false;
   // Le cadre ne reprend sa taille qu'à mi-pivot : d'ici là le verso est encore
   // face à nous, et le voir rapetisser pendant qu'il tourne ferait un à-coup.
   setTimeout(() => {
-    if (!verso.value) hauteurVerso.value = null;
+    if (!props.ouverte) hauteurVerso.value = null;
   }, MI_PIVOT);
 }
 
@@ -288,6 +302,8 @@ const representationAilleurs = computed(() => {
 
 .carte__face--verso {
   transform: rotateY(180deg);
+  /* Toute la face se reclique pour revenir à la photo. */
+  cursor: pointer;
   /* Hauteur du cadre au repos, que le style en ligne remplace à l'ouverture.
      Sur-contrainte avec top et bottom à 0 : c'est bottom qui cède, la fiche
      s'agrandit donc vers le bas. Elle change d'un coup et n'est pas animée :

@@ -63,7 +63,10 @@
           v-show="rangs.has(a._path)"
           :key="a._path"
           :artiste="a"
+          :ouverte="ouverte === a._path"
           :style="eparpillement(rangs.get(a._path) ?? 0)"
+          @ouvrir="ouverte = a._path"
+          @fermer="ouverte = null"
         />
       </div>
     </div>
@@ -78,6 +81,11 @@ const props = defineProps({
 
 // Année sélectionnée : décide quelles fiches flottent ; re-cliquer désélectionne.
 const selected = ref(null);
+
+// Chemin de la fiche retournée, s'il y en a une. L'état vit ici et non dans la
+// carte : en ouvrir une remet ainsi les autres de face, plutôt que de laisser
+// un mur de versos empilés les uns par-dessus les autres.
+const ouverte = ref(null);
 
 // Hauteur du bandeau titre + années. Le calque de cartes couvre toute la section
 // (voir plus bas), titre compris : sans ce décalage la première fiche — celle de
@@ -109,6 +117,9 @@ onBeforeUnmount(() => observateur?.disconnect());
 
 function toggle(year) {
   selected.value = selected.value === year ? null : year;
+  // Changer d'année remet tout de face : la fiche ouverte appartenait à
+  // l'édition qu'on vient de quitter.
+  ouverte.value = null;
 }
 
 // Le mur d'affiches reste entier quelle que soit l'année choisie — c'est ce que
