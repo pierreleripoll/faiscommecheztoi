@@ -225,7 +225,9 @@ watch(cible, async (c) => {
   cursor: pointer;
 }
 
-.artistes__year--active {
+.artistes__year--active,
+.artistes__year:hover,
+.artistes__year:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
@@ -357,6 +359,20 @@ watch(cible, async (c) => {
   .artistes__cartes > * {
     animation: none;
   }
+
+  .artistes__affiche {
+    transition: none;
+  }
+
+  .artistes__affiche:hover,
+  .artistes__affiche:focus-visible {
+    transform: none;
+  }
+
+  /* La lueur ne respire plus, mais s'allume toujours au survol. */
+  .artistes__affiche::after {
+    animation: none;
+  }
 }
 
 /* Affiches ------------------------------------------------------------------ */
@@ -382,6 +398,56 @@ watch(cible, async (c) => {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  /* Ancre de la lueur d'invitation, et léger grossissement au survol. */
+  position: relative;
+  transition: transform 0.4s ease;
+}
+
+/* Rien dans le design ne dit que les affiches se cliquent : leur lueur
+   respire pour inviter au geste (retour de Siméon). L'opacité seule s'anime —
+   pas le box-shadow, coûteux à repeindre à chaque frame. */
+.artistes__affiche::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Au-dessus de l'image de ThumbhashImage (z-index 1). */
+  z-index: 2;
+  box-shadow: var(--glow-invite);
+  opacity: 0;
+  pointer-events: none;
+  animation: invitation-lueur 4.5s ease-in-out infinite;
+}
+
+/* Déphasées, sinon les trois affiches pulsent en chœur. Delay négatif : le
+   cycle est déjà entamé au chargement, pas d'attente à froid. */
+.artistes__poster:nth-child(3n + 2) .artistes__affiche::after {
+  animation-delay: -1.5s;
+}
+
+.artistes__poster:nth-child(3n) .artistes__affiche::after {
+  animation-delay: -3s;
+}
+
+@keyframes invitation-lueur {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.artistes__affiche:hover,
+.artistes__affiche:focus-visible {
+  transform: scale(1.015);
+}
+
+/* Au survol la lueur cesse de respirer et reste allumée : l'affiche répond. */
+.artistes__affiche:hover::after,
+.artistes__affiche:focus-visible::after {
+  animation: none;
+  opacity: 1;
 }
 
 /* ThumbhashImage est prévu pour des boîtes à hauteur fixe (height: 100%). Ici

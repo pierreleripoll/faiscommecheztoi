@@ -116,6 +116,30 @@ function voirFiche(creneau) {
   cursor: pointer;
 }
 
+/* Au survol (ou au focus clavier du bouton-calque) la plaque se soulève et sa
+   lueur s'élargit : elle se donne pour cliquable. Transition ponctuelle, pas
+   d'animation en continu — Siméon garde une idée en réserve pour la grille. */
+.creneau {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.creneau:hover,
+.creneau:focus-within {
+  transform: translateY(-3px);
+  box-shadow: var(--glow-invite);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creneau {
+    transition: none;
+  }
+
+  .creneau:hover,
+  .creneau:focus-within {
+    transform: none;
+  }
+}
+
 /* L'espacement vient du gap : les p ne portent pas leur marge de main.css. */
 .creneau p {
   margin: 0;

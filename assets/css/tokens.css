@@ -42,6 +42,9 @@
   --glow-nav: 0 7px 10px rgba(255, 0, 255, 0.35);
   --glow-photo: rgba(255, 0, 255, 0.5);
   --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
+  /* Invitation au clic (hors Figma) : halo symétrique, plus large que
+     --glow-card, qui respire sur les affiches et s'allume au survol. */
+  --glow-invite: 0 0 18px 5px rgba(255, 0, 255, 0.55);
 
   /* Typo */
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;

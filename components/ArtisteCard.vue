@@ -321,6 +321,13 @@ defineExpose({ ouvrir: retourner });
 
 .carte__photo :deep(.thumbhash-image__img) {
   object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* Survoler le recto grossit doucement la photo : la carte répond au curseur
+   et invite à la retourner (le cadre, overflow: hidden, rogne le débord). */
+.carte__face--recto:hover .carte__photo :deep(.thumbhash-image__img) {
+  transform: scale(1.05);
 }
 
 .carte__photo :deep(.thumbhash-image__placeholder) {
@@ -531,6 +538,14 @@ defineExpose({ ouvrir: retourner });
 @media (prefers-reduced-motion: reduce) {
   .carte__pivot {
     transition: none;
+  }
+
+  .carte__photo :deep(.thumbhash-image__img) {
+    transition: none;
+  }
+
+  .carte__face--recto:hover .carte__photo :deep(.thumbhash-image__img) {
+    transform: none;
   }
 }
 </style>
