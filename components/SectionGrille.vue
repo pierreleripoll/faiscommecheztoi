@@ -37,8 +37,23 @@
                 class="creneau__photo"
                 sizes="90vw sm:45vw lg:280px"
               />
+              <!-- Les mêmes lignes que le verso de la carte artiste, moins ce
+                   que la plaque affiche déjà (heure, titre, durée · format,
+                   lieu) : collaboration, autre festival, présentation, puis
+                   distribution, école et crédit photo. -->
               <div class="creneau__bio">
-                <ContentRenderer :value="creneau.fiche" />
+                <p v-if="creneau.fiche.collaboration">
+                  {{ creneau.fiche.collaboration }}
+                </p>
+                <p v-if="ailleurs(creneau)">{{ ailleurs(creneau) }}</p>
+                <div class="creneau__bio-corps">
+                  <ContentRenderer :value="creneau.fiche" />
+                </div>
+                <p v-if="creneau.fiche.with">Avec {{ creneau.fiche.with }}</p>
+                <p v-if="creneau.fiche.school">{{ creneau.fiche.school }}</p>
+                <p v-if="creneau.photo?.credit">
+                  Photo {{ creneau.photo.credit }}
+                </p>
               </div>
             </div>
           </div>
@@ -119,6 +134,15 @@ function cle(soiree, creneau) {
 function basculer(soiree, creneau) {
   const k = cle(soiree, creneau);
   ouvert.value = ouvert.value === k ? null : k;
+}
+
+// Représentation dans un autre festival, sur une ligne à barres — même
+// écriture que le verso de la carte artiste. Les dates de l'édition, elles,
+// ne sont pas reprises : la grille les affiche déjà.
+function ailleurs(creneau) {
+  const a = creneau.fiche?.also;
+  if (!a) return "";
+  return [a.festival, a.venue, ...(a.dates || [])].filter(Boolean).join(" | ");
 }
 </script>
 
@@ -215,6 +239,17 @@ function basculer(soiree, creneau) {
   margin-top: 12.4px;
   font-size: var(--fs-legend);
   line-height: 1.25;
+}
+
+/* Les lignes d'info s'empilent serrées (le margin: 0 de .creneau p les
+   couvre) ; seule la présentation respire, une ligne vide de part et d'autre
+   — le rythme du verso de la carte. */
+.creneau__bio-corps {
+  margin: 1em 0;
+}
+
+.creneau__bio > :last-child {
+  margin-bottom: 0;
 }
 
 .creneau__croix {
