@@ -72,6 +72,10 @@ export function construireGrille(artistes, annee) {
         format: fiche.format || "",
         lieu: lieu(fiche.venue),
         path: fiche._path,
+        // Le créneau déplié montre le premier portrait et la présentation ;
+        // ContentRenderer veut le document entier, on garde donc la fiche.
+        photo: (fiche.photos || [])[0] || null,
+        fiche,
       });
     }
   }

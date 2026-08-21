@@ -62,7 +62,6 @@
           v-for="a in artistes"
           v-show="rangs.has(a._path)"
           :key="a._path"
-          :ref="(carte) => retenirCarte(a._path, carte)"
           :artiste="a"
           :style="eparpillement(rangs.get(a._path) ?? 0)"
         />
@@ -157,33 +156,6 @@ function eparpillement(i) {
   };
 }
 
-// Depuis la grille horaire, un créneau cliqué désigne une fiche (voir
-// useArtisteCible) : on sélectionne son année, on remonte jusqu'à la carte et
-// on la retourne côté présentation. Les cartes restant toutes montées
-// (v-show), l'instance existe déjà — seul le nextTick est nécessaire pour que
-// la scène se déplie avant la mesure du verso et le défilement.
-const cible = useArtisteCible();
-const cartes = new Map();
-
-function retenirCarte(path, carte) {
-  if (carte) cartes.set(path, carte);
-  else cartes.delete(path);
-}
-
-watch(cible, async (c) => {
-  if (!c) return;
-  selected.value = String(c.annee);
-  await nextTick();
-  const carte = cartes.get(c.path);
-  if (carte?.$el) {
-    carte.ouvrir();
-    // scroll-behavior: smooth (main.css) anime le trajet ; le scroll-margin
-    // des cartes garde la nav sticky hors du chemin.
-    carte.$el.scrollIntoView({ block: "start" });
-  }
-  // Consommée : le prochain clic, même sur le même créneau, redéclenchera.
-  cible.value = null;
-});
 </script>
 
 <style scoped>
@@ -322,9 +294,6 @@ watch(cible, async (c) => {
 .artistes__cartes > * {
   flex: 0 1 var(--card-w);
   animation: carte-apparition 0.35s ease both;
-  /* Cible d'un défilement depuis la grille horaire : la nav sticky (66 px)
-     plus un peu d'air, pour que la carte n'arrive pas collée sous la barre. */
-  scroll-margin-top: 90px;
 }
 
 @keyframes carte-apparition {

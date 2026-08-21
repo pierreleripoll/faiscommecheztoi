@@ -13,6 +13,7 @@
           v-for="creneau in soiree.creneaux"
           :key="`${creneau.path}-${creneau.heure}`"
           class="creneau"
+          :class="{ 'creneau--ouvert': ouvert === cle(soiree, creneau) }"
         >
           <p class="creneau__heure">{{ creneau.heure }}</p>
           <p class="creneau__titre">{{ creneau.titre }}</p>
@@ -24,14 +25,55 @@
             >
           </p>
 
+          <!-- La fiche repliée dans la plaque : portrait puis présentation.
+               Toujours dans le DOM, jamais en v-if — le prérendu ne fabrique
+               les dérivées d'image que pour les URL présentes dans le HTML
+               généré (voir le même arbitrage dans SectionArtistes). -->
+          <div class="creneau__fiche">
+            <div class="creneau__fiche-cadre">
+              <ThumbhashImage
+                v-if="creneau.photo"
+                :image="creneau.photo"
+                class="creneau__photo"
+                sizes="90vw sm:45vw lg:280px"
+              />
+              <div class="creneau__bio">
+                <ContentRenderer :value="creneau.fiche" />
+              </div>
+            </div>
+          </div>
+
           <!-- Le bouton couvre toute la plaque, comme la bascule de la carte
-               artiste : c'est le créneau entier qui mène à la fiche. -->
+               artiste : c'est le créneau entier qui se déplie et se replie. -->
           <button
             class="creneau__lien"
             type="button"
+            :aria-expanded="ouvert === cle(soiree, creneau)"
             :aria-label="`Voir la fiche de ${creneau.name}`"
-            @click="voirFiche(creneau)"
+            @click="basculer(soiree, creneau)"
           />
+
+          <!-- Même croix que le nuage et le verso de la carte : elle signale
+               que la plaque se referme. Décorative — c'est le bouton-calque
+               qui reçoit le clic. -->
+          <svg
+            class="creneau__croix"
+            viewBox="0 0 29.25 29.25"
+            aria-hidden="true"
+          >
+            <path
+              d="M1.875 27.375L27.375 1.875"
+              stroke="currentColor"
+              stroke-width="3.75"
+              stroke-linecap="round"
+            />
+            <path
+              d="M27.375 27.375L1.875 1.875"
+              stroke="currentColor"
+              stroke-width="3.75"
+              stroke-linecap="round"
+            />
+          </svg>
         </article>
       </div>
     </div>
@@ -62,13 +104,21 @@ function meta(creneau) {
   return [creneau.duration, creneau.format].filter(Boolean).join(" · ");
 }
 
-// Cliquer un créneau mène à la fiche de l'artiste (retour de Benjamin,
-// 21.08.2026). La section Artistes écoute cette cible : elle sélectionne
-// l'année, défile jusqu'à la carte et la retourne côté présentation.
-const cible = useArtisteCible();
+// Cliquer un créneau déplie sa fiche sur place — portrait et présentation —
+// plutôt que de renvoyer vers les cartes de la section Artistes (retour de
+// Benjamin, 21.08.2026). Un seul créneau ouvert à la fois : la grille reste
+// lisible, et cliquer ailleurs déplace la lecture au lieu de l'empiler.
+const ouvert = ref(null);
 
-function voirFiche(creneau) {
-  cible.value = { path: creneau.path, annee: props.annee };
+// La clé porte la soirée : un même spectacle joué deux soirs à la même heure
+// donne deux créneaux, qui ne doivent pas s'ouvrir ensemble.
+function cle(soiree, creneau) {
+  return `${soiree.key}-${creneau.path}-${creneau.heure}`;
+}
+
+function basculer(soiree, creneau) {
+  const k = cle(soiree, creneau);
+  ouvert.value = ouvert.value === k ? null : k;
 }
 </script>
 
@@ -116,6 +166,73 @@ function voirFiche(creneau) {
   cursor: pointer;
 }
 
+/* Fiche dépliée -------------------------------------------------------------
+   La plaque s'allonge vers le bas dans sa colonne, poussant les créneaux
+   suivants. grid-template-rows 0fr → 1fr : la seule manière d'animer vers une
+   hauteur inconnue sans la mesurer en JS. */
+.creneau__fiche {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s ease;
+  /* Repliée, la rangée est vide mais compte quand même pour le gap de la
+     plaque : on l'annule pour que la plaque fermée reste au pixel près. */
+  margin-top: -6px;
+}
+
+.creneau--ouvert .creneau__fiche {
+  grid-template-rows: 1fr;
+}
+
+.creneau__fiche-cadre {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* L'air au-dessus du contenu vient d'une marge interne au cadre masqué, pas
+   d'un padding — un padding empêcherait la rangée de retomber à zéro. */
+.creneau__fiche-cadre > :first-child {
+  margin-top: 12.4px;
+}
+
+/* Portrait « pas trop grand » : une bande recadrée, pas la photo entière. */
+.creneau__photo {
+  height: 180px;
+}
+
+.creneau__photo :deep(.thumbhash-image__img) {
+  object-fit: cover;
+}
+
+.creneau__photo :deep(.thumbhash-image__placeholder) {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  background-size: cover;
+}
+
+.creneau__bio {
+  margin-top: 12.4px;
+  font-size: var(--fs-legend);
+  line-height: 1.25;
+}
+
+.creneau__croix {
+  position: absolute;
+  top: 12.4px;
+  right: 12.4px;
+  width: 12px;
+  height: 12px;
+  color: var(--c-ink);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.creneau--ouvert .creneau__croix {
+  opacity: 1;
+}
+
 /* Au survol (ou au focus clavier du bouton-calque) la plaque se soulève et sa
    lueur s'élargit : elle se donne pour cliquable. Transition ponctuelle, pas
    d'animation en continu — Siméon garde une idée en réserve pour la grille. */
@@ -137,6 +254,11 @@ function voirFiche(creneau) {
   .creneau:hover,
   .creneau:focus-within {
     transform: none;
+  }
+
+  /* La fiche s'ouvre d'un coup, sans glissement. */
+  .creneau__fiche {
+    transition: none;
   }
 }
 
