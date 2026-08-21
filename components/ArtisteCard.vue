@@ -366,11 +366,21 @@ const representationAilleurs = computed(() => {
    qui est celle que le design assume déjà. Le voile ne vaut que pour le recto :
    au verso le nom est déjà sur ce fond. */
 .carte__face--recto .carte__nom {
-  padding-bottom: 28px;
+  /* La traîne du fondu vit sous le texte : plus elle est longue, moins le
+     voile a de bord. Avec 28 px la chute entière se jouait juste sous le nom
+     — sur une photo sombre on voyait un bandeau blanc à la coupure nette. */
+  padding-bottom: 56px;
+  /* Presque plein derrière les lignes du nom — le contraste du magenta sur
+     photo sombre s'effondre dès que le voile faiblit —, puis une décrue en
+     ease-out : des paliers rapprochés, aucune cassure visible (retour de
+     Pierre, 21.08.2026). */
   background: linear-gradient(
     to bottom,
     rgba(255, 252, 255, 0.92) 0%,
-    rgba(255, 252, 255, 0.85) 60%,
+    rgba(255, 252, 255, 0.86) 35%,
+    rgba(255, 252, 255, 0.66) 55%,
+    rgba(255, 252, 255, 0.4) 72%,
+    rgba(255, 252, 255, 0.17) 87%,
     rgba(255, 252, 255, 0) 100%
   );
 }
