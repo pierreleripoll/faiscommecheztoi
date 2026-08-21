@@ -223,6 +223,10 @@ const representationAilleurs = computed(() => {
   if (!a) return "";
   return [a.festival, a.venue, ...(a.dates || [])].filter(Boolean).join(" | ");
 });
+
+// La grille horaire ouvre la fiche depuis l'extérieur : cliquer un créneau
+// doit montrer la présentation, pas seulement la photo.
+defineExpose({ ouvrir: retourner });
 </script>
 
 <style scoped>

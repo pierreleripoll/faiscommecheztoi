@@ -23,6 +23,15 @@
               ><br />{{ creneau.lieu }}</template
             >
           </p>
+
+          <!-- Le bouton couvre toute la plaque, comme la bascule de la carte
+               artiste : c'est le créneau entier qui mène à la fiche. -->
+          <button
+            class="creneau__lien"
+            type="button"
+            :aria-label="`Voir la fiche de ${creneau.name}`"
+            @click="voirFiche(creneau)"
+          />
         </article>
       </div>
     </div>
@@ -52,6 +61,15 @@ const grille = useGrille(
 function meta(creneau) {
   return [creneau.duration, creneau.format].filter(Boolean).join(" · ");
 }
+
+// Cliquer un créneau mène à la fiche de l'artiste (retour de Benjamin,
+// 21.08.2026). La section Artistes écoute cette cible : elle sélectionne
+// l'année, défile jusqu'à la carte et la retourne côté présentation.
+const cible = useArtisteCible();
+
+function voirFiche(creneau) {
+  cible.value = { path: creneau.path, annee: props.annee };
+}
 </script>
 
 <style scoped>
@@ -79,12 +97,23 @@ function meta(creneau) {
 /* Plaque de créneau : même fond et même lueur que la carte artiste, mais pas
    son rayon — le coin arrondi de 10.65 px appartient à la carte seule. */
 .creneau {
+  /* Ancre du bouton-calque qui couvre la plaque. */
+  position: relative;
   background: var(--c-card-bg);
   padding: 12.4px;
   box-shadow: var(--glow-card);
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.creneau__lien {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
 }
 
 /* L'espacement vient du gap : les p ne portent pas leur marge de main.css. */
