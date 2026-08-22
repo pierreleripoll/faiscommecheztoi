@@ -1,7 +1,6 @@
 # Sveltia CMS — backend GitHub avec OAuth via le worker sveltia-cms-auth
 # (Cloudflare). Le worker refuse toute origine absente de sa variable
-# ALLOWED_DOMAINS : y ajouter faiscommecheztoi.ch, nouveau.faiscommecheztoi.ch
-# et localhost, sinon /admin affiche « Votre domaine n'est pas autorisé à
+# ALLOWED_DOMAINS : y ajouter faiscommecheztoi.ch (et localhost pour le dev), sinon /admin affiche « Votre domaine n'est pas autorisé à
 # utiliser l'authentificateur ». Les éditeur·ices ont besoin d'un compte GitHub
 # avec accès en écriture au repo (voir README, section « Admin »).
 backend:
@@ -10,9 +9,7 @@ backend:
   branch: dev
   base_url: https://sveltia-cms-auth.pierreripoll13-d89.workers.dev
 
-# Site de staging pour l'instant ; passer à https://faiscommecheztoi.ch
-# le jour de la bascule du domaine dans le Manager Infomaniak.
-site_url: https://nouveau.faiscommecheztoi.ch
+site_url: https://faiscommecheztoi.ch
 
 media_folder: public/uploads
 public_folder: /uploads

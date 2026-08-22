@@ -16,7 +16,7 @@ npm run generate   # build statique complet dans .output/public
 
 **Infomaniak (hébergement mutualisé)** — chaque push sur `dev` déclenche [`deploy-infomaniak.yml`](.github/workflows/deploy-infomaniak.yml) : `npm run generate` puis `rsync` de `.output/public` via SSH. Le job se saute tant que les secrets `INFOMANIAK_*` ne sont pas définis dans GitHub.
 
-Cible actuelle : le site de staging <https://nouveau.faiscommecheztoi.ch>. La bascule se fera dans le Manager Infomaniak en repointant `faiscommecheztoi.ch` vers ce dossier (rollback = repointer le dossier WordPress). `public/.htaccess` porte les 301 depuis les anciennes URLs WordPress.
+En production sur <https://faiscommecheztoi.ch> depuis la bascule d'août 2026 (le domaine a été repointé dans le Manager Infomaniak du dossier WordPress vers ce dossier ; rollback = repointer l'ancien dossier tant qu'il existe). `public/.htaccess` porte les 301 depuis les anciennes URLs WordPress.
 
 `wrangler.jsonc` garde une alternative Cloudflare Workers, non utilisée.
 
@@ -26,7 +26,7 @@ Le contenu vit dans `content/` (une section = un fichier / dossier). Après tout
 
 ## Admin (CMS)
 
-<https://nouveau.faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
+<https://faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
 
 L'aide destinée à l'équipe vit dans l'admin lui-même : le bouton ⓘ en bas à droite ouvre [`public/admin/aide.html`](public/admin/aide.html) (aussi accessible à `/admin/aide.html`) — un aide-mémoire par tâche, dépliable en mode d'emploi complet, captures dans `public/admin/captures/`. Le bouton est posé par `public/admin/index.html` par-dessus Sveltia, sans rien brancher dans le CMS.
 
@@ -47,7 +47,7 @@ L'authentification passe par **GitHub** — c'est le dépôt qui fait autorité 
 `ALLOWED_DOMAINS` liste les domaines qui servent `/admin`, séparés par des virgules. Le worker est partagé avec d'autres sites : **ajouter** à la valeur existante, ne pas la remplacer —
 
 ```
-…valeur actuelle…,faiscommecheztoi.ch,nouveau.faiscommecheztoi.ch,localhost
+…valeur actuelle…,faiscommecheztoi.ch,localhost
 ```
 
 (La doc du worker accepte le joker `*` — `*.faiscommecheztoi.ch` couvre les sous-domaines mais pas le domaine nu, donc garder les deux.) Vérifier aussi que l'*Authorization callback URL* de l'app OAuth GitHub est `https://<worker>.workers.dev/callback`.

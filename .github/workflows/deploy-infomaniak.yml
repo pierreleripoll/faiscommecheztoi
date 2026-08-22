@@ -8,11 +8,10 @@ name: Deploy to Infomaniak
 #   INFOMANIAK_SSH_HOST   hôte SSH de l'hébergement, ex. xxxx.ftp.infomaniak.com
 #   INFOMANIAK_SSH_USER   utilisateur SSH/FTP (SSH activé dans le Manager)
 #   INFOMANIAK_SSH_KEY    clé privée SSH dont la clé publique est déclarée côté Infomaniak
-#   INFOMANIAK_SITE_PATH  dossier du site — d'abord le staging
-#                         ex. /home/clients/xxxxxxxx/sites/nouveau.faiscommecheztoi.ch,
-#                         puis, à la bascule, celui pointé par faiscommecheztoi.ch
-#                         (la bascule se fait dans le Manager en repointant le site
-#                         du dossier WordPress vers ce dossier — rollback instantané)
+#   INFOMANIAK_SITE_PATH  dossier du site pointé par faiscommecheztoi.ch
+#                         ex. /home/clients/xxxxxxxx/sites/faiscommecheztoi.ch
+#                         (bascule faite en août 2026 : le domaine a été repointé
+#                         dans le Manager du dossier WordPress vers ce dossier)
 #
 # Tant que ces secrets ne sont pas définis, le job se saute sans faire échouer le CI.
 
