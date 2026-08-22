@@ -1,0 +1,544 @@
+<title>L'admin de Fais comme chez toi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+
+<style>
+  :root {
+    --ground: #fdeef9;
+    --surface: #ffffff;
+    --surface-2: #fbe2f4;
+    --line: #f0c4e6;
+    --line-strong: #e39fd4;
+    --ink: #2e0f2b;
+    --ink-soft: #6d4468;
+    --ink-faint: #9a7594;
+    --accent: #ff00ff;
+    --accent-ink: #a8007f;
+    --accent-wash: #ffe3fb;
+    --shadow: 0 1px 2px rgba(46, 15, 43, .06), 0 8px 24px -12px rgba(46, 15, 43, .18);
+    --radius: 14px;
+
+    --display: "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Newsreader", Georgia, "Times New Roman", serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #180a1b;
+      --surface: #241028;
+      --surface-2: #2e1533;
+      --line: #40204a;
+      --line-strong: #5c2f68;
+      --ink: #fbe9f8;
+      --ink-soft: #d7aecf;
+      --ink-faint: #a884a3;
+      --accent: #ff6bff;
+      --accent-ink: #ff9ceb;
+      --accent-wash: #35163a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -14px rgba(0, 0, 0, .7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #180a1b;
+    --surface: #241028;
+    --surface-2: #2e1533;
+    --line: #40204a;
+    --line-strong: #5c2f68;
+    --ink: #fbe9f8;
+    --ink-soft: #d7aecf;
+    --ink-faint: #a884a3;
+    --accent: #ff6bff;
+    --accent-ink: #ff9ceb;
+    --accent-wash: #35163a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -14px rgba(0, 0, 0, .7);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2rem) 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.6rem, 5vw, 3.6rem);
+  }
+
+  /* ---------- type ---------- */
+  h1, h2, h3, .label, .btn, table, .steps, .flow, .card-map, .faq dt {
+    font-family: var(--display);
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 8vw, 4rem);
+    font-weight: 700;
+    line-height: .98;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 3.4vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -.005em;
+  }
+
+  p { margin: 0; }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  strong { font-weight: 600; }
+  code {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: .84em;
+    background: var(--accent-wash);
+    color: var(--accent-ink);
+    padding: .1em .38em;
+    border-radius: 5px;
+  }
+
+  .label {
+    font-size: .69rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .lede {
+    font-size: 1.12rem;
+    color: var(--ink-soft);
+    max-width: 34ch;
+  }
+
+  section { display: flex; flex-direction: column; gap: 1rem; }
+  section > p + p { margin-top: -.2rem; }
+
+  /* ---------- hero ---------- */
+  .hero { gap: 1.4rem; }
+
+  .hero-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: .01em;
+    padding: .72rem 1.15rem;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    transition: transform .18s ease, filter .18s ease;
+  }
+
+  :root[data-theme="dark"] .btn { color: #1b0a1e; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn { color: #1b0a1e; } }
+
+  .btn:hover { transform: translateY(-1px); filter: saturate(1.1); }
+
+  /* ---------- flow ---------- */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: .75rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    counter-reset: flow;
+  }
+
+  .flow li {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem 1.05rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    position: relative;
+  }
+
+  .flow b {
+    font-size: .95rem;
+    font-weight: 700;
+  }
+
+  .flow span {
+    font-family: var(--body);
+    font-size: .93rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  .flow li::before {
+    counter-increment: flow;
+    content: counter(flow);
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+    letter-spacing: .1em;
+  }
+
+  /* ---------- steps ---------- */
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .1rem;
+    counter-reset: step;
+  }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: 2.1rem 1fr;
+    gap: .2rem 0;
+    align-items: baseline;
+    padding: .85rem 0;
+    border-top: 1px solid var(--line);
+    font-family: var(--body);
+    color: var(--ink-soft);
+  }
+
+  .steps li:first-child { border-top: 0; padding-top: 0; }
+
+  .steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .steps b { color: var(--ink); font-family: var(--display); font-weight: 700; }
+
+  /* ---------- tables ---------- */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: .93rem;
+    text-align: left;
+  }
+
+  th {
+    font-weight: 700;
+    font-size: .69rem;
+    text-transform: uppercase;
+    letter-spacing: .13em;
+    color: var(--ink-faint);
+    padding: 0 1rem .5rem 0;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: .62rem 1rem .62rem 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    color: var(--ink-soft);
+  }
+
+  td:first-child {
+    color: var(--ink);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: 0; }
+
+  /* ---------- panels ---------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.15rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    box-shadow: var(--shadow);
+  }
+
+  .note {
+    background: var(--surface-2);
+    border: 0;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: .85rem 1.1rem;
+    font-size: .95rem;
+    color: var(--ink-soft);
+    box-shadow: none;
+  }
+
+  .tips { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .45rem; color: var(--ink-soft); }
+  .tips li::marker { color: var(--accent); }
+  .tips b { color: var(--ink); }
+
+  /* ---------- card map ---------- */
+  .card-map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: .9rem;
+  }
+
+  .mock {
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: var(--surface);
+    padding: .85rem;
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+    min-height: 12.5rem;
+  }
+
+  .mock .mock-label {
+    font-size: .63rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+
+  .mock-photo {
+    flex: 1;
+    border-radius: 8px;
+    background:
+      radial-gradient(120% 90% at 30% 20%, var(--accent-wash), transparent 70%),
+      repeating-linear-gradient(135deg, var(--surface-2) 0 8px, var(--surface) 8px 16px);
+    display: flex;
+    align-items: flex-end;
+    padding: .55rem;
+    border: 1px dashed var(--line-strong);
+  }
+
+  .field {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    background: var(--accent-wash);
+    color: var(--accent-ink);
+    border-radius: 5px;
+    padding: .14em .4em;
+  }
+
+  .mock-lines { display: flex; flex-direction: column; gap: .38rem; }
+  .mock-lines .row { display: flex; gap: .3rem; flex-wrap: wrap; align-items: center; }
+  .mock-lines .row small { font-family: var(--body); font-size: .78rem; color: var(--ink-faint); }
+
+  /* ---------- faq ---------- */
+  .faq { margin: 0; display: flex; flex-direction: column; }
+  .faq dt { font-weight: 700; font-size: .97rem; margin-top: 1rem; }
+  .faq dt:first-child { margin-top: 0; }
+  .faq dd { margin: .25rem 0 0; color: var(--ink-soft); font-size: .96rem; }
+
+  /* ---------- cloud ---------- */
+  .cloud-head { display: flex; align-items: center; gap: .75rem; }
+  .cloud-head svg { flex: none; width: 3.2rem; height: auto; color: var(--accent); }
+
+  footer {
+    border-top: 1px solid var(--line-strong);
+    padding-top: 1.2rem;
+    color: var(--ink-soft);
+    font-size: .95rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <span class="label">Fais comme chez toi — équipe</span>
+    </div>
+    <h1>Modifier le site,<br><em>sans rien casser</em></h1>
+    <p class="lede">Tout le contenu du site s'édite dans une page web. Voilà où ça se passe et comment ça marche.</p>
+    <a class="btn" href="https://nouveau.faiscommecheztoi.ch/admin/">Ouvrir l'admin →</a>
+  </header>
+
+  <section>
+    <h2>Ce qui se passe quand tu enregistres</h2>
+    <p>Le site n'a plus de base de données comme l'ancien WordPress : chaque texte, chaque photo est un fichier, et l'admin est une interface qui édite ces fichiers pour toi.</p>
+    <ol class="flow">
+      <li><b>Tu écris</b><span>Dans l'admin, comme dans un formulaire.</span></li>
+      <li><b>Tu enregistres</b><span>La version est archivée : on peut toujours revenir en arrière.</span></li>
+      <li><b>Le site se reconstruit</b><span>Tout seul. C'est en ligne 2 à 3 minutes plus tard.</span></li>
+    </ol>
+    <div class="panel note">Inutile de recharger frénétiquement pendant ces trois minutes : va boire un café, puis recharge la page avec <code>Ctrl</code>+<code>Maj</code>+<code>R</code> (<code>Cmd</code>+<code>Maj</code>+<code>R</code> sur Mac).</div>
+  </section>
+
+  <section>
+    <h2>La première fois : se connecter</h2>
+    <p>L'admin vit à l'adresse <a href="https://nouveau.faiscommecheztoi.ch/admin/">nouveau.faiscommecheztoi.ch/admin</a> — à mettre en favori. Trois étapes, une seule fois :</p>
+    <ol class="steps">
+      <li><div><b>Créer un compte GitHub gratuit</b> sur <a href="https://github.com">github.com</a> — e-mail et mot de passe, deux minutes. C'est là que les fichiers du site sont rangés : ce compte sert de badge d'accès.</div></li>
+      <li><div><b>Envoyer ton nom d'utilisateur à Pierre</b>, qui t'invite sur le site. L'invitation arrive par mail, il faut cliquer pour l'accepter.</div></li>
+      <li><div><b>Retourner sur l'admin</b> et cliquer sur <em>Se connecter avec GitHub</em>. Le navigateur reste connecté ensuite, tu n'y repenses plus.</div></li>
+    </ol>
+    <div class="panel note">Le second bouton, <em>Se connecter avec un jeton d'accès</em>, est un dépannage technique — il n'est pas pour toi.</div>
+  </section>
+
+  <section>
+    <h2>Où trouver quoi</h2>
+    <p>La colonne de gauche liste tout ce qui est modifiable. On clique sur une rubrique, puis sur l'entrée à changer. Tant que tu n'as pas enregistré, rien n'est publié : tu peux fermer sans crainte.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Rubrique</th><th scope="col">Ce qu'il y a dedans</th></tr></thead>
+        <tbody>
+          <tr><td>Sections de la page</td><td>Les blocs de texte du site : intro, nuage « Appel à projet », Infos pratiques, Participer, Contact &amp; Team, logos des soutiens</td></tr>
+          <tr><td>Artistes de l'édition</td><td>Une fiche par artiste — c'est ce qui remplit les cartes de la section Artistes</td></tr>
+          <tr><td>Artistes (par année)</td><td>Les affiches du festival, une entrée par édition, avec le crédit du ou de la graphiste</td></tr>
+          <tr><td>Partenariats</td><td>La Crémaillère, L'entrée en matière, L'Oblique…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Corriger un texte</h2>
+    <p>Le cas le plus courant, en trois gestes : ouvrir la rubrique, corriger le champ, enregistrer. Pour le titre d'un spectacle, par exemple : <strong>Artistes de l'édition</strong> → la ligne de l'artiste (la liste affiche <code>ordre. Nom — Titre</code>) → le champ <strong>Titre du spectacle</strong>.</p>
+    <p>Dans les zones de texte long — le corps des sections, les biographies — la barre d'outils permet le <strong>gras</strong>, l'<em>italique</em> et les liens. Rien d'autre : les couleurs, les tailles et les positions appartiennent au design, elles ne se règlent pas depuis l'admin.</p>
+  </section>
+
+  <section>
+    <h2>Ajouter une fiche artiste</h2>
+    <p>Chaque fiche devient une carte qui se retourne : la photo et le nom au recto, tout le reste au verso.</p>
+
+    <div class="card-map">
+      <div class="mock">
+        <span class="mock-label">Recto</span>
+        <div class="mock-photo"><span class="field">Photos → la première</span></div>
+        <div class="mock-lines"><div class="row"><span class="field">Artiste</span></div></div>
+      </div>
+      <div class="mock">
+        <span class="mock-label">Verso</span>
+        <div class="mock-lines">
+          <div class="row"><span class="field">Artiste</span></div>
+          <div class="row"><span class="field">Titre du spectacle</span></div>
+          <div class="row"><span class="field">Durée</span><small>·</small><span class="field">Format</span></div>
+          <div class="row"><span class="field">Collaboration</span></div>
+          <div class="row"><span class="field">Lieu</span><small>|</small><span class="field">Horaires</span></div>
+          <div class="row"><span class="field">Joué aussi ailleurs</span></div>
+          <div class="row"><span class="field">Biographie</span></div>
+          <div class="row"><span class="field">Avec</span></div>
+          <div class="row"><span class="field">École</span></div>
+          <div class="row"><span class="field">Crédit photo</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Champ</th><th scope="col">À quoi il sert</th></tr></thead>
+        <tbody>
+          <tr><td>Artiste</td><td>Le nom affiché sur la carte. À deux : « Prénom Nom et Prénom Nom »</td></tr>
+          <tr><td>Ordre</td><td>La position dans la liste — on numérote dans l'ordre de la première représentation</td></tr>
+          <tr><td>Année</td><td><code>2026</code> pour l'édition en cours. C'est ce champ qui décide sous quel onglet la fiche apparaît</td></tr>
+          <tr><td>Durée</td><td>Ex. <code>35’</code></td></tr>
+          <tr><td>Format</td><td>Ex. <code>étape de travail/work in progress</code>, <code>projet abouti/création</code></td></tr>
+          <tr><td>Collaboration</td><td>Seulement si le projet vient d'un partenariat, ex. <code>Collaboration avec L'Oblique</code></td></tr>
+          <tr><td>Avec</td><td>Le reste de l'équipe, sans écrire le mot « Avec »</td></tr>
+          <tr><td>Lieu</td><td>Ex. <code>Sion, Petithéâtre</code></td></tr>
+          <tr><td>Horaires</td><td>Une ligne par représentation, ex. <code>Me 07.10, 20:35</code></td></tr>
+          <tr><td>École</td><td>Ex. <code>École de théâtre Serge Martin, 2024</code></td></tr>
+          <tr><td>Joué aussi ailleurs</td><td>Optionnel — l'autre festival, son lieu, ses horaires</td></tr>
+          <tr><td>Biographie</td><td>Le texte au dos de la carte</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Un champ laissé vide ne s'affiche pas : mieux vaut le laisser vide que d'y écrire « — ».</p>
+  </section>
+
+  <section>
+    <h2>Photos et logos</h2>
+    <p>Dans le champ <strong>Photos</strong>, chaque entrée est une image, son texte alternatif et son crédit. <strong>La première photo de la liste est celle qui s'affiche</strong> sur la carte, les suivantes se feuillettent — pour changer la photo principale, il suffit de remonter la bonne en première position.</p>
+    <ul class="tips">
+      <li><b>Des portraits verticaux</b> pour les artistes : les cartes sont en hauteur, une photo panoramique se retrouve rognée.</li>
+      <li><b>Au moins 1000 px de large</b>, mais pas le fichier de 10 Mo sorti de l'appareil photo : le site redimensionne, seul l'envoi sera long.</li>
+      <li><b>Le crédit photo</b> se remplit systématiquement — il s'affiche sur la fiche.</li>
+      <li><b>Le texte alternatif</b> décrit l'image pour les personnes non-voyantes. Le nom de l'artiste suffit le plus souvent.</li>
+    </ul>
+    <p>Les <strong>logos des soutiens</strong> se gèrent dans <em>Sections de la page → Soutiens</em>, avec pour chacun son nom et, si on veut, un lien vers le site de l'institution. Format idéal : un PNG à fond transparent.</p>
+  </section>
+
+  <section>
+    <div class="cloud-head">
+      <svg viewBox="0 0 120 70" fill="none" aria-hidden="true">
+        <path d="M28 62c-12 0-21-8-21-18 0-9 7-16 16-17 1-13 12-23 26-23 12 0 22 7 26 17 2-1 4-1 6-1 10 0 18 7 18 17s-8 18-19 18H28z" fill="currentColor" opacity=".16"/>
+        <path d="M28 62c-12 0-21-8-21-18 0-9 7-16 16-17 1-13 12-23 26-23 12 0 22 7 26 17 2-1 4-1 6-1 10 0 18 7 18 17s-8 18-19 18H28z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+      <h2>Ouvrir et fermer l'appel à projet</h2>
+    </div>
+    <p>Le petit nuage se règle dans <em>Sections de la page → Nuage « Appel à projet »</em>. La case <strong>Visible</strong> l'affiche ou le masque : c'est l'interrupteur à utiliser à l'ouverture et à la clôture de l'appel. Le <strong>Texte</strong> est ce qui est écrit dedans, le <strong>Lien</strong> ce sur quoi il pointe — <code>#participer</code> renvoie vers la section Participer de la page, une adresse complète <code>https://…</code> vers l'extérieur.</p>
+  </section>
+
+  <section>
+    <h2>Questions qui reviennent</h2>
+    <dl class="faq">
+      <dt>J'ai enregistré et je ne vois rien.</dt>
+      <dd>Attendre deux ou trois minutes, puis recharger en vidant le cache : <code>Ctrl</code>+<code>Maj</code>+<code>R</code>, ou <code>Cmd</code>+<code>Maj</code>+<code>R</code> sur Mac.</dd>
+
+      <dt>Est-ce que je peux casser le site ?</dt>
+      <dd>Difficilement, et rien n'est jamais perdu : chaque enregistrement est archivé et on peut revenir à n'importe quelle version. En cas de doute, demander plutôt que de bricoler.</dd>
+
+      <dt>Je voudrais changer une couleur, déplacer une section…</dt>
+      <dd>Ça n'est pas dans l'admin, et c'est volontaire : ça appartient au design de Siméon. Pour ce genre de demande, passer par Pierre.</dd>
+
+      <dt>On peut être plusieurs à éditer ?</dt>
+      <dd>Oui, tant que vous n'êtes pas dans la même fiche à la même seconde.</dd>
+
+      <dt>Et l'ancien site WordPress ?</dt>
+      <dd>Il reste en ligne jusqu'à la bascule du domaine. Les anciennes adresses — <code>/les-artistes/</code>, <code>/contact/</code> — redirigent déjà vers les bonnes sections du nouveau site.</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <span class="label">En cas de pépin</span>
+    <p>Écrire à Pierre avec trois choses : ce que tu essayais de faire, la rubrique concernée, et une capture d'écran du message d'erreur s'il y en a un.</p>
+  </footer>
+
+</div>
