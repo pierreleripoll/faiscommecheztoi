@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Aide — admin Fais comme chez toi</title>
+  <style>
+    :root {
+      --bg: #f7f7f8; --panel: #fff; --line: #dcdce2; --ink: #1c1c21; --muted: #5f5f6b;
+      --accent: #1565c0; --accent-bg: #e8f0fb; --warn-bg: #fff6dc; --warn-line: #e8c962;
+      --code-bg: #ededf1;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1b1b1f; --panel: #242429; --line: #3a3a42; --ink: #ececf1; --muted: #a4a4b0;
+        --accent: #7fb3f0; --accent-bg: #22304a; --warn-bg: #3c3518; --warn-line: #8a7a2f;
+        --code-bg: #34343b;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+    .sub { color: var(--muted); margin: 0 0 1.25rem; }
+    h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 2rem 0 .5rem; }
+    a { color: var(--accent); }
+    code { font: .88em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--code-bg); padding: .08em .35em; border-radius: 4px; }
+    kbd { font: .85em ui-monospace, Menlo, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 .35em; background: var(--panel); }
+
+    /* Barre d'outils : filtre + tout ouvrir/fermer */
+    .tools { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; position: sticky; top: 0; background: var(--bg); padding: .5rem 0; z-index: 2; border-bottom: 1px solid var(--line); }
+    .tools input {
+      flex: 1 1 14rem; font: inherit; padding: .5rem .75rem; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); color: var(--ink);
+    }
+    .tools button {
+      font: inherit; font-size: .85rem; padding: .45rem .7rem; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); color: var(--ink); cursor: pointer;
+    }
+    .tools button:hover { border-color: var(--accent); }
+    .count { font-size: .85rem; color: var(--muted); }
+
+    /* Une tâche = un <details> */
+    details {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0 0 .5rem;
+    }
+    details[open] { border-color: var(--accent); }
+    summary {
+      cursor: pointer; padding: .7rem .9rem; list-style: none; display: grid; grid-template-columns: 1fr auto; gap: .2rem .75rem; align-items: baseline;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary .t { font-weight: 600; }
+    summary .p { grid-column: 1 / -1; color: var(--muted); font-size: .9rem; }
+    summary .p b { color: var(--ink); font-weight: 600; }
+    summary .chev { color: var(--muted); font-size: .8rem; transition: transform .15s; }
+    details[open] summary .chev { transform: rotate(90deg); }
+    summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 8px; }
+    .body { padding: 0 .9rem .9rem; border-top: 1px solid var(--line); }
+    .body > :first-child { margin-top: .75rem; }
+    .body p, .body ol, .body ul { margin: .5rem 0; }
+    .body ol, .body ul { padding-left: 1.4rem; }
+    .body li { margin: .2rem 0; }
+    .note { background: var(--accent-bg); border-radius: 6px; padding: .55rem .75rem; font-size: .92rem; }
+    .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 6px; padding: .55rem .75rem; font-size: .92rem; }
+    table { border-collapse: collapse; width: 100%; font-size: .92rem; margin: .5rem 0; }
+    th, td { text-align: left; vertical-align: top; padding: .4rem .5rem; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    td:first-child { white-space: nowrap; font-weight: 600; }
+    .tablewrap { overflow-x: auto; }
+    figure { margin: .75rem 0 0; }
+    figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 6px; }
+    figcaption { font-size: .82rem; color: var(--muted); margin-top: .3rem; }
+    .anchor { color: var(--muted); text-decoration: none; font-weight: 400; margin-left: .3rem; opacity: 0; }
+    summary:hover .anchor { opacity: 1; }
+    .hidden { display: none; }
+    .empty { color: var(--muted); padding: 1rem 0; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Aide — admin du site</h1>
+  <p class="sub">Chaque ligne rappelle où cliquer ; déplie-la pour le mode d'emploi complet.</p>
+
+  <div class="tools">
+    <input id="q" type="search" placeholder="Filtrer : photo, nuage, logo, titre…" aria-label="Filtrer les rubriques" autocomplete="off">
+    <button type="button" data-all="open">Tout déplier</button>
+    <button type="button" data-all="close">Tout replier</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <h2>Les bases</h2>
+
+  <details id="connexion">
+    <summary><span class="t">Se connecter <a class="anchor" href="#connexion">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Se connecter avec GitHub</b> — la première fois, il faut un compte GitHub invité par Pierre.</span></summary>
+    <div class="body">
+      <p>L'admin est à l'adresse <a href="https://nouveau.faiscommecheztoi.ch/admin/">nouveau.faiscommecheztoi.ch/admin</a> (à mettre en favori). GitHub est l'endroit où les fichiers du site sont rangés : un compte GitHub sert simplement de badge d'accès.</p>
+      <p><b>La première fois seulement :</b></p>
+      <ol>
+        <li>Créer un compte gratuit sur <a href="https://github.com/signup">github.com</a> (e-mail + mot de passe, 2 minutes).</li>
+        <li>Envoyer le nom d'utilisateur choisi à Pierre, qui envoie une invitation. Elle arrive par mail : cliquer pour l'accepter.</li>
+        <li>Revenir sur l'admin → <b>Se connecter avec GitHub</b> → autoriser une fois.</li>
+      </ol>
+      <p>Ensuite le navigateur reste connecté. Le second bouton, <i>Se connecter avec un jeton d'accès</i>, est un dépannage technique : ne pas l'utiliser.</p>
+      <div class="note">Message « Votre domaine n'est pas autorisé à utiliser l'authentificateur » → ce n'est pas toi, c'est un réglage côté Pierre. Lui écrire.</div>
+    </div>
+  </details>
+
+  <details id="enregistrer">
+    <summary><span class="t">Enregistrer et voir le résultat en ligne <a class="anchor" href="#enregistrer">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Enregistrer</b> (en haut à droite) → en ligne <b>2 à 3 minutes</b> plus tard → recharger avec <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd>.</span></summary>
+    <div class="body">
+      <p>Le site n'a pas de base de données comme l'ancien WordPress : chaque enregistrement réécrit un fichier, puis le site se reconstruit tout seul. Compter 2 à 3 minutes avant que la modification soit visible — inutile de recharger frénétiquement.</p>
+      <ul>
+        <li>Tant que tu n'as pas cliqué <b>Enregistrer</b>, rien n'est publié : on peut fermer la fiche sans crainte.</li>
+        <li>Si la modification n'apparaît pas après 3 minutes : recharger en vidant le cache, <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd> sur Mac).</li>
+        <li>Chaque enregistrement est archivé : on peut toujours revenir à une version précédente (demander à Pierre).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details id="trouver">
+    <summary><span class="t">Retrouver une fiche <a class="anchor" href="#trouver">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Barre de recherche</b> en haut → taper un nom. Ou la rubrique dans la colonne de gauche.</span></summary>
+    <div class="body">
+      <p>La colonne de gauche liste tout ce qui est modifiable :</p>
+      <div class="tablewrap"><table>
+        <tr><th>Rubrique</th><th>Contenu</th></tr>
+        <tr><td>Sections de la page</td><td>Les blocs de texte du site : intro, nuage « Appel à projet », Infos pratiques, Participer, Contact &amp; Team, logos des soutiens</td></tr>
+        <tr><td>Artistes de l'édition</td><td>Une fiche par artiste, toutes éditions confondues (71 fiches)</td></tr>
+        <tr><td>Artistes (par année)</td><td>L'affiche de chaque édition et son crédit graphique</td></tr>
+        <tr><td>Partenariats</td><td>La Crémaillère, L'entrée en matière, L'Oblique…</td></tr>
+      </table></div>
+      <p>Avec 71 fiches artistes, la <b>recherche</b> (champ en haut au centre) est souvent plus rapide : elle cherche dans toutes les rubriques.</p>
+      <figure><img src="captures/admin-accueil.jpg" alt="L'accueil de l'admin" loading="lazy"><figcaption>L'accueil : rubriques à gauche, recherche en haut.</figcaption></figure>
+      <figure><img src="captures/admin-recherche.jpg" alt="Résultat de recherche" loading="lazy"><figcaption>Taper « Pellissier » retrouve la fiche directement.</figcaption></figure>
+    </div>
+  </details>
+
+  <h2>Artistes</h2>
+
+  <details id="titre">
+    <summary><span class="t">Corriger le titre d'un spectacle (ou n'importe quel champ d'une fiche) <a class="anchor" href="#titre">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Artistes de l'édition</b> → la fiche → champ <b>Titre du spectacle</b> → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <ol>
+        <li>Colonne de gauche → <b>Artistes de l'édition</b> (ou taper le nom dans la recherche).</li>
+        <li>Cliquer sur la ligne de l'artiste. La liste affiche <code>ordre. Nom — Titre du spectacle</code>.</li>
+        <li>Dans la fiche, corriger le champ voulu. L'aperçu à droite se met à jour en direct.</li>
+        <li><b>Enregistrer</b>, en haut à droite.</li>
+      </ol>
+      <p>Même principe pour la durée, le lieu, les horaires, l'école, la biographie… Un champ laissé vide ne s'affiche pas sur le site : mieux vaut vide que « — ».</p>
+      <figure><img src="captures/admin-fiche-artiste.jpg" alt="Une fiche artiste ouverte" loading="lazy"><figcaption>La fiche d'Emma Pellissier : champs à gauche, aperçu à droite, Enregistrer en haut à droite.</figcaption></figure>
+    </div>
+  </details>
+
+  <details id="nouvelle-fiche">
+    <summary><span class="t">Ajouter un·e artiste <a class="anchor" href="#nouvelle-fiche">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Artistes de l'édition</b> → <b>Nouveau</b> (en haut à droite) → remplir → <b>Enregistrer</b>. Année = <b>2026</b>, Ordre = rang de la première représentation.</span></summary>
+    <div class="body">
+      <figure><img src="captures/admin-artistes-liste.jpg" alt="La liste des fiches artistes" loading="lazy"><figcaption>Le bouton Nouveau, en haut à droite de la liste.</figcaption></figure>
+      <p>Chaque fiche devient une carte qui se retourne sur le site : photo et nom au recto, tout le reste au verso.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Champ</th><th>À quoi il sert</th></tr>
+        <tr><td>Artiste</td><td>Le nom affiché sur la carte. À deux : « Prénom Nom et Prénom Nom »</td></tr>
+        <tr><td>Ordre</td><td>La position dans la liste — on numérote dans l'ordre de la <b>première représentation</b></td></tr>
+        <tr><td>Année</td><td><code>2026</code> pour l'édition en cours. C'est ce champ qui décide sous quel onglet de la section Artistes la fiche apparaît</td></tr>
+        <tr><td>Titre du spectacle</td><td></td></tr>
+        <tr><td>Durée</td><td>Ex. <code>35’</code></td></tr>
+        <tr><td>Format</td><td>Ex. <code>étape de travail/work in progress</code>, <code>projet abouti/création</code></td></tr>
+        <tr><td>Collaboration</td><td>Seulement si le projet vient d'un partenariat, ex. <code>Collaboration avec L'Oblique</code></td></tr>
+        <tr><td>Avec</td><td>Le reste de l'équipe, sans écrire le mot « Avec »</td></tr>
+        <tr><td>Lieu</td><td>Ex. <code>Sion, Petithéâtre</code></td></tr>
+        <tr><td>Horaires</td><td>Une ligne par représentation, ex. <code>Me 07.10, 20:35</code></td></tr>
+        <tr><td>École</td><td>Ex. <code>École de théâtre Serge Martin, 2024</code></td></tr>
+        <tr><td>Joué aussi ailleurs</td><td>Optionnel — l'autre festival, son lieu, ses horaires</td></tr>
+        <tr><td>Photos</td><td>Voir <a href="#photo">Changer la photo d'un·e artiste</a></td></tr>
+        <tr><td>Biographie</td><td>Le texte au dos de la carte</td></tr>
+      </table></div>
+    </div>
+  </details>
+
+  <details id="photo">
+    <summary><span class="t">Changer ou ajouter la photo d'un·e artiste <a class="anchor" href="#photo">#</a></span><span class="chev">▶</span>
+      <span class="p">Fiche → champ <b>Photos</b> → ajouter / remplacer l'image. <b>La première de la liste</b> est celle qui s'affiche.</span></summary>
+    <div class="body">
+      <ol>
+        <li>Ouvrir la fiche de l'artiste, descendre jusqu'à <b>Photos</b>.</li>
+        <li>Sur une photo existante : cliquer l'image pour la remplacer (choisir un fichier de l'ordinateur, ou une image déjà envoyée).</li>
+        <li>Pour en ajouter une : le bouton d'ajout sous la liste, puis remplir <b>Texte alternatif</b> (souvent le nom de l'artiste suffit) et <b>Crédit photo</b>.</li>
+        <li>L'ordre compte : <b>la première photo s'affiche sur la carte</b>, les suivantes se feuillettent. Pour changer la photo principale, remonter la bonne en première position avec les flèches.</li>
+        <li><b>Enregistrer</b>.</li>
+      </ol>
+      <div class="note">Portraits <b>verticaux</b> de préférence (les cartes sont en hauteur, un panorama sera rogné) ; au moins 1000 px de large ; pas le fichier de 10 Mo sorti de l'appareil photo — le site redimensionne, mais l'envoi sera long. Voir <a href="#images">Les règles pour les images</a>.</div>
+    </div>
+  </details>
+
+  <details id="ordre">
+    <summary><span class="t">Changer l'ordre des artistes <a class="anchor" href="#ordre">#</a></span><span class="chev">▶</span>
+      <span class="p">Fiche → champ <b>Ordre</b> → le numéro de passage → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <p>Les artistes apparaissent sur le site dans l'ordre du champ <b>Ordre</b>, du plus petit au plus grand, à l'intérieur de leur année. La convention : numéroter selon la première représentation de chacun·e. Deux fiches peuvent porter le même numéro si elles sont d'années différentes.</p>
+    </div>
+  </details>
+
+  <details id="retirer">
+    <summary><span class="t">Retirer un·e artiste <a class="anchor" href="#retirer">#</a></span><span class="chev">▶</span>
+      <span class="p">Fiche → <b>Supprimer</b> (en haut). Pour une annulation, préférer laisser la fiche et adapter le texte.</span></summary>
+    <div class="body">
+      <p>Dans la fiche ouverte, le bouton <b>Supprimer</b> est en haut, à côté de Dupliquer. La fiche disparaît du site au prochain rebuild.</p>
+      <div class="warn">Supprimer est réversible, mais seulement par Pierre (tout est archivé). Dans le doute — spectacle annulé, artiste remplacé·e — il est plus simple de modifier la fiche que de la supprimer.</div>
+    </div>
+  </details>
+
+  <details id="affiche">
+    <summary><span class="t">Ajouter l'affiche d'une nouvelle édition <a class="anchor" href="#affiche">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Artistes (par année)</b> → <b>Nouveau</b> → Année → Affiches (image + crédit graphiste) → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <p>Une entrée par édition. Le champ <b>Année</b> doit être identique à celui des fiches artistes de cette édition (ex. <code>2026</code>) : c'est ce qui fait apparaître l'onglet dans la section Artistes. On peut mettre plusieurs affiches si l'édition en a eu plusieurs.</p>
+    </div>
+  </details>
+
+  <h2>Textes du site</h2>
+
+  <details id="sections">
+    <summary><span class="t">Modifier l'intro, les Infos pratiques, Participer, Contact &amp; Team <a class="anchor" href="#sections">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Sections de la page</b> → la section → le texte → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <div class="tablewrap"><table>
+        <tr><th>Section</th><th>Ce qu'elle contient</th></tr>
+        <tr><td>Intro (haut de page)</td><td>Le texte d'accueil et la photo d'ambiance</td></tr>
+        <tr><td>Infos pratiques</td><td>Titre + texte</td></tr>
+        <tr><td>Participer</td><td>Titre + texte (conditions, garanties, calendrier de l'appel)</td></tr>
+        <tr><td>Contact &amp; Team</td><td>Titre + texte — un bloc par personne : nom, rôle, e-mail</td></tr>
+      </table></div>
+      <p>Dans Contact &amp; Team, pour garder une personne par bloc avec des retours à la ligne simples, terminer chaque ligne par un retour à la ligne (pas une ligne vide entre nom, rôle et e-mail ; une ligne vide entre deux personnes).</p>
+    </div>
+  </details>
+
+  <details id="mise-en-forme">
+    <summary><span class="t">Gras, italique, liens <a class="anchor" href="#mise-en-forme">#</a></span><span class="chev">▶</span>
+      <span class="p">Sélectionner le texte → la <b>barre d'outils</b> au-dessus du champ. Rien d'autre n'est réglable : le design est fixe.</span></summary>
+    <div class="body">
+      <p>Dans les zones de texte long (sections, biographies), la barre d'outils permet le <b>gras</b>, l'<i>italique</i> et les liens (sélectionner le texte, icône de lien, coller l'adresse — pour un e-mail : <code>mailto:contact@faiscommecheztoi.ch</code>).</p>
+      <p>Couleurs, tailles, positions, ordre des sections : ça appartient au design de Siméon et ne se règle pas depuis l'admin. Pour ce genre de demande, passer par Pierre.</p>
+    </div>
+  </details>
+
+  <details id="nuage">
+    <summary><span class="t">Afficher ou masquer le nuage « Appel à projet » <a class="anchor" href="#nuage">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Sections de la page</b> → <b>Nuage « Appel à projet »</b> → case <b>Visible</b> → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <ul>
+        <li><b>Visible</b> : l'interrupteur. Coché à l'ouverture de l'appel, décoché à la clôture.</li>
+        <li><b>Texte</b> : ce qui est écrit dans le nuage (court : « Appel à projet »).</li>
+        <li><b>Lien</b> : où il envoie. <code>#participer</code> fait défiler vers la section Participer ; une adresse complète (<code>https://…</code>) ouvre une page externe, par exemple le formulaire.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h2>Logos et partenariats</h2>
+
+  <details id="logos">
+    <summary><span class="t">Ajouter ou retirer un logo de soutien <a class="anchor" href="#logos">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Sections de la page</b> → <b>Soutiens (logos)</b> → liste <b>Logos</b> → ajouter / supprimer → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <p>Chaque logo = une image, un <b>Nom</b> (affiché si l'image ne charge pas, et lu par les lecteurs d'écran) et, si on veut, un <b>Lien</b> vers le site de l'institution. L'ordre de la liste est l'ordre d'affichage : les flèches déplacent un logo.</p>
+      <p>Format idéal : PNG à fond transparent, ou SVG. Éviter les logos en JPEG avec un fond blanc, ils font un rectangle sur le fond rose.</p>
+    </div>
+  </details>
+
+  <details id="partenariats">
+    <summary><span class="t">Modifier ou ajouter un partenariat <a class="anchor" href="#partenariats">#</a></span><span class="chev">▶</span>
+      <span class="p"><b>Partenariats</b> → la fiche (ou <b>Nouveau</b>) → Nom, Ordre, Texte → <b>Enregistrer</b>.</span></summary>
+    <div class="body">
+      <p>Un partenariat = un nom, un ordre d'affichage et un texte. Ils s'affichent dans la section Partenariats, triés par <b>Ordre</b>.</p>
+    </div>
+  </details>
+
+  <h2>Images</h2>
+
+  <details id="images">
+    <summary><span class="t">Les règles pour les images <a class="anchor" href="#images">#</a></span><span class="chev">▶</span>
+      <span class="p">JPEG pour les photos, PNG/SVG pour les logos · ≥ 1000 px de large · crédit photo rempli · texte alternatif court.</span></summary>
+    <div class="body">
+      <ul>
+        <li><b>Photos d'artistes</b> : JPEG, portrait vertical, au moins 1000 px de large, idéalement moins de 2 Mo. Le site fabrique lui-même les tailles nécessaires.</li>
+        <li><b>Affiches</b> : JPEG, le format de l'affiche, 1200 px de large suffit.</li>
+        <li><b>Logos</b> : PNG à fond transparent ou SVG.</li>
+        <li><b>Crédit photo</b> : toujours (il s'affiche sur la fiche). <b>Texte alternatif</b> : une courte description pour les personnes non-voyantes — le nom de l'artiste, le nom de l'institution.</li>
+        <li>Une image déjà envoyée est réutilisable : dans le sélecteur d'image, l'onglet des fichiers existants. Le bouton image en haut à gauche de l'admin ouvre la bibliothèque complète.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h2>Quand ça coince</h2>
+
+  <details id="pas-visible">
+    <summary><span class="t">J'ai enregistré et je ne vois rien sur le site <a class="anchor" href="#pas-visible">#</a></span><span class="chev">▶</span>
+      <span class="p">Attendre 3 minutes → <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd>. Toujours rien après 10 minutes → écrire à Pierre.</span></summary>
+    <div class="body">
+      <p>Le site se reconstruit après chaque enregistrement, ça prend 2 à 3 minutes. Ensuite le navigateur peut encore afficher l'ancienne version en cache : recharger avec <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd> sur Mac). Vérifier aussi que la fiche a bien été enregistrée (le bouton Enregistrer redevient grisé) et, pour une fiche artiste, que le champ <b>Année</b> correspond à l'onglet que tu regardes.</p>
+    </div>
+  </details>
+
+  <details id="betise">
+    <summary><span class="t">J'ai fait une bêtise <a class="anchor" href="#betise">#</a></span><span class="chev">▶</span>
+      <span class="p">Rien n'est perdu : chaque enregistrement est archivé. Écrire à Pierre en disant quoi et quand.</span></summary>
+    <div class="body">
+      <p>Texte effacé, mauvaise photo, fiche supprimée : tout est récupérable, parce que chaque enregistrement est une version conservée. Dis à Pierre ce qui a été touché et à quelle heure environ, il restaure. Inutile d'essayer de « réparer » en retapant de mémoire.</p>
+    </div>
+  </details>
+
+  <details id="plusieurs">
+    <summary><span class="t">On peut être plusieurs à éditer ? <a class="anchor" href="#plusieurs">#</a></span><span class="chev">▶</span>
+      <span class="p">Oui — sauf la même fiche au même moment.</span></summary>
+    <div class="body">
+      <p>Chacun·e avec son compte. Le seul cas à éviter : deux personnes qui enregistrent la même fiche à quelques secondes d'intervalle, la seconde écrase la première. Se répartir les fiches suffit.</p>
+    </div>
+  </details>
+
+  <details id="wordpress">
+    <summary><span class="t">Et l'ancien site WordPress ? <a class="anchor" href="#wordpress">#</a></span><span class="chev">▶</span>
+      <span class="p">Il reste en ligne jusqu'à la bascule du domaine. Ne plus rien y modifier.</span></summary>
+    <div class="body">
+      <p>Le nouveau site est pour l'instant sur <code>nouveau.faiscommecheztoi.ch</code>. Le jour de la bascule, <code>faiscommecheztoi.ch</code> pointera dessus et les anciennes adresses (<code>/les-artistes/</code>, <code>/contact/</code>…) redirigeront vers les bonnes sections. D'ici là, toute modification faite dans WordPress sera perdue : c'est ici qu'on édite.</p>
+    </div>
+  </details>
+
+  <details id="pepin">
+    <summary><span class="t">Écrire à Pierre <a class="anchor" href="#pepin">#</a></span><span class="chev">▶</span>
+      <span class="p">Ce que tu essayais de faire + la rubrique + une capture d'écran de l'erreur.</span></summary>
+    <div class="body">
+      <p>Trois choses qui font gagner un aller-retour : ce que tu essayais de faire, dans quelle rubrique, et une capture d'écran s'il y a un message d'erreur.</p>
+    </div>
+  </details>
+
+  <footer>Aide de l'admin du site Fais comme chez toi · <a href="index.html">retour à l'admin</a></footer>
+</div>
+
+<script>
+  (function () {
+    var q = document.getElementById('q');
+    var count = document.getElementById('count');
+    var items = Array.prototype.slice.call(document.querySelectorAll('details'));
+    var heads = Array.prototype.slice.call(document.querySelectorAll('h2'));
+
+    function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+
+    function filter() {
+      var v = norm(q.value.trim());
+      var shown = 0;
+      items.forEach(function (d) {
+        var hit = !v || norm(d.textContent).indexOf(v) !== -1;
+        d.classList.toggle('hidden', !hit);
+        if (hit) shown++;
+        if (v && hit) d.open = true;
+      });
+      heads.forEach(function (h) {
+        var n = h.nextElementSibling, any = false;
+        while (n && n.tagName !== 'H2') { if (n.tagName === 'DETAILS' && !n.classList.contains('hidden')) any = true; n = n.nextElementSibling; }
+        h.classList.toggle('hidden', !any);
+      });
+      count.textContent = v ? shown + ' résultat' + (shown > 1 ? 's' : '') : '';
+    }
+    q.addEventListener('input', filter);
+
+    document.querySelectorAll('[data-all]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var open = b.getAttribute('data-all') === 'open';
+        items.forEach(function (d) { if (!d.classList.contains('hidden')) d.open = open; });
+      });
+    });
+
+    // Un lien #ancre (depuis l'admin ou copié) ouvre la rubrique visée.
+    function openHash() {
+      var t = location.hash && document.getElementById(location.hash.slice(1));
+      if (t && t.tagName === 'DETAILS') { t.open = true; t.scrollIntoView(); }
+    }
+    window.addEventListener('hashchange', openHash);
+    openHash();
+  })();
+</script>
+</body>
+</html>

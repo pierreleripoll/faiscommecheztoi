@@ -28,7 +28,7 @@ Le contenu vit dans `content/` (une section = un fichier / dossier). Après tout
 
 <https://nouveau.faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
 
-Le guide destiné à l'équipe du festival : [`docs/tutoriel-admin.md`](docs/tutoriel-admin.md).
+L'aide destinée à l'équipe vit dans l'admin lui-même : le bouton ⓘ en bas à droite ouvre [`public/admin/aide.html`](public/admin/aide.html) (aussi accessible à `/admin/aide.html`) — un aide-mémoire par tâche, dépliable en mode d'emploi complet, captures dans `public/admin/captures/`. Le bouton est posé par `public/admin/index.html` par-dessus Sveltia, sans rien brancher dans le CMS.
 
 ### Donner l'accès à quelqu'un
 
