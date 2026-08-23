@@ -59,14 +59,17 @@
                   Photo {{ creneau.photo.credit }}
                 </p>
               </div>
-              <!-- En fin de fiche, en Vevey et non en pictogramme : un vrai
-                   .ics du spectacle, fabriqué dans le lien. Hors de l'ordre de
-                   tabulation tant que la fiche est repliée. -->
+              <!-- En fin de fiche, en Vevey et non en pictogramme : le .ics
+                   du spectacle, un vrai fichier généré au build
+                   (scripts/generateAgendaIcs.mjs). Pas d'attribut download :
+                   sur iPhone il forcerait l'enregistrement dans Fichiers au
+                   lieu de laisser Safari ouvrir l'aperçu « Ajouter à
+                   Calendrier ». Hors de l'ordre de tabulation tant que la
+                   fiche est repliée. -->
               <a
                 v-if="lienAgenda(soiree, creneau, annee)"
                 class="creneau__agenda"
                 :href="lienAgenda(soiree, creneau, annee)"
-                :download="nomFichierAgenda(creneau)"
                 :tabindex="ouvert === cle(soiree, creneau) ? 0 : -1"
                 >Ajoute-le à ton agenda</a
               >

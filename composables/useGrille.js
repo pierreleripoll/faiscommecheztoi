@@ -6,7 +6,9 @@
 // Format des dates 2026 dans le frontmatter : « Me 07.10, 19:00 ».
 // Les éditions 2021-2025 utilisent une autre écriture (« Mer. 2 oct. - 19h ») :
 // elles ne matchent pas, et c'est voulu — seule l'édition en cours a une grille.
-const FORMAT_DATE = /^(\w{2})\s+(\d{2})\.(\d{2}),\s*(\d{2}:\d{2})$/;
+// Exporté pour scripts/generateAgendaIcs.mjs, qui écarte les fiches des
+// anciennes éditions sans déclencher l'avertissement ci-dessous.
+export const FORMAT_DATE = /^(\w{2})\s+(\d{2})\.(\d{2}),\s*(\d{2}:\d{2})$/;
 
 const JOURS = {
   Lu: "Lundi",
@@ -90,8 +92,13 @@ export function construireGrille(artistes, annee) {
 }
 
 /* Agenda ---------------------------------------------------------------------
-   Chaque créneau déplié propose un fichier .ics à un seul VEVENT, fabriqué à
-   la volée dans un lien data: — aucun fichier à générer au build ni à servir. */
+   Chaque créneau déplié propose un fichier .ics à un seul VEVENT. Ce sont de
+   vrais fichiers statiques dans public/agenda/, générés au build par
+   scripts/generateAgendaIcs.mjs : un lien data: ne marche pas sur iPhone
+   (Safari iOS ignore les téléchargements data:), alors qu'un vrai .ics servi
+   en text/calendar s'ouvre directement dans l'aperçu « Ajouter à Calendrier ».
+   Le composant ne fabrique donc que l'URL (lienAgenda) ; le contenu
+   (contenuIcs) n'est appelé que par le script de build. */
 
 // RFC 5545 : virgules, points-virgules et barres obliques inverses s'échappent
 // dans les valeurs texte, les sauts de ligne deviennent « \n ».
@@ -118,12 +125,13 @@ function horodatage(annee, mois, jour, heures, mins) {
 }
 
 /**
- * Le lien data: d'un .ics pour un créneau d'une soirée.
+ * Le contenu .ics d'un créneau d'une soirée.
  * `soiree.key` est la clé MM-DD construite plus haut ; l'année vient de la
- * page. Tout est déterministe — le prérendu et l'hydratation doivent produire
- * le même href, donc pas de Date.now() pour le DTSTAMP.
+ * page. Tout est déterministe — même contenu à chaque build, donc pas de
+ * Date.now() pour le DTSTAMP : les agendas mettent à jour l'événement (UID
+ * stable) au lieu de le dupliquer.
  */
-export function lienAgenda(soiree, creneau, annee) {
+export function contenuIcs(soiree, creneau, annee) {
   if (!annee || !soiree?.key || !creneau?.heure) return "";
 
   const [mois, jour] = soiree.key.split("-").map(Number);
@@ -162,21 +170,27 @@ export function lienAgenda(soiree, creneau, annee) {
     "END:VCALENDAR",
   ];
 
-  return (
-    "data:text/calendar;charset=utf-8," +
-    encodeURIComponent(lignes.join("\r\n"))
-  );
+  // RFC 5545 : lignes terminées par CRLF, y compris la dernière.
+  return lignes.join("\r\n") + "\r\n";
 }
 
-/** Nom du fichier téléchargé : « sous-les-jupes.ics ». */
-export function nomFichierAgenda(creneau) {
+/** Nom du fichier : « 2026-10-07-1900-sous-les-jupes.ics ». Date et heure en
+    tête — deux représentations du même spectacle font deux fichiers. */
+export function nomFichierAgenda(soiree, creneau, annee) {
   const base = (creneau?.titre || creneau?.name || "spectacle")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return `${base || "spectacle"}.ics`;
+  const heure = String(creneau?.heure || "").replace(":", "");
+  return `${annee}-${soiree?.key}-${heure}-${base || "spectacle"}.ics`;
+}
+
+/** L'URL du .ics d'un créneau — le fichier lui-même est généré au build. */
+export function lienAgenda(soiree, creneau, annee) {
+  if (!annee || !soiree?.key || !creneau?.heure) return "";
+  return `/agenda/${nomFichierAgenda(soiree, creneau, annee)}`;
 }
 
 /** Version réactive : accepte des refs, des getters ou des valeurs brutes. */

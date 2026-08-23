@@ -23,6 +23,14 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . / [R=301,L]
 </IfModule>
 
+# Les .ics de la grille (/agenda/) doivent partir en text/calendar : c'est ce
+# type qui fait ouvrir à Safari iOS l'aperçu « Ajouter à Calendrier » au lieu
+# d'afficher le fichier en texte brut.
+<IfModule mod_mime.c>
+  AddType text/calendar .ics
+  AddCharset utf-8 .ics
+</IfModule>
+
 # Les JS/CSS du build sont fingerprintés (/_nuxt/) et les fontes ne changent
 # jamais : cache long. Le HTML, lui, reste revalidé à chaque visite.
 <IfModule mod_headers.c>

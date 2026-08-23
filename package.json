@@ -3,9 +3,10 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "node scripts/updateImageDimensions.mjs && nuxt generate",
+    "dev": "node scripts/generateAgendaIcs.mjs && nuxt dev",
+    "generate": "node scripts/updateImageDimensions.mjs && node scripts/generateAgendaIcs.mjs && nuxt generate",
     "preview": "nuxt preview",
+    "update-agenda": "node scripts/generateAgendaIcs.mjs",
     "update-images": "node scripts/updateImageDimensions.mjs"
   },
   "dependencies": {
