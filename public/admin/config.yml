@@ -79,6 +79,12 @@ collections:
               - { label: "Nom", name: "alt", widget: "string" }
               - { label: "Lien", name: "url", widget: "string", required: false }
 
+      - name: "pied"
+        label: "Pied de page"
+        file: "content/pied.md"
+        fields:
+          - { label: "Ligne", name: "ligne", widget: "string", hint: "Ex. Du 7 au 10 octobre 2026, au Spot à Sion — entrée libre" }
+
   - name: "artistes"
     label: "Artistes (par année)"
     folder: "content/artistes"

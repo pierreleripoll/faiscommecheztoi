@@ -417,6 +417,18 @@ const representationAilleurs = computed(() => {
   cursor: pointer;
 }
 
+/* Le liseré de focus du bouton-calque serait rogné par le cadre (overflow:
+   hidden) : on le porte sur la carte, qui n'est pas rognée. */
+.carte__bascule:focus-visible {
+  outline: none;
+}
+
+.carte:has(.carte__bascule:focus-visible) {
+  outline: 3px solid var(--c-ink);
+  outline-offset: 3px;
+  border-radius: var(--card-radius);
+}
+
 /* Le carrousel n'est pas dessiné dans le Figma (les points visibles sur la
    maquette appartiennent aux captures collées par le designer) : on reprend
    l'idiome de la nav — magenta à 50 %, plein au survol et sur l'élément actif. */
@@ -556,6 +568,11 @@ const representationAilleurs = computed(() => {
   background: none;
   color: var(--c-ink);
   cursor: pointer;
+}
+
+/* À 6 px du bord du cadre, le liseré décalé serait rogné : on le colle. */
+.carte__fermer:focus-visible {
+  outline-offset: 0;
 }
 
 .carte__fermer svg {

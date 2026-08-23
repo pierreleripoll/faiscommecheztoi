@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main id="contenu">
     <!-- Hero : texte d'intro + nuage appel à projet + photo pleine largeur -->
     <header class="hero page">
       <div class="hero__text">
@@ -7,6 +7,9 @@
       </div>
       <AppelCloud v-if="appel?.visible" :appel="appel" variant="hero" />
     </header>
+    <!-- La maquette mobile d'origine enchaînait l'intro et Artistes sans la
+         photo ; la maquette « Améliorations » (août 2026) la remet sur tous
+         les gabarits — l'intro seule faisait une page d'entrée sans image. -->
     <figure v-if="hero?.photo?.src" class="hero__photo">
       <ThumbhashImage
         :image="hero.photo"
@@ -174,13 +177,6 @@ const { data: soutiens } = await useAsyncData("soutiens", () =>
       transparent 35px
     ),
     linear-gradient(to top, var(--glow-photo), transparent 35px);
-}
-
-@media (max-width: 720px) {
-  /* La maquette mobile enchaîne directement l'intro et la section Artistes. */
-  .hero__photo {
-    display: none;
-  }
 }
 
 /* Partenariats -------------------------------------------------------------- */

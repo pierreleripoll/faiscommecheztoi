@@ -40,6 +40,7 @@
 
   /* Lueurs magenta (ombres portées du design) */
   --glow-nav: 0 7px 10px rgba(255, 0, 255, 0.35);
+  --glow-pied: 0 -7px 10px rgba(255, 0, 255, 0.35); /* la même, vers le haut */
   --glow-photo: rgba(255, 0, 255, 0.5);
   --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
   /* Invitation au clic (hors Figma) : halo symétrique, plus large que

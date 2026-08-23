@@ -10,6 +10,23 @@ html {
   scroll-padding-top: 66px;
 }
 
+/* Le défilement des ancres est la seule animation du site qui échappait encore
+   au réglage système. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Focus clavier : un liseré magenta, le même partout — liens, onglets d'année
+   et boutons-calques (plaques de la grille, cartes, affiches), dont l'anneau
+   par défaut du navigateur se perdait sur le rose. Décalé pour ne pas mordre
+   sur la lueur. */
+:focus-visible {
+  outline: 3px solid var(--c-ink);
+  outline-offset: 3px;
+}
+
 body {
   margin: 0;
   background: var(--c-bg);

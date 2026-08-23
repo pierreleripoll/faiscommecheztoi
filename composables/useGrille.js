@@ -89,6 +89,96 @@ export function construireGrille(artistes, annee) {
     }));
 }
 
+/* Agenda ---------------------------------------------------------------------
+   Chaque créneau déplié propose un fichier .ics à un seul VEVENT, fabriqué à
+   la volée dans un lien data: — aucun fichier à générer au build ni à servir. */
+
+// RFC 5545 : virgules, points-virgules et barres obliques inverses s'échappent
+// dans les valeurs texte, les sauts de ligne deviennent « \n ».
+function echapper(texte) {
+  return String(texte)
+    .replace(/\\/g, "\\\\")
+    .replace(/([,;])/g, "\\$1")
+    .replace(/\r?\n/g, "\\n");
+}
+
+// « 55’ » → 55. Sans durée lisible, une heure : mieux vaut un créneau trop
+// long qu'un événement sans fin.
+function minutes(duration) {
+  const n = parseInt(String(duration || "").replace(/\D/g, ""), 10);
+  return Number.isFinite(n) && n > 0 ? n : 60;
+}
+
+function deuxChiffres(n) {
+  return String(n).padStart(2, "0");
+}
+
+function horodatage(annee, mois, jour, heures, mins) {
+  return `${annee}${deuxChiffres(mois)}${deuxChiffres(jour)}T${deuxChiffres(heures)}${deuxChiffres(mins)}00`;
+}
+
+/**
+ * Le lien data: d'un .ics pour un créneau d'une soirée.
+ * `soiree.key` est la clé MM-DD construite plus haut ; l'année vient de la
+ * page. Tout est déterministe — le prérendu et l'hydratation doivent produire
+ * le même href, donc pas de Date.now() pour le DTSTAMP.
+ */
+export function lienAgenda(soiree, creneau, annee) {
+  if (!annee || !soiree?.key || !creneau?.heure) return "";
+
+  const [mois, jour] = soiree.key.split("-").map(Number);
+  const [heures, mins] = creneau.heure.split(":").map(Number);
+  const debut = new Date(Date.UTC(annee, mois - 1, jour, heures, mins));
+  const fin = new Date(debut.getTime() + minutes(creneau.duration) * 60000);
+
+  const lieu = [creneau.lieu, "Le Spot", "Sion"].filter(Boolean).join(", ");
+  const uid = `${soiree.key}-${creneau.heure}-${creneau.path}`.replace(
+    /[^\w.-]+/g,
+    "-"
+  );
+
+  // Heure locale du festival, pas UTC : l'agenda du visiteur la convertira.
+  const lignes = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//faiscommecheztoi.ch//grille//FR",
+    "BEGIN:VEVENT",
+    `UID:${uid}@faiscommecheztoi.ch`,
+    `DTSTAMP:${horodatage(annee, mois, jour, 0, 0)}Z`,
+    `DTSTART;TZID=Europe/Zurich:${horodatage(annee, mois, jour, heures, mins)}`,
+    `DTEND;TZID=Europe/Zurich:${horodatage(
+      fin.getUTCFullYear(),
+      fin.getUTCMonth() + 1,
+      fin.getUTCDate(),
+      fin.getUTCHours(),
+      fin.getUTCMinutes()
+    )}`,
+    `SUMMARY:${echapper(
+      [creneau.titre, creneau.name].filter(Boolean).join(" — ")
+    )}`,
+    `LOCATION:${echapper(lieu)}`,
+    "URL:https://faiscommecheztoi.ch/#grille",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ];
+
+  return (
+    "data:text/calendar;charset=utf-8," +
+    encodeURIComponent(lignes.join("\r\n"))
+  );
+}
+
+/** Nom du fichier téléchargé : « sous-les-jupes.ics ». */
+export function nomFichierAgenda(creneau) {
+  const base = (creneau?.titre || creneau?.name || "spectacle")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `${base || "spectacle"}.ics`;
+}
+
 /** Version réactive : accepte des refs, des getters ou des valeurs brutes. */
 export function useGrille(artistes, annee) {
   return computed(() => construireGrille(toValue(artistes), toValue(annee)));

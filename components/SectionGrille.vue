@@ -59,6 +59,17 @@
                   Photo {{ creneau.photo.credit }}
                 </p>
               </div>
+              <!-- En fin de fiche, en Vevey et non en pictogramme : un vrai
+                   .ics du spectacle, fabriqué dans le lien. Hors de l'ordre de
+                   tabulation tant que la fiche est repliée. -->
+              <a
+                v-if="lienAgenda(soiree, creneau, annee)"
+                class="creneau__agenda"
+                :href="lienAgenda(soiree, creneau, annee)"
+                :download="nomFichierAgenda(creneau)"
+                :tabindex="ouvert === cle(soiree, creneau) ? 0 : -1"
+                >Ajoute-le à ton agenda</a
+              >
             </div>
           </div>
 
@@ -281,6 +292,17 @@ function ailleurs(creneau) {
   margin-bottom: 0;
 }
 
+.creneau__agenda {
+  /* Par-dessus le bouton-calque, sinon le clic replierait la fiche au lieu
+     de télécharger. */
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin-top: 12.4px;
+  font-size: var(--fs-legend);
+  line-height: 1.25;
+}
+
 .creneau__croix {
   position: absolute;
   top: 12.4px;
@@ -344,14 +366,16 @@ function ailleurs(creneau) {
   font-size: calc(var(--fs-card) * 0.8);
 }
 
+/* Les légendes à 75 % et non 50 % : à 17 px sur le fond clair, le magenta à
+   moitié ne passait plus le contraste. La hiérarchie tient, la ligne se lit. */
 .creneau__meta {
   font-size: var(--fs-legend);
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .grille__note {
   font-size: var(--fs-legend);
-  opacity: 0.5;
+  opacity: 0.75;
   margin-top: 25px;
 }
 
