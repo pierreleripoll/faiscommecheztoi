@@ -133,12 +133,12 @@
       <p>La colonne de gauche liste tout ce qui est modifiable :</p>
       <div class="tablewrap"><table>
         <tr><th>Rubrique</th><th>Contenu</th></tr>
-        <tr><td>Sections de la page</td><td>Les blocs de texte du site : intro, nuage « Appel à projet », Infos pratiques, Participer, Contact &amp; Team, logos des soutiens, ligne du pied de page</td></tr>
-        <tr><td>Artistes de l'édition</td><td>Une fiche par artiste, toutes éditions confondues (71 fiches)</td></tr>
-        <tr><td>Artistes (par année)</td><td>L'affiche de chaque édition et son crédit graphique</td></tr>
+        <tr><td>Artistes</td><td>Une fiche par artiste. La liste s'ouvre sur l'édition en cours ; le menu <b>Filtrer</b> passe aux éditions précédentes</td></tr>
+        <tr><td>Éditions (affiches)</td><td>Une entrée par édition : l'année et ses affiches</td></tr>
         <tr><td>Partenariats</td><td>La Crémaillère, L'entrée en matière, L'Oblique…</td></tr>
+        <tr><td>Fichiers</td><td>Chaque section de texte du site, en accès direct : intro, nuage « Appel à projet », Infos pratiques, Participer, Contact &amp; Team, Soutiens (logos), pied de page</td></tr>
       </table></div>
-      <p>Avec 71 fiches artistes, la <b>recherche</b> (champ en haut au centre) est souvent plus rapide : elle cherche dans toutes les rubriques.</p>
+      <p>Sous <b>Fichiers</b>, un clic sur une section ouvre directement son formulaire — pas de liste intermédiaire. Et avec plus de 70 fiches artistes, la <b>recherche</b> (champ en haut au centre) est souvent la plus rapide : elle cherche dans toutes les rubriques.</p>
       <figure><img src="captures/admin-accueil.jpg" alt="L'accueil de l'admin" loading="lazy"><figcaption>L'accueil : rubriques à gauche, recherche en haut.</figcaption></figure>
       <figure><img src="captures/admin-recherche.jpg" alt="Résultat de recherche" loading="lazy"><figcaption>Taper « Pellissier » retrouve la fiche directement.</figcaption></figure>
     </div>
@@ -148,10 +148,10 @@
 
   <details id="titre">
     <summary><span class="t">Corriger le titre d'un spectacle (ou n'importe quel champ d'une fiche) <a class="anchor" href="#titre">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Artistes de l'édition</b> → la fiche → champ <b>Titre du spectacle</b> → <b>Enregistrer</b>.</span></summary>
+      <span class="p"><b>Artistes</b> → la fiche → champ <b>Titre du spectacle</b> → <b>Enregistrer</b>.</span></summary>
     <div class="body">
       <ol>
-        <li>Colonne de gauche → <b>Artistes de l'édition</b> (ou taper le nom dans la recherche).</li>
+        <li>Colonne de gauche → <b>Artistes</b> (ou taper le nom dans la recherche). La liste s'ouvre sur l'édition en cours, avec la photo de chaque artiste en vignette ; pour une édition passée, le menu <b>Filtrer</b> en haut de la liste.</li>
         <li>Cliquer sur la ligne de l'artiste. La liste affiche <code>ordre. Nom — Titre du spectacle</code>.</li>
         <li>Dans la fiche, corriger le champ voulu. L'aperçu à droite se met à jour en direct.</li>
         <li><b>Enregistrer</b>, en haut à droite.</li>
@@ -163,7 +163,7 @@
 
   <details id="nouvelle-fiche">
     <summary><span class="t">Ajouter un·e artiste <a class="anchor" href="#nouvelle-fiche">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Artistes de l'édition</b> → <b>Nouveau</b> (en haut à droite) → remplir → <b>Enregistrer</b>. Année = <b>2026</b>, Ordre = rang de la première représentation.</span></summary>
+      <span class="p"><b>Artistes</b> → <b>Nouveau</b> (en haut à droite) → remplir → <b>Enregistrer</b>. Année = <b>2026</b>, Ordre = rang de la première représentation.</span></summary>
     <div class="body">
       <figure><img src="captures/admin-artistes-liste.jpg" alt="La liste des fiches artistes" loading="lazy"><figcaption>Le bouton Nouveau, en haut à droite de la liste.</figcaption></figure>
       <p>Chaque fiche devient une carte qui se retourne sur le site : photo et nom au recto, tout le reste au verso.</p>
@@ -204,9 +204,11 @@
 
   <details id="ordre">
     <summary><span class="t">Changer l'ordre des artistes <a class="anchor" href="#ordre">#</a></span><span class="chev">▶</span>
-      <span class="p">Fiche → champ <b>Ordre</b> → le numéro de passage → <b>Enregistrer</b>.</span></summary>
+      <span class="p"><b>Artistes</b> → bouton <b>Réorganiser</b> (en haut de la liste) → glisser les fiches → <b>Terminer</b>.</span></summary>
     <div class="body">
-      <p>Les artistes apparaissent sur le site dans l'ordre du champ <b>Ordre</b>, du plus petit au plus grand, à l'intérieur de leur année. La convention : numéroter selon la première représentation de chacun·e. Deux fiches peuvent porter le même numéro si elles sont d'années différentes.</p>
+      <p>Le plus simple : dans la liste <b>Artistes</b>, cliquer <b>Réorganiser</b>. Les fiches se regroupent par édition et se déplacent à la souris (ou au doigt) ; en terminant, la numérotation est réécrite automatiquement, édition par édition. On ne peut pas déplacer une fiche d'une édition à l'autre — pour ça, changer son champ <b>Année</b>.</p>
+      <figure><img src="captures/admin-reorganiser.jpg" alt="Le mode Réorganiser, fiches groupées par édition" loading="lazy"><figcaption>Le mode Réorganiser : glisser une fiche, puis Terminé.</figcaption></figure>
+      <p>L'autre méthode marche toujours : ouvrir la fiche et taper le numéro dans le champ <b>Ordre</b>. Les artistes apparaissent sur le site dans l'ordre de ce champ, du plus petit au plus grand, à l'intérieur de leur année. La convention : numéroter selon la première représentation de chacun·e. Deux fiches peuvent porter le même numéro si elles sont d'années différentes.</p>
     </div>
   </details>
 
@@ -221,9 +223,10 @@
 
   <details id="affiche">
     <summary><span class="t">Ajouter l'affiche d'une nouvelle édition <a class="anchor" href="#affiche">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Artistes (par année)</b> → <b>Nouveau</b> → Année → Affiches (image + crédit graphiste) → <b>Enregistrer</b>.</span></summary>
+      <span class="p"><b>Éditions (affiches)</b> → <b>Nouveau</b> → Année → Affiches (image + crédit graphiste) → <b>Enregistrer</b>.</span></summary>
     <div class="body">
       <p>Une entrée par édition. Le champ <b>Année</b> doit être identique à celui des fiches artistes de cette édition (ex. <code>2026</code>) : c'est ce qui fait apparaître l'onglet dans la section Artistes. On peut mettre plusieurs affiches si l'édition en a eu plusieurs.</p>
+      <div class="note">Pour une nouvelle édition, demander aussi à Pierre de mettre à jour le filtre par défaut de la liste Artistes (un réglage dans la configuration de l'admin), pour qu'elle s'ouvre sur la nouvelle année.</div>
     </div>
   </details>
 
@@ -231,7 +234,7 @@
 
   <details id="sections">
     <summary><span class="t">Modifier l'intro, les Infos pratiques, Participer, Contact &amp; Team <a class="anchor" href="#sections">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Sections de la page</b> → la section → le texte → <b>Enregistrer</b>.</span></summary>
+      <span class="p">Colonne de gauche, groupe <b>Fichiers</b> → la section → le texte → <b>Enregistrer</b>.</span></summary>
     <div class="body">
       <div class="tablewrap"><table>
         <tr><th>Section</th><th>Ce qu'elle contient</th></tr>
@@ -255,7 +258,7 @@
 
   <details id="nuage">
     <summary><span class="t">Afficher ou masquer le nuage « Appel à projet » <a class="anchor" href="#nuage">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Sections de la page</b> → <b>Nuage « Appel à projet »</b> → case <b>Visible</b> → <b>Enregistrer</b>.</span></summary>
+      <span class="p">Colonne de gauche → <b>Nuage « Appel à projet »</b> → case <b>Visible</b> → <b>Enregistrer</b>.</span></summary>
     <div class="body">
       <ul>
         <li><b>Visible</b> : l'interrupteur. Coché à l'ouverture de l'appel, décoché à la clôture.</li>
@@ -269,7 +272,7 @@
 
   <details id="logos">
     <summary><span class="t">Ajouter ou retirer un logo de soutien <a class="anchor" href="#logos">#</a></span><span class="chev">▶</span>
-      <span class="p"><b>Sections de la page</b> → <b>Soutiens (logos)</b> → liste <b>Logos</b> → ajouter / supprimer → <b>Enregistrer</b>.</span></summary>
+      <span class="p">Colonne de gauche → <b>Soutiens (logos)</b> → liste <b>Logos</b> → ajouter / supprimer → <b>Enregistrer</b>.</span></summary>
     <div class="body">
       <p>Chaque logo = une image, un <b>Nom</b> (affiché si l'image ne charge pas, et lu par les lecteurs d'écran) et, si on veut, un <b>Lien</b> vers le site de l'institution. L'ordre de la liste est l'ordre d'affichage : les flèches déplacent un logo.</p>
       <p>Format idéal : PNG à fond transparent, ou SVG. Éviter les logos en JPEG avec un fond blanc, ils font un rectangle sur le fond rose.</p>
@@ -280,7 +283,7 @@
     <summary><span class="t">Modifier ou ajouter un partenariat <a class="anchor" href="#partenariats">#</a></span><span class="chev">▶</span>
       <span class="p"><b>Partenariats</b> → la fiche (ou <b>Nouveau</b>) → Nom, Ordre, Texte → <b>Enregistrer</b>.</span></summary>
     <div class="body">
-      <p>Un partenariat = un nom, un ordre d'affichage et un texte. Ils s'affichent dans la section Partenariats, triés par <b>Ordre</b>.</p>
+      <p>Un partenariat = un nom, un ordre d'affichage et un texte. Ils s'affichent dans la section Partenariats, triés par <b>Ordre</b> — modifiable aussi par glisser-déposer avec le bouton <b>Réorganiser</b>, en haut de la liste.</p>
     </div>
   </details>
 
