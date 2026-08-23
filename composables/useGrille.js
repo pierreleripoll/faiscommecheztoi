@@ -124,6 +124,35 @@ function horodatage(annee, mois, jour, heures, mins) {
   return `${annee}${deuxChiffres(mois)}${deuxChiffres(jour)}T${deuxChiffres(heures)}${deuxChiffres(mins)}00`;
 }
 
+// Début et fin du créneau en « horodatage » local (heure du festival) —
+// partagés entre le .ics et le lien Google Agenda, qui écrivent la même
+// période dans deux syntaxes.
+function bornes(soiree, creneau, annee) {
+  const [mois, jour] = soiree.key.split("-").map(Number);
+  const [heures, mins] = creneau.heure.split(":").map(Number);
+  const debut = new Date(Date.UTC(annee, mois - 1, jour, heures, mins));
+  const fin = new Date(debut.getTime() + minutes(creneau.duration) * 60000);
+  return {
+    date: { annee, mois, jour },
+    debut: horodatage(annee, mois, jour, heures, mins),
+    fin: horodatage(
+      fin.getUTCFullYear(),
+      fin.getUTCMonth() + 1,
+      fin.getUTCDate(),
+      fin.getUTCHours(),
+      fin.getUTCMinutes()
+    ),
+  };
+}
+
+function titreEvenement(creneau) {
+  return [creneau.titre, creneau.name].filter(Boolean).join(" — ");
+}
+
+function lieuEvenement(creneau) {
+  return [creneau.lieu, "Le Spot", "Sion"].filter(Boolean).join(", ");
+}
+
 /**
  * Le contenu .ics d'un créneau d'une soirée.
  * `soiree.key` est la clé MM-DD construite plus haut ; l'année vient de la
@@ -134,12 +163,7 @@ function horodatage(annee, mois, jour, heures, mins) {
 export function contenuIcs(soiree, creneau, annee) {
   if (!annee || !soiree?.key || !creneau?.heure) return "";
 
-  const [mois, jour] = soiree.key.split("-").map(Number);
-  const [heures, mins] = creneau.heure.split(":").map(Number);
-  const debut = new Date(Date.UTC(annee, mois - 1, jour, heures, mins));
-  const fin = new Date(debut.getTime() + minutes(creneau.duration) * 60000);
-
-  const lieu = [creneau.lieu, "Le Spot", "Sion"].filter(Boolean).join(", ");
+  const { date, debut, fin } = bornes(soiree, creneau, annee);
   const uid = `${soiree.key}-${creneau.heure}-${creneau.path}`.replace(
     /[^\w.-]+/g,
     "-"
@@ -152,19 +176,11 @@ export function contenuIcs(soiree, creneau, annee) {
     "PRODID:-//faiscommecheztoi.ch//grille//FR",
     "BEGIN:VEVENT",
     `UID:${uid}@faiscommecheztoi.ch`,
-    `DTSTAMP:${horodatage(annee, mois, jour, 0, 0)}Z`,
-    `DTSTART;TZID=Europe/Zurich:${horodatage(annee, mois, jour, heures, mins)}`,
-    `DTEND;TZID=Europe/Zurich:${horodatage(
-      fin.getUTCFullYear(),
-      fin.getUTCMonth() + 1,
-      fin.getUTCDate(),
-      fin.getUTCHours(),
-      fin.getUTCMinutes()
-    )}`,
-    `SUMMARY:${echapper(
-      [creneau.titre, creneau.name].filter(Boolean).join(" — ")
-    )}`,
-    `LOCATION:${echapper(lieu)}`,
+    `DTSTAMP:${horodatage(date.annee, date.mois, date.jour, 0, 0)}Z`,
+    `DTSTART;TZID=Europe/Zurich:${debut}`,
+    `DTEND;TZID=Europe/Zurich:${fin}`,
+    `SUMMARY:${echapper(titreEvenement(creneau))}`,
+    `LOCATION:${echapper(lieuEvenement(creneau))}`,
     "URL:https://faiscommecheztoi.ch/#grille",
     "END:VEVENT",
     "END:VCALENDAR",
@@ -191,6 +207,29 @@ export function nomFichierAgenda(soiree, creneau, annee) {
 export function lienAgenda(soiree, creneau, annee) {
   if (!annee || !soiree?.key || !creneau?.heure) return "";
   return `/agenda/${nomFichierAgenda(soiree, creneau, annee)}`;
+}
+
+/**
+ * Le même créneau en lien « modèle » Google Agenda : sur Android, le .ics
+ * téléchargé demande encore d'ouvrir le fichier, alors que ce lien ouvre
+ * l'app Google Agenda directement sur l'événement pré-rempli — il ne reste
+ * qu'à l'enregistrer. Servi seulement après détection d'Android côté client
+ * (voir SectionGrille) ; partout ailleurs le .ics fait mieux.
+ */
+export function lienGoogleAgenda(soiree, creneau, annee) {
+  if (!annee || !soiree?.key || !creneau?.heure) return "";
+
+  const { debut, fin } = bornes(soiree, creneau, annee);
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: titreEvenement(creneau),
+    // Horodatages sans « Z » + ctz : Google les lit en heure du festival.
+    dates: `${debut}/${fin}`,
+    ctz: "Europe/Zurich",
+    location: lieuEvenement(creneau),
+    details: "https://faiscommecheztoi.ch/#grille",
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
 }
 
 /** Version réactive : accepte des refs, des getters ou des valeurs brutes. */

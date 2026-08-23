@@ -64,12 +64,15 @@
                    (scripts/generateAgendaIcs.mjs). Pas d'attribut download :
                    sur iPhone il forcerait l'enregistrement dans Fichiers au
                    lieu de laisser Safari ouvrir l'aperçu « Ajouter à
-                   Calendrier ». Hors de l'ordre de tabulation tant que la
-                   fiche est repliée. -->
+                   Calendrier ». Sur Android, hrefAgenda bascule vers le lien
+                   Google Agenda après hydratation. Hors de l'ordre de
+                   tabulation tant que la fiche est repliée. -->
               <a
                 v-if="lienAgenda(soiree, creneau, annee)"
                 class="creneau__agenda"
-                :href="lienAgenda(soiree, creneau, annee)"
+                :href="hrefAgenda(soiree, creneau)"
+                :target="surAndroid ? '_blank' : null"
+                :rel="surAndroid ? 'noopener' : null"
                 :tabindex="ouvert === cle(soiree, creneau) ? 0 : -1"
                 >Ajoute-le à ton agenda</a
               >
@@ -152,6 +155,21 @@ function cle(soiree, creneau) {
 function basculer(soiree, creneau) {
   const k = cle(soiree, creneau);
   ouvert.value = ouvert.value === k ? null : k;
+}
+
+// Sur Android, le .ics téléchargé demande encore d'ouvrir le fichier : on lui
+// substitue le lien Google Agenda, qui ouvre l'app sur l'événement pré-rempli.
+// Détection en onMounted seulement — le HTML prérendu est le même pour tout
+// le monde, l'hydratation ne doit donc pas voir un autre href.
+const surAndroid = ref(false);
+onMounted(() => {
+  surAndroid.value = /android/i.test(navigator.userAgent);
+});
+
+function hrefAgenda(soiree, creneau) {
+  return surAndroid.value
+    ? lienGoogleAgenda(soiree, creneau, props.annee)
+    : lienAgenda(soiree, creneau, props.annee);
 }
 
 // Représentation dans un autre festival, sur une ligne à barres — même
