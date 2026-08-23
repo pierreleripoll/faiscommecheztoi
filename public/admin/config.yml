@@ -3,6 +3,13 @@
 # ALLOWED_DOMAINS : y ajouter faiscommecheztoi.ch (et localhost pour le dev), sinon /admin affiche « Votre domaine n'est pas autorisé à
 # utiliser l'authentificateur ». Les éditeur·ices ont besoin d'un compte GitHub
 # avec accès en écriture au repo (voir README, section « Admin »).
+#
+# L'interface s'appuie sur des options récentes de Sveltia (≥ 0.186, août 2026) :
+# `singletons` (sections en accès direct dans la colonne de gauche), `reorder`
+# (réorganisation des artistes par glisser-déposer, groupée par édition),
+# `view_filters`/`view_groups` (la liste s'ouvre sur l'édition courante),
+# `thumbnail` (vignettes dans les listes). /admin/index.html charge la dernière
+# version depuis unpkg — ne pas figer une version antérieure à 0.186.
 backend:
   name: github
   repo: pierreleripoll/faiscommecheztoi
@@ -10,108 +17,24 @@ backend:
   base_url: https://sveltia-cms-auth.pierreripoll13-d89.workers.dev
 
 site_url: https://faiscommecheztoi.ch
+app_title: "Admin — Fais comme chez toi"
 
 media_folder: public/uploads
 public_folder: /uploads
 
 collections:
-  - name: "pages"
-    label: "Sections de la page"
-    files:
-      - name: "hero"
-        label: "Intro (haut de page)"
-        file: "content/hero.md"
-        fields:
-          - label: "Texte d'intro"
-            name: "body"
-            widget: "markdown"
-          - label: "Photo"
-            name: "photo"
-            widget: "object"
-            fields:
-              - { label: "Image", name: "src", widget: "image" }
-              - { label: "Texte alternatif", name: "alt", widget: "string", required: false }
-
-      - name: "appel"
-        label: "Nuage « Appel à projet »"
-        file: "content/appel.md"
-        fields:
-          - { label: "Visible", name: "visible", widget: "boolean", default: true }
-          - { label: "Texte", name: "label", widget: "string" }
-          - label: "Lien"
-            name: "url"
-            widget: "string"
-            hint: "URL ou ancre (ex. #participer, https://…, mailto:…)"
-
-      - name: "infos"
-        label: "Infos pratiques"
-        file: "content/infos.md"
-        fields:
-          - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Texte", name: "body", widget: "markdown" }
-
-      - name: "participer"
-        label: "Participer"
-        file: "content/participer.md"
-        fields:
-          - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Texte", name: "body", widget: "markdown" }
-
-      - name: "team"
-        label: "Contact & Team"
-        file: "content/team.md"
-        fields:
-          - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Texte", name: "body", widget: "markdown" }
-
-      - name: "soutiens"
-        label: "Soutiens (logos)"
-        file: "content/soutiens.md"
-        fields:
-          - { label: "Titre", name: "title", widget: "string" }
-          - label: "Logos"
-            name: "logos"
-            widget: "list"
-            collapsed: true
-            summary: "{{fields.alt}}"
-            fields:
-              - { label: "Image", name: "src", widget: "image" }
-              - { label: "Nom", name: "alt", widget: "string" }
-              - { label: "Lien", name: "url", widget: "string", required: false }
-
-      - name: "pied"
-        label: "Pied de page"
-        file: "content/pied.md"
-        fields:
-          - { label: "Ligne", name: "ligne", widget: "string", hint: "Ex. Du 7 au 10 octobre 2026, au Spot à Sion — entrée libre" }
-
-  - name: "artistes"
-    label: "Artistes (par année)"
-    folder: "content/artistes"
-    create: true
-    slug: "{{year}}"
-    extension: "md"
-    format: "frontmatter"
-    identifier_field: "year"
-    summary: "{{year}}"
-    sortable_fields: ["year"]
-    fields:
-      - { label: "Année", name: "year", widget: "string" }
-      - label: "Affiches"
-        name: "posters"
-        widget: "list"
-        collapsed: true
-        summary: "{{fields.credit}}"
-        fields:
-          - { label: "Affiche", name: "src", widget: "image" }
-          - { label: "Crédit (graphiste)", name: "credit", widget: "string", required: false }
-
   # Un fichier par artiste. Ces fiches s'affichent dans la section « Artistes »,
   # filtrées par l'année. Les champs machine des photos
   # (width/height/ratio/thumbhash) ne sont pas déclarés : le script
   # update-images les ajoute après coup et Sveltia préserve les clés inconnues.
+  #
+  # À CHAQUE NOUVELLE ÉDITION : ajouter un filtre « Édition <année> » ci-dessous
+  # et déplacer `default` dessus, pour que la liste s'ouvre sur l'édition en
+  # cours. (Penser aussi à créer l'entrée de l'année dans « Éditions ».)
   - name: "programme"
-    label: "Artistes de l'édition"
+    label: "Artistes"
+    label_singular: "fiche artiste"
+    icon: "theater_comedy"
     folder: "content/programme"
     create: true
     slug: "{{order}}.{{slug}}"
@@ -119,7 +42,29 @@ collections:
     format: "frontmatter"
     identifier_field: "name"
     summary: "{{order}}. {{name}} — {{title}}"
-    sortable_fields: ["order", "name"]
+    thumbnail: "photos.*.src"
+    sortable_fields:
+      fields: ["order", "name", "year"]
+      default:
+        field: "order"
+    view_filters:
+      filters:
+        - { name: "2026", label: "Édition 2026", field: "year", pattern: "2026" }
+        - { name: "2025", label: "Édition 2025", field: "year", pattern: "2025" }
+        - { name: "2024", label: "Édition 2024", field: "year", pattern: "2024" }
+        - { name: "2023", label: "Édition 2023", field: "year", pattern: "2023" }
+        - { name: "2022", label: "Édition 2022", field: "year", pattern: "2022" }
+        - { name: "2021", label: "Édition 2021", field: "year", pattern: "2021" }
+      default: "2026"
+    view_groups:
+      groups:
+        - { name: "year", label: "Édition", field: "year" }
+      default: "year"
+    # Glisser-déposer (bouton « Réorganiser » de la liste) : renumérote le champ
+    # `order` édition par édition, à partir de 1. Les préfixes numériques des
+    # noms de fichiers ne sont pas renommés — seul le champ fait foi.
+    reorder:
+      group: "year"
     fields:
       - { label: "Artiste", name: "name", widget: "string" }
       - label: "Ordre"
@@ -127,7 +72,7 @@ collections:
         widget: "number"
         value_type: "int"
         default: 1
-        hint: "Ordre d'affichage — les artistes sont classés par première représentation."
+        hint: "Ordre d'affichage — les artistes sont classés par première représentation. Modifiable aussi par glisser-déposer : bouton « Réorganiser » en haut de la liste."
       - label: "Année"
         name: "year"
         widget: "string"
@@ -170,7 +115,8 @@ collections:
         widget: "list"
         required: false
         collapsed: true
-        summary: "{{fields.src}}"
+        summary: "{{fields.alt}}"
+        thumbnail: "src"
         hint: "La première photo est celle qui s'affiche ; les suivantes se feuillettent sur la carte."
         fields:
           - { label: "Image", name: "src", widget: "image" }
@@ -178,15 +124,131 @@ collections:
           - { label: "Crédit photo", name: "credit", widget: "string", required: false }
       - { label: "Biographie", name: "body", widget: "markdown" }
 
+  # Une entrée par édition du festival : l'année (qui crée l'onglet dans la
+  # section Artistes) et ses affiches.
+  - name: "artistes"
+    label: "Éditions (affiches)"
+    label_singular: "édition"
+    icon: "calendar_month"
+    folder: "content/artistes"
+    create: true
+    slug: "{{year}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "year"
+    summary: "Édition {{year}}"
+    thumbnail: "posters.*.src"
+    sortable_fields:
+      fields: ["year"]
+      default:
+        field: "year"
+        direction: "descending"
+    fields:
+      - { label: "Année", name: "year", widget: "string" }
+      - label: "Affiches"
+        name: "posters"
+        widget: "list"
+        collapsed: true
+        summary: "{{fields.credit}}"
+        thumbnail: "src"
+        fields:
+          - { label: "Affiche", name: "src", widget: "image" }
+          - { label: "Crédit (graphiste)", name: "credit", widget: "string", required: false }
+
   - name: "partenariats"
     label: "Partenariats"
+    label_singular: "partenariat"
+    icon: "handshake"
     folder: "content/partenariats"
     create: true
     slug: "{{order}}.{{slug}}"
     extension: "md"
     format: "frontmatter"
     summary: "{{title}}"
+    sortable_fields:
+      fields: ["order", "title"]
+      default:
+        field: "order"
+    reorder: true
     fields:
       - { label: "Nom", name: "title", widget: "string" }
-      - { label: "Ordre", name: "order", widget: "number", value_type: "int", default: 1 }
+      - { label: "Ordre", name: "order", widget: "number", value_type: "int", default: 1, hint: "Modifiable aussi par glisser-déposer : bouton « Réorganiser » en haut de la liste." }
       - { label: "Texte", name: "body", widget: "markdown" }
+
+# Les sections de la page, chacune en accès direct dans la colonne de gauche
+# (groupe « Fichiers »), dans l'ordre où elles apparaissent sur le site.
+singletons:
+  - name: "hero"
+    label: "Intro (haut de page)"
+    icon: "waving_hand"
+    file: "content/hero.md"
+    fields:
+      - label: "Texte d'intro"
+        name: "body"
+        widget: "markdown"
+      - label: "Photo"
+        name: "photo"
+        widget: "object"
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - { label: "Texte alternatif", name: "alt", widget: "string", required: false }
+
+  - name: "appel"
+    label: "Nuage « Appel à projet »"
+    icon: "cloud"
+    file: "content/appel.md"
+    fields:
+      - { label: "Visible", name: "visible", widget: "boolean", default: true }
+      - { label: "Texte", name: "label", widget: "string" }
+      - label: "Lien"
+        name: "url"
+        widget: "string"
+        hint: "URL ou ancre (ex. #participer, https://…, mailto:…)"
+
+  - name: "infos"
+    label: "Infos pratiques"
+    icon: "info"
+    file: "content/infos.md"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Texte", name: "body", widget: "markdown" }
+
+  - name: "participer"
+    label: "Participer"
+    icon: "edit_note"
+    file: "content/participer.md"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Texte", name: "body", widget: "markdown" }
+
+  - name: "team"
+    label: "Contact & Team"
+    icon: "groups"
+    file: "content/team.md"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Texte", name: "body", widget: "markdown" }
+
+  - name: "soutiens"
+    label: "Soutiens (logos)"
+    icon: "volunteer_activism"
+    file: "content/soutiens.md"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - label: "Logos"
+        name: "logos"
+        widget: "list"
+        collapsed: true
+        summary: "{{fields.alt}}"
+        thumbnail: "src"
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - { label: "Nom", name: "alt", widget: "string" }
+          - { label: "Lien", name: "url", widget: "string", required: false }
+
+  - name: "pied"
+    label: "Pied de page"
+    icon: "copyright"
+    file: "content/pied.md"
+    fields:
+      - { label: "Ligne", name: "ligne", widget: "string", hint: "Ex. Du 7 au 10 octobre 2026, au Spot à Sion — entrée libre" }

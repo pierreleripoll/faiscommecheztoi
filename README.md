@@ -28,6 +28,8 @@ Le contenu vit dans `content/` (une section = un fichier / dossier). Après tout
 
 <https://faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
 
+L'interface ([`public/admin/config.yml`](public/admin/config.yml)) est organisée autour des éditions : la liste **Artistes** s'ouvre filtrée sur l'édition courante (menu *Filtrer* pour les années passées, vignettes photos, bouton *Réorganiser* pour changer l'ordre par glisser-déposer — renuméroté édition par édition dans le champ `order`, sans renommer les fichiers), **Éditions (affiches)** porte l'année et les affiches, et chaque section de texte est en accès direct dans la barre latérale (groupe *Fichiers*). **À chaque nouvelle édition** : créer l'entrée dans Éditions, puis dans `config.yml` ajouter le filtre « Édition &lt;année&gt; » et déplacer `view_filters.default` dessus.
+
 L'aide destinée à l'équipe vit dans l'admin lui-même : le bouton ⓘ en bas à droite ouvre [`public/admin/aide.html`](public/admin/aide.html) (aussi accessible à `/admin/aide.html`) — un aide-mémoire par tâche, dépliable en mode d'emploi complet, captures dans `public/admin/captures/`. Le bouton est posé par `public/admin/index.html` par-dessus Sveltia, sans rien brancher dans le CMS.
 
 ### Donner l'accès à quelqu'un
