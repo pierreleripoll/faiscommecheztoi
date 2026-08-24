@@ -41,7 +41,7 @@ collections:
     extension: "md"
     format: "frontmatter"
     identifier_field: "name"
-    summary: "{{order}}. {{name}} — {{title}}"
+    summary: "{{year}} — {{name}} — {{title}}"
     thumbnail: "photos.*.src"
     sortable_fields:
       fields: ["order", "name", "year"]
@@ -127,7 +127,7 @@ collections:
   # Une entrée par édition du festival : l'année (qui crée l'onglet dans la
   # section Artistes) et ses affiches.
   - name: "artistes"
-    label: "Éditions (affiches)"
+    label: "Éditions"
     label_singular: "édition"
     icon: "calendar_month"
     folder: "content/artistes"

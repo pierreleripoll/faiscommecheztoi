@@ -2,7 +2,7 @@
 
 Site du festival **Fais comme chez toi** — Rencontres des artistes émergent·es valaisan·nes, au [Spot](https://spot-sion.ch) à Sion.
 
-One-pager statique [Nuxt 3](https://nuxt.com) + [@nuxt/content](https://content.nuxt.com), design de Siméon Dubuis, contenu éditable via [Sveltia CMS](https://github.com/sveltia/sveltia-cms) (`/admin`). Architecture reprise du site [mariaclaracastioni](https://github.com/pierreleripoll/mariaclaracastioni).
+One-pager statique [Nuxt 3](https://nuxt.com) + [@nuxt/content](https://content.nuxt.com), design de Siméon Dubuis, contenu éditable via [Sveltia CMS](https://github.com/sveltia/sveltia-cms) (`nouveau.faiscommecheztoi.ch/admin`). Architecture reprise du site [mariaclaracastioni](https://github.com/pierreleripoll/mariaclaracastioni).
 
 ## Développement
 
@@ -14,7 +14,12 @@ npm run generate   # build statique complet dans .output/public
 
 ## Déploiement
 
-**Infomaniak (hébergement mutualisé)** — chaque push sur `dev` déclenche [`deploy-infomaniak.yml`](.github/workflows/deploy-infomaniak.yml) : `npm run generate` puis `rsync` de `.output/public` via SSH. Le job se saute tant que les secrets `INFOMANIAK_*` ne sont pas définis dans GitHub.
+**Infomaniak (hébergement mutualisé)** — chaque push sur `dev` déclenche [`deploy-infomaniak.yml`](.github/workflows/deploy-infomaniak.yml), qui construit et `rsync` **deux** sites via SSH :
+
+- **`faiscommecheztoi.ch`** (secret `INFOMANIAK_SITE_PATH`) : `npm run generate`, sans le dossier `admin/`.
+- **`nouveau.faiscommecheztoi.ch`** (secret `INFOMANIAK_SITE_PATH_NOUVEAU`) : le même build avec `NUXT_PUBLIC_APERCU=1` — il embarque l'admin, le plugin d'aperçu en direct, et se déclare `noindex`. `faiscommecheztoi.ch/admin` y redirige (`.htaccess`).
+
+Le job se saute tant que les secrets `INFOMANIAK_*` ne sont pas définis dans GitHub ; le second déploiement se saute si seul `INFOMANIAK_SITE_PATH_NOUVEAU` manque.
 
 En production sur <https://faiscommecheztoi.ch> depuis la bascule d'août 2026 (le domaine a été repointé dans le Manager Infomaniak du dossier WordPress vers ce dossier ; rollback = repointer l'ancien dossier tant qu'il existe). `public/.htaccess` porte les 301 depuis les anciennes URLs WordPress.
 
@@ -26,9 +31,11 @@ Le contenu vit dans `content/` (une section = un fichier / dossier). Après tout
 
 ## Admin (CMS)
 
-<https://faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
+<https://nouveau.faiscommecheztoi.ch/admin/> — Sveltia CMS écrit directement dans ce dépôt : chaque enregistrement est un commit sur `dev`, qui déclenche le déploiement. Une modification est donc en ligne 2–3 minutes plus tard.
 
-L'interface ([`public/admin/config.yml`](public/admin/config.yml)) est organisée autour des éditions : la liste **Artistes** s'ouvre filtrée sur l'édition courante (menu *Filtrer* pour les années passées, vignettes photos, bouton *Réorganiser* pour changer l'ordre par glisser-déposer — renuméroté édition par édition dans le champ `order`, sans renommer les fichiers), **Éditions (affiches)** porte l'année et les affiches, et chaque section de texte est en accès direct dans la barre latérale (groupe *Fichiers*). **À chaque nouvelle édition** : créer l'entrée dans Éditions, puis dans `config.yml` ajouter le filtre « Édition &lt;année&gt; » et déplacer `view_filters.default` dessus.
+**Aperçu en direct.** Le volet de droite de l'éditeur est le vrai site, mis à jour à chaque frappe, avant même d'enregistrer. Trois pièces : [`public/admin/apercu.js`](public/admin/apercu.js) enregistre un *preview template* Sveltia qui n'est qu'une iframe sur `/?apercu#apercu` et lui envoie le formulaire par `postMessage` ; [`apercu/plugin.client.js`](apercu/plugin.client.js) (embarqué seulement si `NUXT_PUBLIC_APERCU=1`) reçoit, parse le markdown avec le pipeline MDC du build et pose le document dans une surcharge ; [`composables/useContenu.js`](composables/useContenu.js) remplace `useAsyncData` dans les sections et rend la surcharge quand elle existe. En dev, `npm run dev` suffit : `NUXT_PUBLIC_APERCU=1 npm run dev` puis <http://localhost:3000/admin/>.
+
+L'interface ([`public/admin/config.yml`](public/admin/config.yml)) est organisée autour des éditions : la liste **Artistes** s'ouvre filtrée sur l'édition courante (menu *Filtrer* pour les années passées, vignettes photos, bouton *Réorganiser* pour changer l'ordre par glisser-déposer — renuméroté édition par édition dans le champ `order`, sans renommer les fichiers), **Éditions** porte l'année et les affiches, et chaque section de texte est en accès direct dans la barre latérale (groupe *Fichiers*). **À chaque nouvelle édition** : créer l'entrée dans Éditions, puis dans `config.yml` ajouter le filtre « Édition &lt;année&gt; » et déplacer `view_filters.default` dessus.
 
 L'aide destinée à l'équipe vit dans l'admin lui-même : le bouton ⓘ en bas à droite ouvre [`public/admin/aide.html`](public/admin/aide.html) (aussi accessible à `/admin/aide.html`) — un aide-mémoire par tâche, dépliable en mode d'emploi complet, captures dans `public/admin/captures/`. Le bouton est posé par `public/admin/index.html` par-dessus Sveltia, sans rien brancher dans le CMS.
 
@@ -49,7 +56,7 @@ L'authentification passe par **GitHub** — c'est le dépôt qui fait autorité 
 `ALLOWED_DOMAINS` liste les domaines qui servent `/admin`, séparés par des virgules. Le worker est partagé avec d'autres sites : **ajouter** à la valeur existante, ne pas la remplacer —
 
 ```
-…valeur actuelle…,faiscommecheztoi.ch,localhost
+…valeur actuelle…,faiscommecheztoi.ch,nouveau.faiscommecheztoi.ch,localhost
 ```
 
 (La doc du worker accepte le joker `*` — `*.faiscommecheztoi.ch` couvre les sous-domaines mais pas le domaine nu, donc garder les deux.) Vérifier aussi que l'*Authorization callback URL* de l'app OAuth GitHub est `https://<worker>.workers.dev/callback`.

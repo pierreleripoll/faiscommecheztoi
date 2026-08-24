@@ -15,7 +15,7 @@
       so there's no need to remove it on load.
     -->
     <img
-      v-if="thumbPng"
+      v-if="thumbPng && !apercu"
       class="thumbhash-image__placeholder"
       :src="spacerSvg"
       :style="{ backgroundImage: `url(${thumbPng})` }"
@@ -29,7 +29,20 @@
       the SSR HTML; the rest defer with loading="lazy". We render our own
       placeholder above, so no lazy-load library is needed.
     -->
+    <!--
+      Aperçu de l'admin : l'image brute, sans NuxtPicture. Les dérivées IPX
+      n'existent que pour les URL vues au build, et une image qu'on vient de
+      choisir est un blob: du navigateur. Le ratio se mesure au chargement.
+    -->
+    <img
+      v-if="apercu"
+      class="thumbhash-image__img"
+      :src="image.src"
+      :alt="alt"
+      @load="mesurer"
+    />
     <NuxtPicture
+      v-else
       :src="image.src"
       :alt="alt"
       :width="image.width"
@@ -44,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { thumbHashToDataURL } from "thumbhash";
 
 const props = defineProps({
@@ -91,6 +104,18 @@ const props = defineProps({
   },
 });
 
+// Vrai dans l'iframe d'aperçu de l'admin, après hydratation (useContenu.js).
+const apercu = useApercuActif();
+
+// Ratio mesuré sur l'image chargée : en aperçu, le frontmatter peut être
+// absent (image nouvelle) ou périmé (image changée, anciennes dimensions
+// conservées par le CMS).
+const mesure = ref(null);
+function mesurer(e) {
+  const { naturalWidth: w, naturalHeight: h } = e.target;
+  if (w && h) mesure.value = `${w} / ${h}`;
+}
+
 const alt = computed(() => {
   return props.image.caption || props.image.alt || "Image";
 });
@@ -103,6 +128,7 @@ const alt = computed(() => {
 // the height — without it the box would collapse to 0 and the image vanishes.
 const boxAspectRatio = computed(() => {
   if (props.aspectRatio) return String(props.aspectRatio);
+  if (apercu.value && mesure.value) return mesure.value;
   return props.image.width && props.image.height
     ? `${props.image.width} / ${props.image.height}`
     : undefined;

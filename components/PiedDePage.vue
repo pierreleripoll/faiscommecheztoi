@@ -2,7 +2,7 @@
   <!-- La page s'arrêtait sur la rangée de logos, sans point final. Le pied
        reprend la barre de nav, lueur vers le haut cette fois : la page se
        referme comme elle s'ouvre. -->
-  <footer class="pied">
+  <footer id="pied" class="pied">
     <p class="pied__marque">Fais comme chez toi</p>
     <p v-if="pied?.ligne" class="pied__ligne">{{ pied.ligne }}</p>
     <a class="pied__remonter" href="#top">Remonter</a>
@@ -10,9 +10,7 @@
 </template>
 
 <script setup>
-const { data: pied } = await useAsyncData("pied", () =>
-  queryContent("/pied").findOne()
-);
+const pied = await useContenu("pied", () => queryContent("/pied").findOne());
 </script>
 
 <style scoped>

@@ -47,6 +47,9 @@
     <!-- Sveltia CMS (successeur drop-in de Decap/Netlify CMS).
          Auth : GitHub OAuth via le worker sveltia-cms-auth (voir config.yml). -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+    <!-- Aperçu en direct : le volet de droite devient une iframe du site,
+         mise à jour à chaque frappe (voir le fichier). -->
+    <script src="apercu.js"></script>
 
     <button id="fcct-aide-btn" type="button" title="Aide : comment modifier le site" aria-label="Ouvrir l'aide">i</button>
     <dialog id="fcct-aide" aria-label="Aide de l'admin">

@@ -1,6 +1,19 @@
+// Build d'édition (nouveau.faiscommecheztoi.ch) : embarque le plugin d'aperçu
+// en direct de l'admin et se déclare noindex. Sans le drapeau, le site public
+// ne contient ni ce plugin ni /admin (retiré par le workflow avant le rsync).
+const APERCU = !!process.env.NUXT_PUBLIC_APERCU;
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxt/content", "@nuxt/image"],
+
+  // Hors du dossier plugins/ pour ne pas être scanné : il n'entre dans le
+  // bundle que si on le demande.
+  plugins: APERCU ? ["~/apercu/plugin.client.js"] : [],
+
+  runtimeConfig: {
+    public: { apercu: APERCU },
+  },
 
   // Vevey Positive (la police du design) est déclarée dans tokens.css et servie
   // depuis public/fonts/. Quicksand, self-hébergée via @fontsource, ne sert plus
@@ -44,6 +57,7 @@ export default defineNuxtConfig({
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
       htmlAttrs: { lang: "fr" },
+      meta: APERCU ? [{ name: "robots", content: "noindex, nofollow" }] : [],
       link: [
         // Le rideau d'ouverture affiche le titre du festival dès le premier
         // peint : sans préchargement, il s'écrirait en Quicksand puis

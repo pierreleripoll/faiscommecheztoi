@@ -65,7 +65,7 @@
             class="soutiens__logo"
           >
             <img
-              :src="img(logo.src, { quality: 90 })"
+              :src="apercu ? logo.src : img(logo.src, { quality: 90 })"
               :alt="logo.alt || ''"
               :width="logo.width"
               :height="logo.height"
@@ -80,40 +80,47 @@
 
 <script setup>
 const img = useImage();
+// Dans l'iframe d'aperçu de l'admin, les images se rendent telles quelles :
+// les dérivées IPX n'existent que pour ce que le build a vu.
+const apercu = useApercuActif();
 
-const { data: hero } = await useAsyncData("hero", () =>
-  queryContent("/hero").findOne()
-);
-const { data: appel } = await useAsyncData("appel", () =>
+// useContenu = useAsyncData + queryContent, avec l'aperçu de l'admin par-dessus
+// (composables/useContenu.js) ; chaque constante s'utilise comme `data`.
+const hero = await useContenu("hero", () => queryContent("/hero").findOne());
+const appel = await useContenu("appel", () =>
   queryContent("/appel").findOne()
 );
 // Les fiches artistes de l'édition, affichées dans la section Artistes.
 // $numeric est indispensable : sans lui queryContent compare les nombres comme
 // des chaînes et classe 1, 10, 11, 12, 2, 3…
-const { data: artistes } = await useAsyncData("artistes-fiches", () =>
-  queryContent("/programme").sort({ order: 1, $numeric: true }).find()
+const artistes = await useContenu(
+  "artistes-fiches",
+  () => queryContent("/programme").sort({ order: 1, $numeric: true }).find(),
+  { tri: TRI_ORDRE }
 );
-const { data: years } = await useAsyncData("artistes", () =>
-  queryContent("/artistes").sort({ year: -1 }).find()
+const years = await useContenu(
+  "artistes",
+  () => queryContent("/artistes").sort({ year: -1 }).find(),
+  { tri: TRI_ANNEE_DESC }
 );
 // La grille horaire ne concerne que l'édition en cours : les archives n'ont pas
 // d'horaires exploitables. `years` est trié décroissant, la première entrée est
 // donc l'édition la plus récente — pas d'année en dur à mettre à jour chaque an.
 const anneeCourante = computed(() => years.value?.[0]?.year || "");
 
-const { data: infos } = await useAsyncData("infos", () =>
+const infos = await useContenu("infos", () =>
   queryContent("/infos").findOne()
 );
-const { data: partenaires } = await useAsyncData("partenariats", () =>
-  queryContent("/partenariats").sort({ order: 1, $numeric: true }).find()
+const partenaires = await useContenu(
+  "partenariats",
+  () => queryContent("/partenariats").sort({ order: 1, $numeric: true }).find(),
+  { tri: TRI_ORDRE }
 );
-const { data: participer } = await useAsyncData("participer", () =>
+const participer = await useContenu("participer", () =>
   queryContent("/participer").findOne()
 );
-const { data: team } = await useAsyncData("team", () =>
-  queryContent("/team").findOne()
-);
-const { data: soutiens } = await useAsyncData("soutiens", () =>
+const team = await useContenu("team", () => queryContent("/team").findOne());
+const soutiens = await useContenu("soutiens", () =>
   queryContent("/soutiens").findOne()
 );
 </script>

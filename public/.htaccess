@@ -7,6 +7,12 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# L'admin (et son aperçu en direct) ne vit que sur le sous-domaine d'édition,
+# dont le build embarque le plugin d'aperçu ; le build public n'a pas de
+# dossier admin/. Le même .htaccess sert les deux et branche sur l'hôte.
+RewriteCond %{HTTP_HOST} !^nouveau\.
+RewriteRule ^admin(/.*)?$ https://nouveau.faiscommecheztoi.ch/admin$1 [R=301,L,NE]
+
 # Anciennes pages « artistes » (liste + éditions par année) → section Artistes.
 RewriteRule ^(les-artistes|artistes-20[0-9]{2})/?$ /#artistes [R=301,L,NE]
 
@@ -37,4 +43,8 @@ RewriteRule . / [R=301,L]
   <FilesMatch "\.(js|css|otf|woff2?)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+  # Le sous-domaine d'édition est une copie du site : pas d'indexation
+  # (doublé d'une meta robots dans le build, voir nuxt.config.ts).
+  SetEnvIf Host ^nouveau\. NOUVEAU
+  Header set X-Robots-Tag "noindex, nofollow" env=NOUVEAU
 </IfModule>

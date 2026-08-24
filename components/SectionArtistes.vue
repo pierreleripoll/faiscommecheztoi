@@ -62,6 +62,7 @@
           v-for="a in artistes"
           v-show="rangs.has(a._path)"
           :key="a._path"
+          :data-path="a._path"
           :artiste="a"
           :ouverte="ouverte === a._path"
           :style="eparpillement(rangs.get(a._path) ?? 0)"
@@ -80,12 +81,14 @@ const props = defineProps({
 });
 
 // Année sélectionnée : décide quelles fiches flottent ; re-cliquer désélectionne.
-const selected = ref(null);
+// En useState (comme le nuage « Appel à projet ») : l'aperçu de l'admin choisit
+// l'année et retourne la fiche qu'on édite (apercu/plugin.client.js).
+const selected = useState("artistes-annee", () => null);
 
 // Chemin de la fiche retournée, s'il y en a une. L'état vit ici et non dans la
 // carte : en ouvrir une remet ainsi les autres de face, plutôt que de laisser
 // un mur de versos empilés les uns par-dessus les autres.
-const ouverte = ref(null);
+const ouverte = useState("artistes-ouverte", () => null);
 
 // Hauteur du bandeau titre + années. Le calque de cartes couvre toute la section
 // (voir plus bas), titre compris : sans ce décalage la première fiche — celle de

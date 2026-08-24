@@ -12,6 +12,11 @@ name: Deploy to Infomaniak
 #                         ex. /home/clients/xxxxxxxx/sites/faiscommecheztoi.ch
 #                         (bascule faite en août 2026 : le domaine a été repointé
 #                         dans le Manager du dossier WordPress vers ce dossier)
+#   INFOMANIAK_SITE_PATH_NOUVEAU
+#                         dossier pointé par nouveau.faiscommecheztoi.ch : le
+#                         site d'édition, même contenu plus /admin et son aperçu
+#                         en direct. Sans ce secret, ce second déploiement se
+#                         saute — mais le site public n'a plus d'admin.
 #
 # Tant que ces secrets ne sont pas définis, le job se saute sans faire échouer le CI.
 
@@ -40,6 +45,8 @@ jobs:
     needs: check-secrets
     if: needs.check-secrets.outputs.configured == 'true'
     runs-on: ubuntu-latest
+    env:
+      SITE_PATH_NOUVEAU: ${{ secrets.INFOMANIAK_SITE_PATH_NOUVEAU }}
     steps:
       - uses: actions/checkout@v4
 
@@ -58,6 +65,10 @@ jobs:
       # Garantit la présence du .htaccess (redirections 301 depuis l'ancien
       # WordPress) même si la copie des dotfiles de public/ changeait.
       - run: cp public/.htaccess .output/public/.htaccess
+
+      # Le site public ne sert pas l'admin : il vit sur le sous-domaine
+      # d'édition (second build plus bas), et /admin y renvoie via .htaccess.
+      - run: rm -rf .output/public/admin
 
       - name: Configurer la clé SSH
         env:
@@ -82,6 +93,31 @@ jobs:
           USER_T="$(printf '%s' "$SSH_USER" | xargs)"
           HOST_T="$(printf '%s' "$SSH_HOST" | xargs)"
           PATH_T="$(printf '%s' "$SITE_PATH" | xargs)"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            .output/public/ \
+            "$USER_T@$HOST_T:$PATH_T/"
+
+      # Second build pour nouveau.faiscommecheztoi.ch : le même site, avec
+      # l'admin et son aperçu en direct. NUXT_PUBLIC_APERCU=1 embarque le plugin
+      # (apercu/plugin.client.js) et pose la meta noindex — voir nuxt.config.ts.
+      - name: Construire le site d'édition
+        if: env.SITE_PATH_NOUVEAU != ''
+        env:
+          NUXT_PUBLIC_APERCU: "1"
+        run: |
+          npm run generate
+          cp public/.htaccess .output/public/.htaccess
+
+      - name: Déployer le site d'édition via rsync
+        if: env.SITE_PATH_NOUVEAU != ''
+        env:
+          SSH_USER: ${{ secrets.INFOMANIAK_SSH_USER }}
+          SSH_HOST: ${{ secrets.INFOMANIAK_SSH_HOST }}
+        run: |
+          USER_T="$(printf '%s' "$SSH_USER" | xargs)"
+          HOST_T="$(printf '%s' "$SSH_HOST" | xargs)"
+          PATH_T="$(printf '%s' "$SITE_PATH_NOUVEAU" | xargs)"
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key" \
             .output/public/ \
