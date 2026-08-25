@@ -54,12 +54,14 @@
      — balayage : un texte cliquable reste pâle et une fenêtre de lettres
        pleines le parcourt en boucle, de gauche à droite, à la place du
        soulignement. Le pâle est le magenta à 45 % ; le cycle est le temps
-       d'un aller complet (Pierre l'a voulu « un peu plus rapide » que 3,5 s).
+       d'un aller complet : c'est le seul réglage de vitesse du balayage, et
+       il ne concerne que le texte (les cartes ont leur --vague-cycle). Parti
+       de 3,5 s, Pierre l'a voulu plus rapide — deux crans, jusqu'à 2 s.
        Au survol, une bande de surligneur (--c-surligne) envahit le texte.
      — vague : les cartes s'allument une à une en ordre de lecture, d'un voile
        rose ; le survol reprend la même teinte. */
   --c-balayage-pale: rgba(255, 0, 255, 0.45);
-  --balayage-cycle: 2.6s;
+  --balayage-cycle: 2s;
   --c-surligne: var(--c-cloud);
   /* Rose atténué pour teinter une surface entière (créneau de la grille au
      survol et au passage de la vague) sans rendre son texte illisible. */
