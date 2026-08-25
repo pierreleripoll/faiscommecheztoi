@@ -215,20 +215,23 @@ function eparpillement(i) {
 
 /* Les années en pâle (Siméon, commentaire Figma #1), parcourues par le
    balayage (.balayage, main.css) qui remplace le soulignement ; l'édition
-   choisie, l'année survolée ou au focus se figent en plein. background-color
-   et non `background: none`, qui effacerait le dégradé du balayage. */
+   choisie se fige en plein, le survol et le focus font venir la bande de
+   surligneur. background-color et non `background: none`, qui effacerait le
+   dégradé du balayage ; padding-block seulement, pour laisser au balayage son
+   léger débord latéral (la bande dépasse un peu des lettres). */
 .artistes__year {
   border: 0;
   background-color: transparent;
-  padding: 0;
+  padding-block: 0;
   font: inherit;
   font-size: var(--fs-body);
   line-height: 1;
   cursor: pointer;
   /* Chaque année balaie son propre mot : décalées d'un rang à l'autre, la
      fenêtre semble traverser toute la rangée de gauche à droite, comme sur
-     une seule ligne de texte. */
-  animation-delay: calc(var(--i, 0) * var(--balayage-cycle) * 0.12);
+     une seule ligne de texte. Par la variable et non animation-delay
+     directement : la bande de survol, elle, doit partir sans attendre. */
+  --balayage-delai: calc(var(--i, 0) * var(--balayage-cycle) * 0.12);
 }
 
 /* Fiches --------------------------------------------------------------------

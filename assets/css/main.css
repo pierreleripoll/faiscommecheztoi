@@ -53,12 +53,22 @@ a {
    Le dégradé pâle → plein → pâle est découpé aux lettres (background-clip:
    text), trois fois plus large que le texte, et c'est sa position qui
    défile : de 100 % (bord droit du dégradé) à 0 %, le dégradé glisse vers la
-   droite et la fenêtre pleine avec lui. Au survol, au focus ou à l'état actif
-   le texte se fige en plein : la réponse au geste. */
+   droite et la fenêtre pleine avec lui. L'édition active se fige en plein.
+   Au survol ou au focus, la réponse au geste : le texte passe en plein et une
+   bande de surligneur rose l'envahit depuis la droite (dégradé uni en image
+   de fond, ancré à droite, dont seule la largeur s'anime). On quitte alors le
+   découpage aux lettres — la bande se peint derrière le texte, pas dedans.
+   La bande déborde un peu du texte, comme un vrai trait de surligneur ; sur
+   un lien qui passe à la ligne, clone plutôt que slice : chaque fragment porte
+   sa propre bande, sinon le second se retrouvait nu. */
 .balayage,
 .section a {
   text-decoration: none;
   color: transparent;
+  padding-inline: 0.08em;
+  margin-inline: -0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   background-image: linear-gradient(
     90deg,
     var(--c-balayage-pale) 0%,
@@ -73,16 +83,27 @@ a {
   -webkit-background-clip: text;
   background-clip: text;
   animation: balayage var(--balayage-cycle) linear infinite;
+  animation-delay: var(--balayage-delai, 0s);
+}
+
+.balayage--fixe {
+  animation: none;
+  background-image: none;
+  color: var(--c-ink);
 }
 
 .balayage:hover,
 .balayage:focus-visible,
-.balayage--fixe,
 .section a:hover,
 .section a:focus-visible {
-  animation: none;
-  background-image: none;
   color: var(--c-ink);
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
+  background-size: 0% 100%;
+  background-position: right center;
+  /* Le raccourci remet aussi le délai à zéro : la bande part tout de suite. */
+  animation: surligne 0.35s ease 0s forwards;
 }
 
 @keyframes balayage {
@@ -91,6 +112,12 @@ a {
   }
   to {
     background-position: 0% 0;
+  }
+}
+
+@keyframes surligne {
+  to {
+    background-size: 100% 100%;
   }
 }
 
@@ -138,12 +165,21 @@ a {
     display: none;
   }
 
-  /* Le texte cliquable reste plein, sans balayage. */
+  /* Le texte cliquable reste plein, sans balayage ; la bande de surligneur
+     apparaît d'un coup au survol. */
   .balayage,
   .section a {
     animation: none;
     background-image: none;
     color: var(--c-ink);
+  }
+
+  .balayage:hover,
+  .balayage:focus-visible,
+  .section a:hover,
+  .section a:focus-visible {
+    background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
+    background-size: 100% 100%;
   }
 }
 
