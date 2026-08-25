@@ -44,100 +44,106 @@ a {
   text-underline-offset: 0.16em;
 }
 
-/* Texte cliquable : surligneur plutôt que soulignement ------------------------
-   Siméon (25.08.2026) : les infos cliquables — années des éditions, « Spot à
-   Sion », adresses e-mail — ne se soulignent plus ; au survol une bande de
-   surligneur rose balaie le texte de droite à gauche. La bande est un dégradé
-   uni en image de fond, ancré à droite et dont seule la largeur s'anime :
-   elle pousse vers la gauche, puis se retire par où elle est venue.
-   Sur un lien qui passe à la ligne, clone plutôt que slice : chaque fragment
-   porte sa propre bande, sinon le second se retrouvait nu. */
-.surligne,
+/* Texte cliquable : balayage plutôt que soulignement ---------------------------
+   Référence de Siméon (vidéo WhatsApp du 24.08.2026, « AVAILABLE FOR NEW
+   PROJECTS ») : le texte reste pâle et une fenêtre de lettres pleines le
+   parcourt en boucle, de gauche à droite, sans jamais s'arrêter. Il vaut pour
+   tout ce qui se clique dans le texte — années des éditions, « Spot à Sion »,
+   adresses e-mail, lien agenda — à la place du soulignement.
+   Le dégradé pâle → plein → pâle est découpé aux lettres (background-clip:
+   text), trois fois plus large que le texte, et c'est sa position qui
+   défile : de 100 % (bord droit du dégradé) à 0 %, le dégradé glisse vers la
+   droite et la fenêtre pleine avec lui. Au survol, au focus ou à l'état actif
+   le texte se fige en plein : la réponse au geste. */
+.balayage,
 .section a {
   text-decoration: none;
-  background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--c-balayage-pale) 0%,
+    var(--c-balayage-pale) 36%,
+    var(--c-ink) 46%,
+    var(--c-ink) 54%,
+    var(--c-balayage-pale) 64%,
+    var(--c-balayage-pale) 100%
+  );
+  background-size: 300% 100%;
   background-repeat: no-repeat;
-  background-size: 0% 100%;
-  background-position: right center;
-  transition: background-size 0.35s ease;
-  /* La bande déborde un peu du texte, comme un vrai trait de surligneur. */
-  padding-inline: 0.08em;
-  margin-inline: -0.08em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: balayage var(--balayage-cycle) linear infinite;
 }
 
-.surligne:hover,
-.surligne:focus-visible,
-.surligne--actif,
+.balayage:hover,
+.balayage:focus-visible,
+.balayage--fixe,
 .section a:hover,
 .section a:focus-visible {
-  background-size: 100% 100%;
+  animation: none;
+  background-image: none;
+  color: var(--c-ink);
 }
 
-/* Reflet de carte ---------------------------------------------------------------
-   L'éclat des cartes Pokémon, en rose (Siméon, 25.08.2026) : une bande claire
-   traverse la carte en diagonale, du haut-gauche au bas-droit, puis marque une
-   pause avant de repasser. Il dit « ça se clique » sur les affiches, les fiches
-   artistes et les créneaux de la grille.
-   Un élément réel et non un pseudo-élément : il faut un cadre qui rogne
-   (overflow: hidden) ET une bande qui bouge dedans, deux boîtes. Poser le
-   rognage sur la carte elle-même couperait sa lueur ou son liseré de focus.
-   Seule la transformation s'anime — sur le compositeur, sans repeindre — et
-   le fondu « screen » éclaircit ce qu'il survole au lieu de le voiler.
-   Le déphasage (--reflet-delai) se règle là où les cartes voisinent, sinon
-   elles scintillent en chœur. */
-.reflet {
+@keyframes balayage {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+/* Vague sur les cartes -----------------------------------------------------------
+   Référence de Siméon (vidéo WhatsApp du 24.08.2026, grille de rectangles) :
+   les cartes s'allument une à une, entières, en ordre de lecture — de gauche à
+   droite puis ligne suivante —, deux ou trois à la fois, puis la vague marque
+   une pause et repart du début. Elle dit « ça se clique » sur les affiches,
+   les fiches artistes et les créneaux de la grille.
+   Un voile rose (.vague) posé sur chaque carte, dont l'opacité monte et
+   redescend ; toutes les cartes d'un groupe partagent le même cycle
+   (--vague-cycle, réglé sur le groupe) et chacune part avec un retard de
+   3 % du cycle par rang (--i, posé sur la carte) : allumée de 0 à 12 %,
+   elle chevauche ses deux voisines. Le rang suit l'ordre de lecture de la
+   mise en page, pas celui du DOM — la grille horaire le recalcule selon son
+   nombre de colonnes. Le cycle se choisit d'après le nombre de cartes : à
+   3 % par rang, 28 rangs occupent 84 % du cycle, le reste est la pause. */
+.vague {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   border-radius: inherit;
+  background: var(--c-vague);
+  opacity: 0;
   pointer-events: none;
-  /* Le fondu se pose sur le cadre et non sur la bande : on donne au cadre un
-     z-index pour le placer dans la carte, ce qui en fait un contexte
-     d'empilement — posé sur la bande, le fondu ne verrait plus que le cadre,
-     vide, et la bande s'imprimerait en rose opaque. */
-  mix-blend-mode: screen;
+  animation: vague var(--vague-cycle, 4s) linear infinite;
+  animation-delay: calc(var(--i, 0) * var(--vague-cycle, 4s) * 0.03);
 }
 
-.reflet::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    115deg,
-    transparent 40%,
-    var(--c-reflet) 50%,
-    transparent 60%
-  );
-  transform: translate(-60%, -60%);
-  animation: reflet var(--reflet-duree) ease-in-out infinite;
-  animation-delay: var(--reflet-delai, 0s);
-}
-
-/* La traversée occupe moins de la moitié du cycle, le reste est un temps
-   mort : une carte qui brille sans arrêt lasse au lieu d'inviter. */
-@keyframes reflet {
+@keyframes vague {
   0% {
-    transform: translate(-60%, -60%);
+    opacity: 0;
   }
-  42%,
+  3%,
+  9% {
+    opacity: 1;
+  }
+  12%,
   100% {
-    transform: translate(60%, 60%);
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reflet::before {
+  .vague {
     display: none;
   }
 
-  .surligne,
+  /* Le texte cliquable reste plein, sans balayage. */
+  .balayage,
   .section a {
-    transition: none;
+    animation: none;
+    background-image: none;
+    color: var(--c-ink);
   }
 }
 

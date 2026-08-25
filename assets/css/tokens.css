@@ -48,19 +48,22 @@
      détacher du fond rose de la page — à 0.55 sur 18 px il s'y noyait. */
   --glow-invite: 0 0 26px 8px rgba(255, 0, 255, 0.75);
 
-  /* Signaux de cliquabilité demandés par Siméon (25.08.2026), en rose et non
-     en noir : voir .surligne et .reflet dans main.css.
-     — surligne : la bande de surligneur qui balaie un texte cliquable, de
-       droite à gauche, à la place du soulignement. Le rose du nuage.
-     — reflet : l'éclat qui traverse les cartes en diagonale, façon carte
-       Pokémon, en fondu « screen » pour éclaircir ce qu'il survole (photo,
-       texte magenta ou fond de page) sans le voiler. */
+  /* Signaux de cliquabilité demandés par Siméon (25.08.2026, deux vidéos de
+     référence sur WhatsApp), en rose et non en noir : voir .balayage et .vague
+     dans main.css.
+     — balayage : un texte cliquable reste pâle et une fenêtre de lettres
+       pleines le parcourt en boucle, de gauche à droite, à la place du
+       soulignement. Le pâle est le magenta à 45 %.
+     — vague : les cartes s'allument une à une en ordre de lecture, d'un voile
+       rose ; le survol reprend la même teinte. */
+  --c-balayage-pale: rgba(255, 0, 255, 0.45);
+  --balayage-cycle: 3.5s;
   --c-surligne: var(--c-cloud);
-  /* Le même rose, atténué, pour teinter une surface entière au survol (les
-     créneaux de la grille) sans rendre son texte illisible. */
+  /* Rose atténué pour teinter une surface entière (créneau de la grille au
+     survol et au passage de la vague) sans rendre son texte illisible. */
   --c-surligne-doux: rgba(255, 125, 255, 0.4);
-  --c-reflet: rgba(255, 125, 255, 0.85);
-  --reflet-duree: 5.5s;
+  /* Voile de la vague sur une photo (affiche, recto de carte). */
+  --c-vague: rgba(255, 125, 255, 0.55);
 
   /* Typo */
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;

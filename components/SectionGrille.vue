@@ -3,17 +3,18 @@
     <h2 class="section__title">Grille horaire</h2>
 
     <div class="grille">
-      <div v-for="soiree in grille" :key="soiree.key" class="grille__jour">
+      <div v-for="(soiree, j) in grille" :key="soiree.key" class="grille__jour">
         <h3 class="grille__jour-titre">
           <span>{{ soiree.jour }}</span>
           <span>{{ soiree.date }}</span>
         </h3>
 
         <article
-          v-for="creneau in soiree.creneaux"
+          v-for="(creneau, k) in soiree.creneaux"
           :key="`${creneau.path}-${creneau.heure}`"
           class="creneau"
           :class="{ 'creneau--ouvert': ouvert === cle(soiree, creneau) }"
+          :style="rangVague(j, k)"
         >
           <p class="creneau__heure">{{ creneau.heure }}</p>
           <p class="creneau__titre">{{ creneau.titre }}</p>
@@ -89,8 +90,8 @@
             @click="basculer(soiree, creneau)"
           />
 
-          <!-- L'éclat façon carte Pokémon (.reflet, main.css). -->
-          <span class="reflet" aria-hidden="true" />
+          <!-- Le voile de la vague (.vague, main.css), sous le texte. -->
+          <span class="vague" aria-hidden="true" />
 
           <!-- Même croix que le nuage et le verso de la carte : elle signale
                que la plaque se referme. Décorative — c'est le bouton-calque
@@ -137,6 +138,25 @@ const grille = useGrille(
   () => props.artistes,
   () => props.annee
 );
+
+// Rang de chaque créneau dans la vague (.vague, main.css), en ordre de
+// lecture : la grille a quatre colonnes (une par soir), deux sous 1024 px, une
+// sous 720 px, et l'ordre de lecture change avec elles. Les trois rangs sont
+// posés sur le créneau, la feuille de style choisit le sien selon la largeur.
+// j = colonne (soir), k = ligne (créneau du soir).
+const lignes = computed(() =>
+  Math.max(0, ...grille.value.map((s) => s.creneaux.length))
+);
+
+function rangVague(j, k) {
+  const n = grille.value.length;
+  return {
+    "--i-4": k * n + j,
+    // Deux colonnes : les soirs vont par paires, l'une sous l'autre.
+    "--i-2": Math.floor(j / 2) * 2 * lignes.value + k * 2 + (j % 2),
+    "--i-1": j * lignes.value + k,
+  };
+}
 
 // Durée et format sur la même ligne ; l'un ou l'autre peut manquer.
 function meta(creneau) {
@@ -191,6 +211,9 @@ function ailleurs(creneau) {
   grid-template-columns: repeat(4, 1fr);
   /* 21 px : la gouttière entre deux cartes artistes dans le Figma. */
   gap: 21px;
+  /* Jusqu'à 28 créneaux (7 lignes × 4 soirs) : la vague met 5 s à tous les
+     parcourir, puis se tait une seconde. */
+  --vague-cycle: 6s;
 }
 
 .grille__jour {
@@ -211,23 +234,31 @@ function ailleurs(creneau) {
    passage à l'heure suivante (Siméon, commentaire Figma #6 — la plaque
    blanche à lueur de la première version a disparu). */
 .creneau {
-  /* Ancre du bouton-calque et du reflet qui couvrent le créneau. */
+  /* Ancre du bouton-calque et du voile qui couvrent le créneau. */
   position: relative;
+  /* Le voile de la vague passe sous le texte (z-index négatif) : il faut un
+     contexte d'empilement ici pour qu'il ne file pas sous toute la page. */
+  isolation: isolate;
   padding-bottom: 12.4px;
   border-bottom: 1px solid rgba(255, 0, 255, 0.6);
   display: flex;
   flex-direction: column;
   gap: 6px;
   transition: background-color 0.25s ease, border-color 0.25s ease;
+  /* Rang dans la vague selon le nombre de colonnes (voir rangVague). */
+  --i: var(--i-4);
 }
 
-/* Déphasés, sinon toute la colonne scintille d'un coup. */
-.creneau:nth-of-type(3n + 2) {
-  --reflet-delai: -1.8s;
+@media (max-width: 1023px) {
+  .creneau {
+    --i: var(--i-2);
+  }
 }
 
-.creneau:nth-of-type(3n) {
-  --reflet-delai: -3.6s;
+@media (max-width: 720px) {
+  .creneau {
+    --i: var(--i-1);
+  }
 }
 
 .creneau__lien {
@@ -267,9 +298,13 @@ function ailleurs(creneau) {
   margin-top: 12.4px;
 }
 
-/* Le reflet passe sous le lien agenda (z-index 1), qui doit rester net. */
-.creneau .reflet {
-  z-index: 0;
+/* Le voile prend la teinte du survol et passe sous le texte : la vague montre
+   l'état que le curseur déclenchera. Il déborde de 6 px à gauche et à droite,
+   comme la bande du survol. */
+.creneau .vague {
+  z-index: -1;
+  inset-inline: -6px;
+  background: var(--c-surligne-doux);
 }
 
 /* Portrait « pas trop grand » : un cadre recadré, pas la photo entière. La

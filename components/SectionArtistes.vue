@@ -5,13 +5,14 @@
         <h2 class="artistes__title">Artistes</h2>
         <div class="artistes__years">
           <button
-            v-for="y in years"
+            v-for="(y, i) in years"
             :key="y.year"
-            class="artistes__year surligne"
+            class="artistes__year balayage"
             :class="{
               'artistes__year--active': selected === y.year,
-              'surligne--actif': selected === y.year,
+              'balayage--fixe': selected === y.year,
             }"
+            :style="{ '--i': i }"
             type="button"
             @click="toggle(y.year)"
           >
@@ -21,7 +22,12 @@
       </div>
 
       <div class="artistes__grid">
-        <figure v-for="p in posters" :key="p.src" class="artistes__poster">
+        <figure
+          v-for="(p, i) in posters"
+          :key="p.src"
+          class="artistes__poster"
+          :style="{ '--i': i }"
+        >
           <!-- L'affiche est le second déclencheur : cliquer dessus revient à
                cliquer sur son onglet d'année. -->
           <button
@@ -39,7 +45,7 @@
               :aspect-ratio="385 / 547"
               sizes="90vw sm:45vw lg:385px"
             />
-            <span class="reflet" aria-hidden="true" />
+            <span class="vague" aria-hidden="true" />
           </button>
           <figcaption v-if="p.credit" class="artistes__credit">
             {{ p.credit }}
@@ -171,9 +177,9 @@ function eparpillement(i) {
     "--carte-y": `${DECALAGES[i % DECALAGES.length]}px`,
     // Les cartes se posent l'une après l'autre plutôt que d'apparaître en bloc.
     animationDelay: `${Math.min(i, 11) * 40}ms`,
-    // Le reflet de chaque carte part à son tour : même cycle de quatre que
-    // l'éparpillement, pour que deux voisines ne scintillent jamais ensemble.
-    "--reflet-delai": `${-(i % DECALAGES.length) * 1.3}s`,
+    // Rang de la carte dans la vague (.vague, main.css) : l'ordre de lecture
+    // est celui du flux, l'éparpillement ne déplace les cartes qu'en hauteur.
+    "--i": i,
   };
 }
 
@@ -207,11 +213,10 @@ function eparpillement(i) {
   flex-wrap: wrap;
 }
 
-/* Les années à 50 %, comme les entrées de nav (Siméon, commentaire Figma #1) ;
-   l'édition choisie et l'année survolée reviennent pleines. Le surligneur
-   (.surligne, main.css) remplace le soulignement, et reste posé sur l'année
-   active. background-color et non `background: none`, qui effacerait la
-   bande. */
+/* Les années en pâle (Siméon, commentaire Figma #1), parcourues par le
+   balayage (.balayage, main.css) qui remplace le soulignement ; l'édition
+   choisie, l'année survolée ou au focus se figent en plein. background-color
+   et non `background: none`, qui effacerait le dégradé du balayage. */
 .artistes__year {
   border: 0;
   background-color: transparent;
@@ -219,16 +224,11 @@ function eparpillement(i) {
   font: inherit;
   font-size: var(--fs-body);
   line-height: 1;
-  color: var(--c-ink);
   cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.15s ease, background-size 0.35s ease;
-}
-
-.artistes__year--active,
-.artistes__year:hover,
-.artistes__year:focus-visible {
-  opacity: 1;
+  /* Chaque année balaie son propre mot : décalées d'un rang à l'autre, la
+     fenêtre semble traverser toute la rangée de gauche à droite, comme sur
+     une seule ligne de texte. */
+  animation-delay: calc(var(--i, 0) * var(--balayage-cycle) * 0.12);
 }
 
 /* Fiches --------------------------------------------------------------------
@@ -402,10 +402,11 @@ function eparpillement(i) {
   isolation: isolate;
 }
 
-/* Rien dans le design ne dit que les affiches se cliquent : un reflet les
-   traverse (.reflet, main.css — retour de Siméon, 25.08.2026, qui remplace la
-   lueur qui respirait) et, au survol, la lueur s'allume. L'opacité seule
-   s'anime — pas le box-shadow, coûteux à repeindre à chaque frame. */
+/* Rien dans le design ne dit que les affiches se cliquent : la vague les
+   allume l'une après l'autre (.vague, main.css — retour de Siméon,
+   25.08.2026, qui remplace la lueur qui respirait) et, au survol, la lueur
+   s'allume. L'opacité seule s'anime — pas le box-shadow, coûteux à repeindre
+   à chaque frame. */
 .artistes__affiche::after {
   content: "";
   position: absolute;
@@ -418,18 +419,20 @@ function eparpillement(i) {
   transition: opacity 0.4s ease;
 }
 
-.artistes__affiche .reflet {
+/* Au-dessus de l'image de ThumbhashImage (z-index 1). Trois affiches : la
+   vague les parcourt en un tiers de seconde, le reste du cycle est la pause. */
+.artistes__affiche .vague {
   z-index: 2;
 }
 
-/* Déphasées, sinon les trois affiches scintillent en chœur. Delay négatif : le
-   cycle est déjà entamé au chargement, pas d'attente à froid. */
-.artistes__poster:nth-child(3n + 2) {
-  --reflet-delai: -1.8s;
+.artistes__grid {
+  --vague-cycle: 4s;
 }
 
-.artistes__poster:nth-child(3n) {
-  --reflet-delai: -3.6s;
+/* Douze fiches en trois ou quatre colonnes : la vague met un peu plus d'une
+   seconde à les parcourir, puis se tait deux secondes. */
+.artistes__cartes {
+  --vague-cycle: 3.5s;
 }
 
 .artistes__affiche:hover,

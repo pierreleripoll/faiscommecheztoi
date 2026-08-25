@@ -83,9 +83,9 @@
         </template>
 
         <div class="carte__lueur" aria-hidden="true" />
-        <!-- L'éclat façon carte Pokémon (.reflet, main.css) : par-dessus la
-             photo, la teinte et le nom, sous les commandes du carrousel. -->
-        <div class="reflet carte__reflet" aria-hidden="true" />
+        <!-- Le voile de la vague (.vague, main.css) : par-dessus la photo, la
+             teinte et le nom, sous les commandes du carrousel. -->
+        <div class="vague carte__vague" aria-hidden="true" />
       </div>
 
       <!-- VERSO ------------------------------------------------------------ -->
@@ -327,13 +327,13 @@ const representationAilleurs = computed(() => {
   pointer-events: none;
 }
 
-.carte__reflet {
+.carte__vague {
   z-index: 4;
 }
 
-/* Retournée, la carte cache son recto : inutile de faire briller une face
-   qu'on ne voit pas. */
-.carte--retournee .carte__reflet::before {
+/* Retournée, la carte cache son recto : inutile d'allumer une face qu'on ne
+   voit pas. */
+.carte--retournee .carte__vague {
   animation-play-state: paused;
 }
 
