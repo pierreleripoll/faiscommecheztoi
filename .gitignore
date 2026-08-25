@@ -10,5 +10,7 @@ dist
 .ipx-cache
 formulaires
 
-# Fichiers .ics de la grille, régénérés au build (generateAgendaIcs.mjs)
+# Fichiers .ics de la grille et soirs des éditions pour le champ « horaire »
+# de l'admin, régénérés au build (generateAgendaIcs.mjs)
 public/agenda
+public/admin/horaires.json

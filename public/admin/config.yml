@@ -14,6 +14,8 @@
 # sveltia/sveltia-cms#929 (commit b21e728, 25.08.2026, première version après
 # la 0.198.0) ; au doigt et au clavier, les flèches restent. /admin/index.html
 # charge la dernière version depuis unpkg — ne pas figer une version antérieure.
+# Le champ `horaire` des fiches artistes est à nous : `CMS.registerFieldType`
+# dans /admin/horaire.js (Sveltia ≥ 0.198 pour `entry` et `isValid`).
 backend:
   name: github
   repo: pierreleripoll/faiscommecheztoi
@@ -99,8 +101,12 @@ collections:
       - label: "Horaires"
         name: "dates"
         widget: "list"
-        field: { label: "Date", name: "date", widget: "string" }
-        hint: "Ex. Je 08.10, 19:05"
+        # Champ maison (horaire.js) : on tape la date comme on veut ou on la
+        # choisit au calendrier, le champ l'écrit « Je 08.10, 19:05 » — la
+        # seule forme que la grille horaire sait lire — et refuse une date qui
+        # n'existe pas ou qui tombe loin des autres soirs de l'édition.
+        field: { label: "Date", name: "date", widget: "horaire" }
+        hint: "Une ligne par représentation. Tape « 8.10 19h05 » ou clique le calendrier : la date se remet au propre toute seule (Je 08.10, 19:05). L'année est celle du champ Année."
       - { label: "École", name: "school", widget: "string" }
       - label: "Joué aussi ailleurs"
         name: "also"
@@ -113,7 +119,10 @@ collections:
           - label: "Horaires"
             name: "dates"
             widget: "list"
-            field: { label: "Date", name: "date", widget: "string" }
+            # Un autre festival, à une autre période : même champ, sans le
+            # contrôle de proximité avec les soirs de l'édition.
+            field: { label: "Date", name: "date", widget: "horaire", plausibilite: false }
+            hint: "Même écriture que les horaires de l'édition (ex. Sa 19.09, 20:00)."
       - label: "Photos"
         name: "photos"
         widget: "list"

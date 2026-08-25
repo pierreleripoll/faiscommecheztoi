@@ -5,6 +5,11 @@
 // servi en text/calendar s'ouvre directement dans l'aperçu « Ajouter à
 // Calendrier ». Le dossier est régénéré entier à chaque exécution et n'est
 // pas versionné — lancé par `npm run dev` et `npm run generate`.
+//
+// Au passage, public/admin/horaires.json (non versionné lui aussi) liste les
+// soirs connus de chaque édition : le champ « horaire » de l'admin
+// (public/admin/horaire.js) s'en sert pour refuser une date tapée loin du
+// festival.
 import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
@@ -38,8 +43,11 @@ await fs.rm(sortieDir, { recursive: true, force: true });
 await fs.mkdir(sortieDir, { recursive: true });
 
 let total = 0;
+// { "2026": ["2026-10-07", "2026-10-08", …] } — une date par soir, en ISO.
+const soirsParEdition = {};
 for (const annee of [...new Set(fiches.map((f) => String(f.year)))].sort()) {
   for (const soiree of construireGrille(fiches, annee)) {
+    (soirsParEdition[annee] ??= []).push(`${annee}-${soiree.key}`);
     for (const creneau of soiree.creneaux) {
       await fs.writeFile(
         path.join(sortieDir, nomFichierAgenda(soiree, creneau, annee)),
@@ -51,4 +59,9 @@ for (const annee of [...new Set(fiches.map((f) => String(f.year)))].sort()) {
   }
 }
 
-console.log(`Agenda: ${total} fichiers .ics dans public/agenda/.`);
+const fichierSoirs = path.resolve("public/admin/horaires.json");
+await fs.writeFile(fichierSoirs, JSON.stringify(soirsParEdition), "utf8");
+
+console.log(
+  `Agenda: ${total} fichiers .ics dans public/agenda/, soirs des éditions dans public/admin/horaires.json.`
+);
