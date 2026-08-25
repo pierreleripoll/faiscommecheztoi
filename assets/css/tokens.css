@@ -44,10 +44,23 @@
   --glow-photo: rgba(255, 0, 255, 0.5);
   --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
   /* Invitation au clic (hors Figma) : halo symétrique, plus large que
-     --glow-card, qui respire sur les affiches et s'allume au survol. Assez
-     dense pour se détacher du fond rose de la page — à 0.55 sur 18 px il s'y
-     noyait. */
+     --glow-card, qui s'allume au survol des affiches. Assez dense pour se
+     détacher du fond rose de la page — à 0.55 sur 18 px il s'y noyait. */
   --glow-invite: 0 0 26px 8px rgba(255, 0, 255, 0.75);
+
+  /* Signaux de cliquabilité demandés par Siméon (25.08.2026), en rose et non
+     en noir : voir .surligne et .reflet dans main.css.
+     — surligne : la bande de surligneur qui balaie un texte cliquable, de
+       droite à gauche, à la place du soulignement. Le rose du nuage.
+     — reflet : l'éclat qui traverse les cartes en diagonale, façon carte
+       Pokémon, en fondu « screen » pour éclaircir ce qu'il survole (photo,
+       texte magenta ou fond de page) sans le voiler. */
+  --c-surligne: var(--c-cloud);
+  /* Le même rose, atténué, pour teinter une surface entière au survol (les
+     créneaux de la grille) sans rendre son texte illisible. */
+  --c-surligne-doux: rgba(255, 125, 255, 0.4);
+  --c-reflet: rgba(255, 125, 255, 0.85);
+  --reflet-duree: 5.5s;
 
   /* Typo */
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;

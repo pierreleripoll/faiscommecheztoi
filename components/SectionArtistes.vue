@@ -7,8 +7,11 @@
           <button
             v-for="y in years"
             :key="y.year"
-            class="artistes__year"
-            :class="{ 'artistes__year--active': selected === y.year }"
+            class="artistes__year surligne"
+            :class="{
+              'artistes__year--active': selected === y.year,
+              'surligne--actif': selected === y.year,
+            }"
             type="button"
             @click="toggle(y.year)"
           >
@@ -36,6 +39,7 @@
               :aspect-ratio="385 / 547"
               sizes="90vw sm:45vw lg:385px"
             />
+            <span class="reflet" aria-hidden="true" />
           </button>
           <figcaption v-if="p.credit" class="artistes__credit">
             {{ p.credit }}
@@ -167,6 +171,9 @@ function eparpillement(i) {
     "--carte-y": `${DECALAGES[i % DECALAGES.length]}px`,
     // Les cartes se posent l'une après l'autre plutôt que d'apparaître en bloc.
     animationDelay: `${Math.min(i, 11) * 40}ms`,
+    // Le reflet de chaque carte part à son tour : même cycle de quatre que
+    // l'éparpillement, pour que deux voisines ne scintillent jamais ensemble.
+    "--reflet-delai": `${-(i % DECALAGES.length) * 1.3}s`,
   };
 }
 
@@ -200,22 +207,28 @@ function eparpillement(i) {
   flex-wrap: wrap;
 }
 
+/* Les années à 50 %, comme les entrées de nav (Siméon, commentaire Figma #1) ;
+   l'édition choisie et l'année survolée reviennent pleines. Le surligneur
+   (.surligne, main.css) remplace le soulignement, et reste posé sur l'année
+   active. background-color et non `background: none`, qui effacerait la
+   bande. */
 .artistes__year {
   border: 0;
-  background: none;
+  background-color: transparent;
   padding: 0;
   font: inherit;
   font-size: var(--fs-body);
   line-height: 1;
   color: var(--c-ink);
   cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s ease, background-size 0.35s ease;
 }
 
 .artistes__year--active,
 .artistes__year:hover,
 .artistes__year:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
+  opacity: 1;
 }
 
 /* Fiches --------------------------------------------------------------------
@@ -351,11 +364,6 @@ function eparpillement(i) {
   .artistes__affiche:focus-visible {
     transform: none;
   }
-
-  /* La lueur ne respire plus, mais s'allume toujours au survol. */
-  .artistes__affiche::after {
-    animation: none;
-  }
 }
 
 /* Affiches ------------------------------------------------------------------ */
@@ -394,9 +402,10 @@ function eparpillement(i) {
   isolation: isolate;
 }
 
-/* Rien dans le design ne dit que les affiches se cliquent : leur lueur
-   respire pour inviter au geste (retour de Siméon). L'opacité seule s'anime —
-   pas le box-shadow, coûteux à repeindre à chaque frame. */
+/* Rien dans le design ne dit que les affiches se cliquent : un reflet les
+   traverse (.reflet, main.css — retour de Siméon, 25.08.2026, qui remplace la
+   lueur qui respirait) et, au survol, la lueur s'allume. L'opacité seule
+   s'anime — pas le box-shadow, coûteux à repeindre à chaque frame. */
 .artistes__affiche::after {
   content: "";
   position: absolute;
@@ -406,32 +415,21 @@ function eparpillement(i) {
   box-shadow: var(--glow-invite);
   opacity: 0;
   pointer-events: none;
-  animation: invitation-lueur 2.7s ease-in-out infinite;
+  transition: opacity 0.4s ease;
 }
 
-/* Déphasées, sinon les trois affiches pulsent en chœur. Delay négatif : le
-   cycle est déjà entamé au chargement, pas d'attente à froid. Un tiers de
-   cycle chacune. */
-.artistes__poster:nth-child(3n + 2) .artistes__affiche::after {
-  animation-delay: -0.9s;
+.artistes__affiche .reflet {
+  z-index: 2;
 }
 
-.artistes__poster:nth-child(3n) .artistes__affiche::after {
-  animation-delay: -1.8s;
+/* Déphasées, sinon les trois affiches scintillent en chœur. Delay négatif : le
+   cycle est déjà entamé au chargement, pas d'attente à froid. */
+.artistes__poster:nth-child(3n + 2) {
+  --reflet-delai: -1.8s;
 }
 
-/* La lueur monte vite, se tient un instant au sommet, puis retombe : à pulsation
-   symétrique elle ne passait qu'un éclair par son maximum et se remarquait à
-   peine. */
-@keyframes invitation-lueur {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  40%,
-  60% {
-    opacity: 1;
-  }
+.artistes__poster:nth-child(3n) {
+  --reflet-delai: -3.6s;
 }
 
 .artistes__affiche:hover,
@@ -439,10 +437,8 @@ function eparpillement(i) {
   transform: scale(1.015);
 }
 
-/* Au survol la lueur cesse de respirer et reste allumée : l'affiche répond. */
 .artistes__affiche:hover::after,
 .artistes__affiche:focus-visible::after {
-  animation: none;
   opacity: 1;
 }
 

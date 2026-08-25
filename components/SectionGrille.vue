@@ -79,7 +79,7 @@
             </div>
           </div>
 
-          <!-- Le bouton couvre toute la plaque, comme la bascule de la carte
+          <!-- Le bouton couvre tout le créneau, comme la bascule de la carte
                artiste : c'est le créneau entier qui se déplie et se replie. -->
           <button
             class="creneau__lien"
@@ -88,6 +88,9 @@
             :aria-label="`Voir la fiche de ${creneau.name}`"
             @click="basculer(soiree, creneau)"
           />
+
+          <!-- L'éclat façon carte Pokémon (.reflet, main.css). -->
+          <span class="reflet" aria-hidden="true" />
 
           <!-- Même croix que le nuage et le verso de la carte : elle signale
                que la plaque se referme. Décorative — c'est le bouton-calque
@@ -204,17 +207,27 @@ function ailleurs(creneau) {
   color: var(--c-ink);
 }
 
-/* Plaque de créneau : même fond et même lueur que la carte artiste, mais pas
-   son rayon — le coin arrondi de 10.65 px appartient à la carte seule. */
+/* Créneau : de la couleur du fond, fermé par une fine ligne qui marque le
+   passage à l'heure suivante (Siméon, commentaire Figma #6 — la plaque
+   blanche à lueur de la première version a disparu). */
 .creneau {
-  /* Ancre du bouton-calque qui couvre la plaque. */
+  /* Ancre du bouton-calque et du reflet qui couvrent le créneau. */
   position: relative;
-  background: var(--c-card-bg);
-  padding: 12.4px;
-  box-shadow: var(--glow-card);
+  padding-bottom: 12.4px;
+  border-bottom: 1px solid rgba(255, 0, 255, 0.6);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Déphasés, sinon toute la colonne scintille d'un coup. */
+.creneau:nth-of-type(3n + 2) {
+  --reflet-delai: -1.8s;
+}
+
+.creneau:nth-of-type(3n) {
+  --reflet-delai: -3.6s;
 }
 
 .creneau__lien {
@@ -252,6 +265,11 @@ function ailleurs(creneau) {
    d'un padding — un padding empêcherait la rangée de retomber à zéro. */
 .creneau__fiche-cadre > :first-child {
   margin-top: 12.4px;
+}
+
+/* Le reflet passe sous le lien agenda (z-index 1), qui doit rester net. */
+.creneau .reflet {
+  z-index: 0;
 }
 
 /* Portrait « pas trop grand » : un cadre recadré, pas la photo entière. La
@@ -326,8 +344,8 @@ function ailleurs(creneau) {
 
 .creneau__croix {
   position: absolute;
-  top: 12.4px;
-  right: 12.4px;
+  top: 0;
+  right: 0;
   width: 12px;
   height: 12px;
   color: var(--c-ink);
@@ -340,27 +358,21 @@ function ailleurs(creneau) {
   opacity: 1;
 }
 
-/* Au survol (ou au focus clavier du bouton-calque) la plaque se soulève et sa
-   lueur s'élargit : elle se donne pour cliquable. Transition ponctuelle, pas
-   d'animation en continu — Siméon garde une idée en réserve pour la grille. */
-.creneau {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
+/* Au survol (ou au focus clavier du bouton-calque) le créneau se teinte d'un
+   rose atténué et sa ligne se renforce : il répond, comme le texte cliquable.
+   Atténué, car la fiche dépliée se lit sous le curseur — le rose plein du
+   surligneur y noierait le corps de texte à 17 px. La bande déborde un peu à
+   gauche et à droite, façon surligneur, sans décaler la colonne. */
 .creneau:hover,
 .creneau:focus-within {
-  transform: translateY(-3px);
-  box-shadow: var(--glow-invite);
+  background-color: var(--c-surligne-doux);
+  border-color: var(--c-ink);
+  box-shadow: -6px 0 0 var(--c-surligne-doux), 6px 0 0 var(--c-surligne-doux);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .creneau {
     transition: none;
-  }
-
-  .creneau:hover,
-  .creneau:focus-within {
-    transform: none;
   }
 
   /* La fiche s'ouvre d'un coup, sans glissement. */

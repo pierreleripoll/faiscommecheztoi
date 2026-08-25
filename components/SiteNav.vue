@@ -1,18 +1,16 @@
 <template>
-  <nav class="site-nav">
-    <!-- La ligne de la maquette desktop. Plus large que l'écran, elle défile
-         latéralement plutôt que de passer à la ligne. -->
-    <div ref="ligne" class="site-nav__inner" @scroll.passive="mesurer">
+  <nav class="site-nav" :class="{ 'site-nav--compacte': compacte }">
+    <!-- La ligne de la maquette desktop. Dès qu'elle ne tient plus en entier
+         dans la fenêtre, elle cède la place au nuage-menu (Siméon, 25.08.2026)
+         — elle ne défile plus latéralement, ce que rien ne signalait. Elle
+         reste dans le DOM, invisible, pour qu'on puisse la remesurer. -->
+    <div ref="ligne" class="site-nav__inner">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
       <a v-for="e in ENTREES" :key="e.href" :href="e.href">{{ e.label }}</a>
     </div>
-    <!-- Fondu de bord : tant que la ligne a de quoi défiler à droite, une
-         bande aux couleurs de la barre avale la dernière entrée — l'idiome des
-         dégradés de protection du design, pas un pictogramme. Sans lui la
-         ligne se coupe net et rien ne dit qu'elle bouge. -->
-    <div v-show="deborde" class="site-nav__fondu" aria-hidden="true" />
 
-    <!-- Gabarit mobile : la marque et un nuage-menu, la ligne disparaît. -->
+    <!-- Barre compacte : la marque et un nuage-menu. Sous 720 px d'office
+         (HTML prérendu), au-dessus dès que la ligne déborde (mesuré). -->
     <div class="site-nav__mobile">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
       <!-- Le tracé est celui du nuage « Appel à projet » (nœud CLOUD du Figma),
@@ -102,15 +100,28 @@ function lireAncre() {
   courant.value = location.hash;
 }
 
-// Fondu de bord ---------------------------------------------------------------
+// Barre compacte --------------------------------------------------------------
+// La ligne complète ne s'affiche que si elle tient en entier : sinon la barre
+// passe en marque + nuage-menu. Mesuré plutôt que fixé par une media query, la
+// largeur de la ligne dépendant de la police (Vevey ou son repli) et de ses
+// entrées. Sous 720 px la feuille de style tranche déjà toute seule, avant
+// l'hydratation ; la mesure ne fait qu'étendre la barre compacte vers le haut.
 const ligne = ref(null);
-const deborde = ref(false);
+const compacte = ref(false);
 
 function mesurer() {
   const el = ligne.value;
   if (!el) return;
-  deborde.value = el.scrollWidth - el.clientWidth - el.scrollLeft > 1;
+  // La ligne mesure toujours la largeur de la barre, même cachée (position
+  // absolue de bord à bord) : scrollWidth dit ce qu'il lui faudrait.
+  compacte.value = el.scrollWidth - el.clientWidth > 1;
 }
+
+// Si la fenêtre s'élargit assez pour la ligne avec le menu ouvert, le panneau
+// se ferme : sinon il resterait affiché et le défilement bloqué.
+watch(compacte, (c) => {
+  if (!c) fermer();
+});
 
 
 // Nuage-menu ------------------------------------------------------------------
@@ -133,21 +144,12 @@ function fermer() {
   nuage.value?.focus({ preventScroll: true });
 }
 
-// Si la fenêtre repasse au gabarit desktop avec le menu ouvert, le panneau
-// disparaît (display: none) mais le défilement resterait bloqué.
-const desktop = ref(null);
-function surChangementDeGabarit(e) {
-  if (e.matches) fermer();
-}
-
 onMounted(() => {
   mesurer();
   // La largeur de la ligne dépend de la police : on remesure quand Vevey
   // arrive, et à chaque redimensionnement.
   document.fonts?.ready.then(mesurer);
   window.addEventListener("resize", mesurer, { passive: true });
-  desktop.value = window.matchMedia("(min-width: 721px)");
-  desktop.value.addEventListener("change", surChangementDeGabarit);
   lireAncre();
   window.addEventListener("hashchange", lireAncre);
 });
@@ -155,7 +157,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", mesurer);
   window.removeEventListener("hashchange", lireAncre);
-  desktop.value?.removeEventListener("change", surChangementDeGabarit);
 });
 </script>
 
@@ -177,15 +178,25 @@ onBeforeUnmount(() => {
   padding: 20px var(--pad-x);
   font-size: var(--fs-nav);
   line-height: 1.3;
-  /* Sur mobile la maquette laisse la nav déborder sur une seule ligne :
-     on la rend défilable horizontalement plutôt que de la faire passer à la ligne. */
-  overflow-x: auto;
+  /* Sur une seule ligne, jamais à la ligne : ce qui déborde est mesuré et
+     fait basculer la barre en compacte. Le rognage n'est visible que le temps
+     de l'hydratation, dans la bande entre 720 px et la largeur de la ligne. */
   white-space: nowrap;
-  scrollbar-width: none;
+  overflow: hidden;
 }
 
-.site-nav__inner::-webkit-scrollbar {
-  display: none;
+/* Barre compacte : la ligne se retire — mais reste mesurable, de bord à bord —
+   et la marque + le nuage prennent sa place. */
+.site-nav--compacte .site-nav__inner {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.site-nav--compacte .site-nav__mobile {
+  display: flex;
 }
 
 .site-nav a {
@@ -202,16 +213,6 @@ onBeforeUnmount(() => {
 
 .site-nav__brand {
   text-transform: uppercase;
-}
-
-.site-nav__fondu {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 45px;
-  pointer-events: none;
-  background: linear-gradient(to left, var(--c-bar) 20%, transparent);
 }
 
 /* Mobile : la marque et le nuage ---------------------------------------------- */
@@ -332,20 +333,20 @@ onBeforeUnmount(() => {
   text-underline-offset: 0.16em;
 }
 
+/* Sous 720 px, compacte d'office : le HTML prérendu sort déjà juste, sans
+   attendre la mesure. Même retrait que par la classe, pour qu'on puisse
+   toujours mesurer la ligne. */
 @media (max-width: 720px) {
-  .site-nav__inner,
-  .site-nav__fondu {
-    display: none;
+  .site-nav__inner {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .site-nav__mobile {
     display: flex;
-  }
-}
-
-@media (min-width: 721px) {
-  .site-nav__panneau {
-    display: none;
   }
 }
 

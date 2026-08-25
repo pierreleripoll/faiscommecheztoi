@@ -83,6 +83,9 @@
         </template>
 
         <div class="carte__lueur" aria-hidden="true" />
+        <!-- L'éclat façon carte Pokémon (.reflet, main.css) : par-dessus la
+             photo, la teinte et le nom, sous les commandes du carrousel. -->
+        <div class="reflet carte__reflet" aria-hidden="true" />
       </div>
 
       <!-- VERSO ------------------------------------------------------------ -->
@@ -322,6 +325,16 @@ const representationAilleurs = computed(() => {
   border-radius: inherit;
   box-shadow: var(--glow-card-inset);
   pointer-events: none;
+}
+
+.carte__reflet {
+  z-index: 4;
+}
+
+/* Retournée, la carte cache son recto : inutile de faire briller une face
+   qu'on ne voit pas. */
+.carte--retournee .carte__reflet::before {
+  animation-play-state: paused;
 }
 
 /* Recto ---------------------------------------------------------------------

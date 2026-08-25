@@ -44,6 +44,103 @@ a {
   text-underline-offset: 0.16em;
 }
 
+/* Texte cliquable : surligneur plutôt que soulignement ------------------------
+   Siméon (25.08.2026) : les infos cliquables — années des éditions, « Spot à
+   Sion », adresses e-mail — ne se soulignent plus ; au survol une bande de
+   surligneur rose balaie le texte de droite à gauche. La bande est un dégradé
+   uni en image de fond, ancré à droite et dont seule la largeur s'anime :
+   elle pousse vers la gauche, puis se retire par où elle est venue.
+   Sur un lien qui passe à la ligne, clone plutôt que slice : chaque fragment
+   porte sa propre bande, sinon le second se retrouvait nu. */
+.surligne,
+.section a {
+  text-decoration: none;
+  background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  background-position: right center;
+  transition: background-size 0.35s ease;
+  /* La bande déborde un peu du texte, comme un vrai trait de surligneur. */
+  padding-inline: 0.08em;
+  margin-inline: -0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.surligne:hover,
+.surligne:focus-visible,
+.surligne--actif,
+.section a:hover,
+.section a:focus-visible {
+  background-size: 100% 100%;
+}
+
+/* Reflet de carte ---------------------------------------------------------------
+   L'éclat des cartes Pokémon, en rose (Siméon, 25.08.2026) : une bande claire
+   traverse la carte en diagonale, du haut-gauche au bas-droit, puis marque une
+   pause avant de repasser. Il dit « ça se clique » sur les affiches, les fiches
+   artistes et les créneaux de la grille.
+   Un élément réel et non un pseudo-élément : il faut un cadre qui rogne
+   (overflow: hidden) ET une bande qui bouge dedans, deux boîtes. Poser le
+   rognage sur la carte elle-même couperait sa lueur ou son liseré de focus.
+   Seule la transformation s'anime — sur le compositeur, sans repeindre — et
+   le fondu « screen » éclaircit ce qu'il survole au lieu de le voiler.
+   Le déphasage (--reflet-delai) se règle là où les cartes voisinent, sinon
+   elles scintillent en chœur. */
+.reflet {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Le fondu se pose sur le cadre et non sur la bande : on donne au cadre un
+     z-index pour le placer dans la carte, ce qui en fait un contexte
+     d'empilement — posé sur la bande, le fondu ne verrait plus que le cadre,
+     vide, et la bande s'imprimerait en rose opaque. */
+  mix-blend-mode: screen;
+}
+
+.reflet::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    var(--c-reflet) 50%,
+    transparent 60%
+  );
+  transform: translate(-60%, -60%);
+  animation: reflet var(--reflet-duree) ease-in-out infinite;
+  animation-delay: var(--reflet-delai, 0s);
+}
+
+/* La traversée occupe moins de la moitié du cycle, le reste est un temps
+   mort : une carte qui brille sans arrêt lasse au lieu d'inviter. */
+@keyframes reflet {
+  0% {
+    transform: translate(-60%, -60%);
+  }
+  42%,
+  100% {
+    transform: translate(60%, 60%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reflet::before {
+    display: none;
+  }
+
+  .surligne,
+  .section a {
+    transition: none;
+  }
+}
+
 h1,
 h2,
 h3 {

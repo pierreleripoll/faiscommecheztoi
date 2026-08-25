@@ -221,5 +221,9 @@ const soutiens = await useContenu("soutiens", () =>
   /* Rangée de 82 px de haut dans la maquette, les logos y sont centrés. */
   height: clamp(38px, 4.5vw, 61px);
   width: auto;
+  /* Les logos arrivent sur fond blanc ; en multiplication le blanc prend la
+     couleur de la page et disparaît (Siméon, 25.08.2026). Un logo déjà rose
+     s'assombrit un peu — Siméon envoie les versions officielles. */
+  mix-blend-mode: multiply;
 }
 </style>
