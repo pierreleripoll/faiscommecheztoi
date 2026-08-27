@@ -9,7 +9,7 @@
 // dans la surcharge que lit useContenu — la section se redessine, le reste de
 // la page ne bouge pas.
 
-import { apostrophes } from "../utils/typo.js";
+import { typo } from "../utils/typo.js";
 
 // section (nom de collection ou de fichier Sveltia) → clé useAsyncData, ancre
 // où défiler, dossier de contenu pour les collections.
@@ -90,9 +90,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   async function fabriquerDoc(s, { section, fichier, slug, data, assets }) {
     const { body, ...champs } = data || {};
     const parse = await chargerParseur();
-    // Mêmes apostrophes courbes que le build (server/plugins/apostrophes.ts) :
+    // Même typographie que le build (server/plugins/apostrophes.ts) :
     // sans ça l'aperçu montrerait des primes que le site n'aura pas.
-    const r = await parse(apostrophes(typeof body === "string" ? body : ""));
+    const r = await parse(typo(typeof body === "string" ? body : ""));
     courber(champs);
 
     if (!fichier) fichier = `${s.dossier || section}/${slug || "nouveau"}.md`;
@@ -147,7 +147,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   function courber(obj) {
     if (!obj || typeof obj !== "object") return;
     for (const [k, v] of Object.entries(obj)) {
-      if (typeof v === "string") obj[k] = apostrophes(v);
+      if (typeof v === "string") obj[k] = typo(v);
       else courber(v);
     }
   }

@@ -17,16 +17,15 @@
          (HTML prérendu), au-dessus dès que la ligne déborde (mesuré). -->
     <div class="site-nav__mobile">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
-      <!-- Le tracé est celui du nuage « Appel à projet » (nœud CLOUD du Figma),
-           ici en contour et non plein (FCCT_2, 27.08.2026). Siméon ne dessine
-           plus les traits ≡ à l'intérieur ; on les garde quand même — sans eux
-           rien ne dit que ce nuage ouvre le menu — et ils se ferment en croix
-           à l'ouverture, la croix ayant quitté le panneau. Trois tracés
-           séparés pour pouvoir les animer un à un. Ils sont posés dans le
-           corps plat du nuage, sous les bosses : le creux de droite du tracé
-           descend jusqu'à y=112 (x=312), et le ≡ y touchait presque le
-           contour — d'où les 138→290 en x, et les 140/181/222 en y, qui
-           laissent de l'air en haut comme en bas. -->
+      <!-- Le nuage seul, sans le ≡ (Siméon, 27.08.2026) : « ce sont des icônes
+           inventées au début d'internet, le nuage est positionné au même
+           endroit que sur 99 % des autres sites, on peut faire confiance à nos
+           utilisateurs » — et plein de marques prennent aujourd'hui leur logo
+           comme menu. Ce qui dit qu'il se clique, ce n'est donc plus un
+           pictogramme mais l'animation : le même balayage que les textes
+           cliquables, plus la bande de surligneur au survol. Reste une croix,
+           mais à l'ouverture seulement : elle ferme le panneau, elle ne
+           présente pas le menu. -->
       <button
         ref="nuage"
         class="site-nav__nuage"
@@ -37,19 +36,87 @@
         @click="basculer"
       >
         <svg viewBox="0 0 428 257" aria-hidden="true">
-          <path class="site-nav__nuage-corps" :d="NUAGE" />
-          <g class="site-nav__nuage-traits">
-            <path
-              class="site-nav__trait site-nav__trait--haut"
-              d="M138 140H290"
+          <defs>
+            <!-- Le balayage du texte, transposé au tracé. Le découpage aux
+                 lettres (background-clip: text) n'a pas d'équivalent ici :
+                 c'est un masque qui découpe. Et pour que le rendu suive
+                 partout, le masque reste FIXE — le contour du nuage, en blanc
+                 — et c'est le rectangle dessous qui bouge, un simple transform
+                 composité par le GPU. Son dégradé reprend celui de .balayage :
+                 pâle aux bords, plein dans une fenêtre de 8 %, sur trois fois
+                 la largeur du nuage. -->
+            <linearGradient :id="`fenetre-${uid}`" x1="0" y1="0" x2="1" y2="0">
+              <stop
+                offset="0.36"
+                stop-color="var(--c-ink)"
+                stop-opacity="0.5"
+              />
+              <stop offset="0.46" stop-color="var(--c-ink)" stop-opacity="1" />
+              <stop offset="0.54" stop-color="var(--c-ink)" stop-opacity="1" />
+              <stop
+                offset="0.64"
+                stop-color="var(--c-ink)"
+                stop-opacity="0.5"
+              />
+            </linearGradient>
+            <!-- Le trait est donné en pixels d'écran, il déborde donc du
+                 tracé : le masque prend huit unités de marge pour ne pas le
+                 rogner. -->
+            <mask
+              :id="`contour-${uid}`"
+              maskUnits="userSpaceOnUse"
+              x="-8"
+              y="-8"
+              width="444"
+              height="273"
+            >
+              <path
+                :d="NUAGE"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2"
+                vector-effect="non-scaling-stroke"
+              />
+            </mask>
+            <!-- Même montage pour le surligneur : masque fixe (le nuage plein),
+                 rectangle mobile ancré à droite. -->
+            <mask
+              :id="`plein-${uid}`"
+              maskUnits="userSpaceOnUse"
+              x="-8"
+              y="-8"
+              width="444"
+              height="273"
+            >
+              <path :d="NUAGE" fill="#fff" />
+            </mask>
+          </defs>
+          <path class="site-nav__nuage-fond" :d="NUAGE" />
+          <g :mask="`url(#plein-${uid})`">
+            <rect
+              class="site-nav__surligneur"
+              x="-8"
+              y="-8"
+              width="444"
+              height="273"
             />
+          </g>
+          <g :mask="`url(#contour-${uid})`">
+            <rect
+              class="site-nav__fenetre"
+              x="-856"
+              y="-8"
+              width="1284"
+              height="273"
+              :fill="`url(#fenetre-${uid})`"
+            />
+          </g>
+          <!-- Deux traits confondus au repos, écartés en croix à l'ouverture. -->
+          <g class="site-nav__croix">
+            <path class="site-nav__croix-trait" d="M138 181H290" />
             <path
-              class="site-nav__trait site-nav__trait--milieu"
+              class="site-nav__croix-trait site-nav__croix-trait--contre"
               d="M138 181H290"
-            />
-            <path
-              class="site-nav__trait site-nav__trait--bas"
-              d="M138 222H290"
             />
           </g>
         </svg>
@@ -64,9 +131,8 @@
             :key="e.href"
             :href="e.href"
             :style="{ '--i': i }"
-            :class="{ 'site-nav__lien--courant': courant === e.href }"
             @click="fermer"
-            >{{ e.label }}</a
+            ><span>{{ e.label }}</span></a
           >
         </div>
       </div>
@@ -86,13 +152,6 @@ const ENTREES = [
 
 const NUAGE =
   "M390.481 256.962L37.9204 257C17.8298 257 0.0857717 241.547 0.0643417 221.075L5.17068e-05 167.133C-0.0320933 140.511 14.926 117.084 38.183 104.58C51.7535 97.2822 67.0224 94.2634 82.7359 95.1857C70.3333 53.657 95.6528 11.0667 137.136 1.80112C179.021 -7.55556 220.177 20.5038 226.274 63.6732C262.989 55.5927 299.758 76.3222 311.957 112.103C334.983 96.0972 364.835 94.1133 389.876 107.813C412.41 120.14 428.021 144.339 428 171.331L427.952 221.08C427.936 241.273 410.46 256.957 390.476 256.957L390.481 256.962Z";
-
-// La section d'où l'on vient, lue dans l'ancre de l'URL — après montage
-// seulement, le HTML prérendu ne connaît pas l'ancre.
-const courant = ref("");
-function lireAncre() {
-  courant.value = location.hash;
-}
 
 // Barre compacte --------------------------------------------------------------
 // La ligne complète ne s'affiche que si elle tient en entier : sinon la barre
@@ -122,6 +181,9 @@ watch(compacte, (c) => {
 // (maquette FCCT_2) et c'est lui qu'on retape pour refermer.
 const ouvert = ref(false);
 const nuage = ref(null);
+// Les masques et le filtre du nuage sont référencés par id : il en faut un par
+// instance, la nav pouvant être montée deux fois (aperçu du CMS).
+const uid = useId();
 const liens = ref(null);
 
 function basculer() {
@@ -150,13 +212,10 @@ onMounted(() => {
   // arrive, et à chaque redimensionnement.
   document.fonts?.ready.then(mesurer);
   window.addEventListener("resize", mesurer, { passive: true });
-  lireAncre();
-  window.addEventListener("hashchange", lireAncre);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", mesurer);
-  window.removeEventListener("hashchange", lireAncre);
 });
 </script>
 
@@ -262,37 +321,94 @@ onBeforeUnmount(() => {
   filter: drop-shadow(var(--glow-cloud));
 }
 
-/* Contour magenta sur fond de barre : le nuage est dessiné, plus rempli
-   (FCCT_2). Le trait est donné en pixels d'écran — sans non-scaling-stroke,
-   2 unités de la boîte de 428 ne feraient pas 0,2 px à l'écran. */
-.site-nav__nuage-corps {
+/* Le fond du nuage : couleur de la barre au repos (le nuage est dessiné, plus
+   rempli — FCCT_2), magenta à l'ouverture. Pas d'ombre interne blanche ici,
+   contrairement au nuage « Appel à projet » : à 42 px de large, ses 10 unités
+   de décalage et 5 de flou sur une boîte de 428 ne font pas un pixel — mesuré,
+   le rendu est identique au pixel près. */
+.site-nav__nuage-fond {
   fill: var(--c-bar);
-  stroke: var(--c-ink);
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.5;
-  transition:
-    fill 0.3s ease,
-    opacity 0.3s ease;
+  transition: fill 0.3s ease;
 }
 
-.site-nav__nuage-traits {
+/* La bande de surligneur des textes cliquables, découpée au nuage : elle
+   envahit depuis la droite au survol et au focus, et se retire quand on
+   quitte. Le masque, lui, ne bouge pas — c'est le rectangle qui s'étire. */
+.site-nav__surligneur {
+  fill: var(--c-surligne);
+  transform-box: view-box;
+  /* Ancrée au bord droit du rectangle, à mi-hauteur. */
+  transform-origin: 436px 128.5px;
+  transform: scaleX(0);
+  transition: transform 0.35s ease;
+}
+
+.site-nav__nuage:hover .site-nav__surligneur,
+.site-nav__nuage:focus-visible .site-nav__surligneur {
+  transform: scaleX(1);
+}
+
+/* La fenêtre pleine qui parcourt le contour, de la gauche vers la droite, en
+   boucle — et sur le même cycle que les textes. Le rectangle fait trois fois
+   la largeur du nuage et glisse d'une largeur de nuage de part et d'autre :
+   la fenêtre attend donc hors champ le reste du cycle, comme le dégradé de
+   .balayage attend hors du texte. */
+.site-nav__fenetre {
+  transform-box: view-box;
+  animation: nav-balayage var(--balayage-cycle) linear infinite;
+}
+
+@keyframes nav-balayage {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(856px);
+  }
+}
+
+/* Au survol, le contour passe en plein d'un coup : le balayage a fait son
+   travail, la réponse au geste prend le relais. La couleur unie l'emporte sur
+   le dégradé — une déclaration CSS bat un attribut de présentation. */
+.site-nav__nuage:hover .site-nav__fenetre,
+.site-nav__nuage:focus-visible .site-nav__fenetre {
+  fill: var(--c-ink);
+  animation: none;
+  transform: none;
+}
+
+/* Ouvert : le nuage se remplit de magenta (à 30 %, maquette FCCT_2), le
+   balayage s'arrête, et contour comme croix passent au rose pâle — en magenta
+   ils se seraient fondus dans le remplissage. */
+.site-nav--ouverte .site-nav__nuage-fond {
+  fill: var(--c-ink);
+  opacity: 0.3;
+}
+
+.site-nav--ouverte .site-nav__fenetre,
+.site-nav--ouverte .site-nav__nuage:hover .site-nav__fenetre,
+.site-nav--ouverte .site-nav__nuage:focus-visible .site-nav__fenetre {
+  fill: var(--c-bar);
+  animation: none;
+  transform: none;
+}
+
+/* Le surligneur n'a plus rien à dire sur un nuage déjà rempli — et le curseur
+   reste posé sur le nuage juste après le clic, d'où la règle de survol reprise
+   ici : sans elle, elle l'emportait en spécificité et lavait le magenta. */
+.site-nav--ouverte .site-nav__surligneur,
+.site-nav--ouverte .site-nav__nuage:hover .site-nav__surligneur,
+.site-nav--ouverte .site-nav__nuage:focus-visible .site-nav__surligneur {
+  transform: scaleX(0);
+}
+
+/* La croix. Au repos les deux traits sont confondus sur la ligne médiane et
+   réduits à rien ; à l'ouverture ils s'étirent et basculent à 45°, chacun dans
+   son sens. Rien à translater : ils sont déjà au centre. */
+.site-nav__croix-trait {
   fill: none;
-  stroke: var(--c-ink);
+  stroke: var(--c-bar);
   stroke-linecap: round;
-  /* Même présence que le contour au repos. */
-  opacity: 0.5;
-  transition:
-    stroke 0.3s ease,
-    opacity 0.3s ease;
-}
-
-/* Les trois traits pivotent autour de leur propre centre (214, 181 — le trait
-   du milieu), en unités de la boîte de dessin (transform-box: view-box) : la
-   translation vaut donc l'écart entre deux traits, 41. Elle vient AVANT la
-   rotation — écrite à droite : le trait rejoint d'abord la ligne médiane, puis
-   bascule à 45°, et la croix se referme sur elle-même. */
-.site-nav__trait {
   /* L'épaisseur en pixels d'écran doit être posée sur les tracés eux-mêmes :
      vector-effect ne s'hérite pas, et sur le groupe elle ne descendait pas —
      2 unités de la boîte de 428 faisaient alors 0,2 px, soit rien. */
@@ -300,46 +416,24 @@ onBeforeUnmount(() => {
   vector-effect: non-scaling-stroke;
   transform-box: view-box;
   transform-origin: 214px 181px;
+  transform: rotate(45deg) scaleX(0);
+  opacity: 0;
   transition:
     transform 0.3s ease,
     opacity 0.3s ease;
 }
 
-.site-nav__nuage:hover .site-nav__nuage-corps,
-.site-nav__nuage:focus-visible .site-nav__nuage-corps,
-.site-nav__nuage:hover .site-nav__nuage-traits,
-.site-nav__nuage:focus-visible .site-nav__nuage-traits {
+.site-nav__croix-trait--contre {
+  transform: rotate(-45deg) scaleX(0);
+}
+
+.site-nav--ouverte .site-nav__croix-trait {
+  transform: rotate(45deg) scaleX(1);
   opacity: 1;
 }
 
-/* Ouvert : le nuage se remplit de magenta (à 30 %, maquette FCCT_2) et le ≡ se
-   ferme en ×. Les traits repassent en plein — à 30 % sur un nuage lui-même à
-   30 %, la croix se serait fondue dans le fond de la barre. */
-.site-nav--ouverte .site-nav__nuage-corps {
-  fill: var(--c-ink);
-  opacity: 0.3;
-}
-
-/* Le ≡ et le nuage échangent leurs couleurs : la croix se pose désormais SUR
-   un nuage magenta, elle doit donc passer au rose pâle. En magenta elle
-   disparaissait dans le remplissage dès que le curseur venait dessus (le
-   survol monte le nuage à 100 %). */
-.site-nav--ouverte .site-nav__nuage-traits {
-  stroke: var(--c-bar);
-  opacity: 1;
-}
-
-.site-nav--ouverte .site-nav__trait--haut {
-  transform: rotate(45deg) translateY(41px);
-}
-
-.site-nav--ouverte .site-nav__trait--milieu {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.site-nav--ouverte .site-nav__trait--bas {
-  transform: rotate(-45deg) translateY(-41px);
+.site-nav--ouverte .site-nav__croix-trait--contre {
+  transform: rotate(-45deg) scaleX(1);
 }
 
 /* Le panneau ouvert : toute la fenêtre aux couleurs de la barre, la barre
@@ -377,13 +471,28 @@ onBeforeUnmount(() => {
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
-/* La section d'où l'on vient reste soulignée — l'état actif du design. */
-.site-nav__liens a:hover,
-.site-nav__liens a:focus-visible,
-.site-nav__liens .site-nav__lien--courant {
-  text-decoration: underline;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.16em;
+/* Plus de soulignement sur l'entrée d'où l'on vient : « pour le menu on peut
+   enlever le soulignement quand on clique, c'est pas nécessaire » (Siméon,
+   27.08.2026) — le panneau se referme sur le clic, l'état n'a rien à marquer.
+   Au survol et au focus, la réponse au geste reste celle du reste du site :
+   la bande de surligneur qui envahit depuis la droite, pas un trait. En
+   transition et non en animation — les entrées en ont déjà une, pour leur
+   cascade d'ouverture, et elle repartirait à chaque fois qu'on les quitte. */
+/* La bande se pose sur le mot, pas sur la ligne : le lien, lui, reste large
+   de bord à bord — c'est la cible tactile. */
+.site-nav__liens span {
+  padding-inline: 0.08em;
+  margin-inline: -0.08em;
+  background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 0% 100%;
+  transition: background-size 0.35s ease;
+}
+
+.site-nav__liens a:hover span,
+.site-nav__liens a:focus-visible span {
+  background-size: 100% 100%;
 }
 
 /* Le panneau descend de sous la barre, les entrées le suivent une à une. */
@@ -431,12 +540,20 @@ onBeforeUnmount(() => {
 }
 
 /* Le menu s'ouvre et se ferme d'un coup : ni glissement, ni cascade, ni bascule
-   du nuage — seules restent les couleurs, qui portent l'information. */
+   du nuage — seules restent les couleurs, qui portent l'information. Le
+   balayage s'arrête aussi : le contour reste plein, comme les textes
+   cliquables au même réglage. */
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__nuage-corps,
-  .site-nav__nuage-traits,
-  .site-nav__trait {
+  .site-nav__nuage-fond,
+  .site-nav__surligneur,
+  .site-nav__croix-trait {
     transition: none;
+  }
+
+  .site-nav__fenetre {
+    fill: var(--c-ink);
+    animation: none;
+    transform: none;
   }
 
   .panneau-enter-active,
@@ -446,6 +563,10 @@ onBeforeUnmount(() => {
 
   .site-nav__liens a {
     animation: none;
+  }
+
+  .site-nav__liens span {
+    transition: none;
   }
 }
 </style>
