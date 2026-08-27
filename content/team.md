@@ -21,5 +21,8 @@ et toute l'équipe du Spot
 Graphisme:\
 Siméon Dubuis (site web) et Alice Gillioz (visuel 2026)
 
+Développement web:\
+Pierre Ripoll
+
 Photo\
 Fi'Ni studio
