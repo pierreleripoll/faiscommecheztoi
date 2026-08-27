@@ -42,7 +42,10 @@
   --glow-nav: 0 7px 10px rgba(255, 0, 255, 0.35);
   --glow-pied: 0 -7px 10px rgba(255, 0, 255, 0.35); /* la même, vers le haut */
   --glow-photo: rgba(255, 0, 255, 0.5);
-  --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
+  /* La lueur du nuage : 10/10, flou 20, magenta à 60 % — relevé sur le groupe
+     CLOUD du Figma (FCCT_2). Elle vit sur le nuage entier ; à l'intérieur, une
+     ombre blanche lui donne son volume (filtre SVG dans AppelCloud.vue). */
+  --glow-cloud: 10px 10px 20px rgba(255, 0, 255, 0.6);
   /* Invitation au clic (hors Figma) : halo symétrique, plus large que
      --glow-card, qui s'allume au survol des affiches. Assez dense pour se
      détacher du fond rose de la page — à 0.55 sur 18 px il s'y noyait. */
