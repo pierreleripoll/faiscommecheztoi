@@ -207,9 +207,13 @@ function eparpillement(i) {
   font-size: var(--fs-h1);
 }
 
+/* Dans la maquette les années ne sont pas des blocs espacés mais un seul mot
+   par édition sur une même ligne, séparées d'une simple espace-mot. Siméon les
+   voulait plus rapprochées (27.08.2026) : l'écart suit donc la taille du texte
+   (0,3 em) au lieu des 25 px fixes. */
 .artistes__years {
   display: flex;
-  gap: 25px;
+  gap: 0.3em;
   flex-wrap: wrap;
 }
 
@@ -226,6 +230,8 @@ function eparpillement(i) {
   font: inherit;
   font-size: var(--fs-body);
   line-height: 1;
+  /* Chiffres légèrement resserrés, toujours d'après le même retour. */
+  letter-spacing: -0.02em;
   cursor: pointer;
   /* Chaque année balaie son propre mot : décalées d'un rang à l'autre, la
      fenêtre semble traverser toute la rangée de gauche à droite, comme sur

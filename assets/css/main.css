@@ -33,9 +33,10 @@ body {
   color: var(--c-ink);
   font-family: var(--font-sans);
   font-size: var(--fs-body);
-  /* Les styles Figma sont en interligne 100 % ; on desserre très légèrement
-     pour que les accents et les points médians restent lisibles à l'écran. */
-  line-height: 1.12;
+  /* Les styles Figma sont en interligne 100 % ; on desserre (--lh-body) pour la
+     lisibilité — les accents et les points médians ont besoin d'air, et Siméon
+     en a demandé davantage encore le 27.08.2026. */
+  line-height: var(--lh-body);
 }
 
 a {
@@ -123,40 +124,63 @@ a {
 
 /* Vague sur les cartes -----------------------------------------------------------
    Référence de Siméon (vidéo WhatsApp du 24.08.2026, grille de rectangles) :
-   les cartes s'allument une à une, entières, en ordre de lecture — de gauche à
-   droite puis ligne suivante —, deux ou trois à la fois, puis la vague marque
-   une pause et repart du début. Elle dit « ça se clique » sur les affiches,
-   les fiches artistes et les créneaux de la grille.
-   Un voile rose (.vague) posé sur chaque carte, dont l'opacité monte et
-   redescend ; toutes les cartes d'un groupe partagent le même cycle
-   (--vague-cycle, réglé sur le groupe) et chacune part avec un retard de
-   3 % du cycle par rang (--i, posé sur la carte) : allumée de 0 à 12 %,
-   elle chevauche ses deux voisines. Le rang suit l'ordre de lecture de la
-   mise en page, pas celui du DOM — la grille horaire le recalcule selon son
-   nombre de colonnes. Le cycle se choisit d'après le nombre de cartes : à
-   3 % par rang, 28 rangs occupent 84 % du cycle, le reste est la pause. */
+   les cartes s'allument une à une, en ordre de lecture — de gauche à droite
+   puis ligne suivante —, deux ou trois à la fois, puis la vague marque une
+   pause et repart du début. Elle dit « ça se clique » sur les affiches, les
+   fiches artistes et les créneaux de la grille.
+   Ce n'est plus un voile plein qui s'allume et s'éteint : trop « carré », il
+   faisait clignoter des rectangles (Siméon, 27.08.2026). C'est un REFLET —
+   une bande diagonale à bords fondus qui balaie la carte, comme la fenêtre du
+   balayage balaie le texte. La bande vit dans un ::before qui traverse de
+   gauche à droite ; .vague la rogne aux coins arrondis de la carte
+   (border-radius hérité + overflow), d'où des angles doux et non plus une
+   arête. Les deux extrémités du dégradé sont transparentes : la bande peut
+   attendre hors champ le reste du cycle sans que rien ne saute.
+   Toutes les cartes d'un groupe partagent le même cycle (--vague-cycle, réglé
+   sur le groupe) et chacune part avec un retard de 3 % du cycle par rang
+   (--i, posé sur la carte) : la traversée dure 12 % du cycle, chaque carte
+   chevauche donc ses deux voisines. Le rang suit l'ordre de lecture de la mise
+   en page, pas celui du DOM — la grille horaire le recalcule selon son nombre
+   de colonnes. Le cycle se choisit d'après le nombre de cartes : à 3 % par
+   rang, 28 rangs occupent 84 % du cycle, le reste est la pause.
+   La bande s'anime en transform (composité par le GPU) plutôt qu'en opacité de
+   surface : douze cartes qui se repeignent en entier à chaque frame, c'était
+   cher. */
 .vague {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: var(--c-vague);
-  opacity: 0;
+  /* Le reflet est coupé net au bord de la carte, coins arrondis compris. */
+  overflow: hidden;
   pointer-events: none;
+}
+
+.vague::before {
+  content: "";
+  position: absolute;
+  /* La bande est penchée : elle doit dépasser en haut et en bas pour couvrir
+     les coins de la carte, et faire une largeur de carte pour la traverser. */
+  inset-block: -30%;
+  inset-inline-start: 0;
+  width: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    var(--c-vague) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
   animation: vague var(--vague-cycle, 4s) linear infinite;
   animation-delay: calc(var(--i, 0) * var(--vague-cycle, 4s) * 0.03);
 }
 
 @keyframes vague {
   0% {
-    opacity: 0;
-  }
-  3%,
-  9% {
-    opacity: 1;
+    transform: translateX(-100%);
   }
   12%,
   100% {
-    opacity: 0;
+    transform: translateX(100%);
   }
 }
 

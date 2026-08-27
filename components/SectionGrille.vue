@@ -120,7 +120,7 @@
 
     <p class="grille__note">
       Entrée libre, sans réservation en amont. Pour le Petithéâtre uniquement,
-      les places sont à réserver le soir de la représentation à l'entrée du
+      les places sont à réserver le soir de la représentation à l’entrée du
       théâtre.
     </p>
   </section>
@@ -298,13 +298,14 @@ function ailleurs(creneau) {
   margin-top: 12.4px;
 }
 
-/* Le voile prend la teinte du survol et passe sous le texte : la vague montre
+/* Le reflet prend la teinte du survol et passe sous le texte : la vague montre
    l'état que le curseur déclenchera. Il déborde de 6 px à gauche et à droite,
-   comme la bande du survol. */
+   comme la bande du survol. La teinte se pose sur la variable, pas sur le fond :
+   c'est la bande du ::before qui la lit (.vague, main.css). */
 .creneau .vague {
   z-index: -1;
   inset-inline: -6px;
-  background: var(--c-surligne-doux);
+  --c-vague: var(--c-surligne-doux);
 }
 
 /* Portrait « pas trop grand » : un cadre recadré, pas la photo entière. La

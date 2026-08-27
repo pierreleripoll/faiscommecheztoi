@@ -9,6 +9,8 @@
 // dans la surcharge que lit useContenu — la section se redessine, le reste de
 // la page ne bouge pas.
 
+import { apostrophes } from "../utils/typo.js";
+
 // section (nom de collection ou de fichier Sveltia) → clé useAsyncData, ancre
 // où défiler, dossier de contenu pour les collections.
 const SECTIONS = {
@@ -88,7 +90,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   async function fabriquerDoc(s, { section, fichier, slug, data, assets }) {
     const { body, ...champs } = data || {};
     const parse = await chargerParseur();
-    const r = await parse(typeof body === "string" ? body : "");
+    // Mêmes apostrophes courbes que le build (server/plugins/apostrophes.ts) :
+    // sans ça l'aperçu montrerait des primes que le site n'aura pas.
+    const r = await parse(apostrophes(typeof body === "string" ? body : ""));
+    courber(champs);
 
     if (!fichier) fichier = `${s.dossier || section}/${slug || "nouveau"}.md`;
     const existant = trouverExistant(s, fichier);
@@ -135,6 +140,16 @@ export default defineNuxtPlugin((nuxtApp) => {
       _partial: false,
       _locale: "",
     };
+  }
+
+  // Le pendant de beforeParse pour le frontmatter : le hook du build voit le
+  // fichier en un seul bloc, ici les champs arrivent déjà démêlés par Sveltia.
+  function courber(obj) {
+    if (!obj || typeof obj !== "object") return;
+    for (const [k, v] of Object.entries(obj)) {
+      if (typeof v === "string") obj[k] = apostrophes(v);
+      else courber(v);
+    }
   }
 
   // Une image qu'on vient de choisir dans l'admin n'existe pas encore sur le
