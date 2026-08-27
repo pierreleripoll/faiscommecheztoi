@@ -90,16 +90,57 @@
             >
               <path :d="NUAGE" fill="#fff" />
             </mask>
-          </defs>
-          <path class="site-nav__nuage-fond" :d="NUAGE" />
-          <g :mask="`url(#plein-${uid})`">
-            <rect
-              class="site-nav__surligneur"
+            <!-- L'ombre interne blanche du nuage « Appel à projet » : elle
+                 creuse le nuage et lui donne du volume (Siméon, 27.08.2026).
+                 Les valeurs sont retaillées pour l'échelle — 30 et 15 au lieu
+                 des 10 et 5 du Figma. Le nuage y fait 490 px de large, ici 42 :
+                 gardées telles quelles, les 10 unités de décalage tombent sous
+                 le pixel et l'ombre disparaît, surtout sur le nuage rempli de
+                 l'état ouvert. Au triple, elle rend à 42 px ce que le Figma
+                 rend à 490 ; au-delà (40/20) elle voile la forme. -->
+            <filter
+              :id="`volume-${uid}`"
               x="-8"
               y="-8"
               width="444"
-              height="273"
-            />
+              height="303"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha"
+              />
+              <feOffset dy="30" />
+              <feGaussianBlur stdDeviation="15" />
+              <feComposite
+                in2="hardAlpha"
+                operator="arithmetic"
+                k2="-1"
+                k3="1"
+              />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0"
+              />
+              <feBlend mode="normal" in2="SourceGraphic" />
+            </filter>
+          </defs>
+          <!-- Fond et surligneur sous le même filtre : le volume se pose donc
+               aussi sur le nuage rempli du survol, pas seulement sur le fond. -->
+          <g :filter="`url(#volume-${uid})`">
+            <path class="site-nav__nuage-fond" :d="NUAGE" />
+            <g :mask="`url(#plein-${uid})`">
+              <rect
+                class="site-nav__surligneur"
+                x="-8"
+                y="-8"
+                width="444"
+                height="273"
+              />
+            </g>
           </g>
           <g :mask="`url(#contour-${uid})`">
             <rect
@@ -322,10 +363,9 @@ onBeforeUnmount(() => {
 }
 
 /* Le fond du nuage : couleur de la barre au repos (le nuage est dessiné, plus
-   rempli — FCCT_2), magenta à l'ouverture. Pas d'ombre interne blanche ici,
-   contrairement au nuage « Appel à projet » : à 42 px de large, ses 10 unités
-   de décalage et 5 de flou sur une boîte de 428 ne font pas un pixel — mesuré,
-   le rendu est identique au pixel près. */
+   rempli — FCCT_2), magenta à l'ouverture. L'ombre interne qui lui donne son
+   volume est posée sur le groupe, pas ici — voir le filtre #volume dans le
+   template. */
 .site-nav__nuage-fond {
   fill: var(--c-bar);
   transition: fill 0.3s ease;
