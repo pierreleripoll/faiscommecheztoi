@@ -1,5 +1,9 @@
 <template>
-  <nav class="site-nav" :class="{ 'site-nav--compacte': compacte }">
+  <nav
+    class="site-nav"
+    :class="{ 'site-nav--compacte': compacte, 'site-nav--ouverte': ouvert }"
+    @keydown.esc="fermer"
+  >
     <!-- La ligne de la maquette desktop. Dès qu'elle ne tient plus en entier
          dans la fenêtre, elle cède la place au nuage-menu (Siméon, 25.08.2026)
          — elle ne défile plus latéralement, ce que rien ne signalait. Elle
@@ -14,69 +18,55 @@
     <div class="site-nav__mobile">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
       <!-- Le tracé est celui du nuage « Appel à projet » (nœud CLOUD du Figma),
-           le hamburger en traits à bouts ronds, aux couleurs du nuage. -->
+           ici en contour et non plein (FCCT_2). La maquette ne dessine plus
+           les traits ≡ à l'intérieur ; on les garde quand même — sans eux
+           rien ne dit que ce nuage ouvre le menu — et ils se ferment en croix
+           à l'ouverture, la croix ayant quitté le panneau. Trois tracés
+           séparés pour pouvoir les animer un à un. -->
       <button
         ref="nuage"
         class="site-nav__nuage"
         type="button"
-        aria-label="Menu"
+        :aria-label="ouvert ? 'Fermer le menu' : 'Menu'"
         aria-controls="menu-nuage"
         :aria-expanded="ouvert"
-        @click="ouvrir"
+        @click="basculer"
       >
         <svg viewBox="0 0 428 257" aria-hidden="true">
           <path class="site-nav__nuage-corps" :d="NUAGE" />
-          <path
-            class="site-nav__nuage-traits"
-            d="M162 121H266M162 158H266M162 195H266"
-          />
+          <g class="site-nav__nuage-traits">
+            <path
+              class="site-nav__trait site-nav__trait--haut"
+              d="M132 112H296"
+            />
+            <path
+              class="site-nav__trait site-nav__trait--milieu"
+              d="M132 158H296"
+            />
+            <path
+              class="site-nav__trait site-nav__trait--bas"
+              d="M132 204H296"
+            />
+          </g>
         </svg>
       </button>
     </div>
 
-    <div
-      v-show="ouvert"
-      id="menu-nuage"
-      class="site-nav__panneau"
-      @keydown.esc="fermer"
-    >
-      <div class="site-nav__panneau-tete">
-        <span class="site-nav__brand">Fais comme chez toi</span>
-        <!-- Même croix que le nuage et le verso de la carte. -->
-        <button
-          ref="croix"
-          class="site-nav__fermer"
-          type="button"
-          aria-label="Fermer le menu"
-          @click="fermer"
-        >
-          <svg viewBox="0 0 29.25 29.25" aria-hidden="true">
-            <path
-              d="M1.875 27.375L27.375 1.875"
-              stroke="currentColor"
-              stroke-width="3.75"
-              stroke-linecap="round"
-            />
-            <path
-              d="M27.375 27.375L1.875 1.875"
-              stroke="currentColor"
-              stroke-width="3.75"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
+    <Transition name="panneau">
+      <div v-show="ouvert" id="menu-nuage" class="site-nav__panneau">
+        <div ref="liens" class="site-nav__liens">
+          <a
+            v-for="(e, i) in ENTREES"
+            :key="e.href"
+            :href="e.href"
+            :style="{ '--i': i }"
+            :class="{ 'site-nav__lien--courant': courant === e.href }"
+            @click="fermer"
+            >{{ e.label }}</a
+          >
+        </div>
       </div>
-      <div class="site-nav__liens">
-        <a
-          v-for="e in ENTREES"
-          :key="e.href"
-          :href="e.href"
-          :class="{ 'site-nav__lien--courant': courant === e.href }"
-          @click="fermer"
-          >{{ e.label }}</a
-        >
-      </div>
-    </div>
+    </Transition>
   </nav>
 </template>
 
@@ -123,18 +113,24 @@ watch(compacte, (c) => {
   if (!c) fermer();
 });
 
-
 // Nuage-menu ------------------------------------------------------------------
+// Le nuage est une bascule : il reste visible par-dessus le panneau ouvert
+// (maquette FCCT_2) et c'est lui qu'on retape pour refermer.
 const ouvert = ref(false);
 const nuage = ref(null);
-const croix = ref(null);
+const liens = ref(null);
+
+function basculer() {
+  if (ouvert.value) fermer();
+  else ouvrir();
+}
 
 async function ouvrir() {
   ouvert.value = true;
   // Le panneau couvre toute la fenêtre : la page dessous ne doit plus défiler.
   document.documentElement.style.overflow = "hidden";
   await nextTick();
-  croix.value?.focus();
+  liens.value?.querySelector("a")?.focus();
 }
 
 function fermer() {
@@ -215,113 +211,165 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
 }
 
-/* Mobile : la marque et le nuage ---------------------------------------------- */
+/* Mobile : la marque et le nuage ----------------------------------------------
+   Marges de la maquette FCCT_2 : 35 px de part et d'autre, 66 px de haut. En
+   dessous de 720 px --pad-x vaut 15 px, d'où le max() ; au-delà (barre
+   compacte étendue par la mesure) c'est --pad-x qui l'emporte, la barre
+   s'alignant alors sur le reste de la page. */
 .site-nav__mobile {
   display: none;
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  padding: 10px var(--pad-x);
+  padding: 0 max(35px, var(--pad-x));
   /* Même hauteur que la ligne desktop : scroll-padding-top compte dessus. */
   min-height: 66px;
   font-size: var(--fs-nav);
   line-height: 1.3;
+  /* Au-dessus du panneau, qui couvre le reste de la fenêtre : la barre reste
+     entière et le nuage cliquable, comme dans la maquette ouverte. */
+  position: relative;
+  z-index: 1;
 }
 
+/* Le nuage fait 42 px de large dans la maquette ; le bouton, lui, garde les
+   66 px de la barre pour rester une cible tactile confortable, et sa marge
+   négative ramène le bord droit du tracé à 35 px du bord de l'écran. */
 .site-nav__nuage {
   flex: none;
-  width: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  margin-right: -12px;
   border: 0;
   padding: 0;
   background: none;
   cursor: pointer;
-  filter: drop-shadow(var(--glow-cloud));
 }
 
 .site-nav__nuage svg {
   display: block;
-  width: 100%;
+  width: 42px;
   height: auto;
   /* La lueur déborde du tracé. */
   overflow: visible;
+  filter: drop-shadow(var(--glow-cloud));
 }
 
+/* Contour magenta sur fond de barre : le nuage est dessiné, plus rempli
+   (FCCT_2). Le trait est donné en pixels d'écran — sans non-scaling-stroke,
+   2 unités de la boîte de 428 ne feraient pas 0,2 px à l'écran. */
 .site-nav__nuage-corps {
-  fill: var(--c-cloud);
+  fill: var(--c-bar);
+  stroke: var(--c-ink);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.5;
+  transition:
+    fill 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .site-nav__nuage-traits {
   fill: none;
-  stroke: var(--c-cloud-ink);
-  /* Le poids de la croix du nuage, rapporté à la boîte de 428 px. */
-  stroke-width: 17;
+  stroke: var(--c-ink);
   stroke-linecap: round;
+  /* Même présence que le contour au repos. */
+  opacity: 0.5;
+  transition:
+    stroke 0.3s ease,
+    opacity 0.3s ease;
 }
 
-/* Le panneau ouvert : toute la fenêtre aux couleurs de la barre. -------------- */
+/* Les trois traits pivotent autour du centre du nuage, en unités de la boîte
+   de dessin (transform-box: view-box). La translation vient AVANT la rotation
+   — écrite à droite : le trait rejoint d'abord la ligne médiane, puis bascule
+   à 45°, et la croix se referme sur elle-même. */
+.site-nav__trait {
+  /* L'épaisseur en pixels d'écran doit être posée sur les tracés eux-mêmes :
+     vector-effect ne s'hérite pas, et sur le groupe elle ne descendait pas —
+     2 unités de la boîte de 428 faisaient alors 0,2 px, soit rien. */
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  transform-box: view-box;
+  transform-origin: 214px 158px;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.site-nav__nuage:hover .site-nav__nuage-corps,
+.site-nav__nuage:focus-visible .site-nav__nuage-corps,
+.site-nav__nuage:hover .site-nav__nuage-traits,
+.site-nav__nuage:focus-visible .site-nav__nuage-traits {
+  opacity: 1;
+}
+
+/* Ouvert : le nuage se remplit de magenta (à 30 %, maquette FCCT_2) et le ≡ se
+   ferme en ×. Les traits repassent en plein — à 30 % sur un nuage lui-même à
+   30 %, la croix se serait fondue dans le fond de la barre. */
+.site-nav--ouverte .site-nav__nuage-corps {
+  fill: var(--c-ink);
+  opacity: 0.3;
+}
+
+/* Le ≡ et le nuage échangent leurs couleurs : la croix se pose désormais SUR
+   un nuage magenta, elle doit donc passer au rose pâle. En magenta elle
+   disparaissait dans le remplissage dès que le curseur venait dessus (le
+   survol monte le nuage à 100 %). */
+.site-nav--ouverte .site-nav__nuage-traits {
+  stroke: var(--c-bar);
+  opacity: 1;
+}
+
+.site-nav--ouverte .site-nav__trait--haut {
+  transform: rotate(45deg) translateY(46px);
+}
+
+.site-nav--ouverte .site-nav__trait--milieu {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.site-nav--ouverte .site-nav__trait--bas {
+  transform: rotate(-45deg) translateY(-46px);
+}
+
+/* Le panneau ouvert : toute la fenêtre aux couleurs de la barre, la barre
+   elle-même restant posée dessus (d'où le z-index inférieur à celui de
+   .site-nav__mobile). Les entrées commencent juste sous elle, à 72 px. */
 .site-nav__panneau {
   position: fixed;
   inset: 0;
-  /* Par-dessus la barre elle-même (20) et les cartes retournées. */
-  z-index: 30;
+  z-index: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px var(--pad-x) 40px;
+  padding: 72px 10px 105px;
   background: var(--c-bar);
   overflow-y: auto;
   font-size: var(--fs-nav);
   line-height: 1.3;
-  animation: panneau-fondu 0.25s ease;
 }
 
-@keyframes panneau-fondu {
-  from {
-    opacity: 0;
-  }
-}
-
-.site-nav__panneau-tete {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-/* La marque du panneau n'est pas un lien : même présence que dans la barre. */
-.site-nav__panneau-tete .site-nav__brand {
-  opacity: 0.5;
-}
-
-.site-nav__fermer {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border: 0;
-  padding: 0;
-  background: none;
-  color: var(--c-ink);
-  cursor: pointer;
-}
-
-.site-nav__fermer svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
+/* Les entrées à 37 px sur un interligne de 56, centrées et pleines : seules,
+   sur toute la fenêtre, elles n'ont plus à s'effacer devant la page. Leur
+   rythme vient de l'interligne, pas d'un gap (maquette FCCT_2). */
 .site-nav__liens {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  margin-top: 60px;
+  text-align: center;
 }
 
-/* Les entrées à la taille du corps mobile (37 px), pleines et non à 50 % :
-   seules, sur toute la fenêtre, elles n'ont plus à s'effacer devant la page. */
 .site-nav__liens a {
   font-size: 37px;
-  line-height: 1;
+  line-height: 56px;
   opacity: 1;
+  /* Entrée en cascade, une entrée après l'autre. L'animation repart à chaque
+     ouverture : v-show remet le panneau de display: none à visible. */
+  animation: lien-entree 0.35s ease backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
 }
 
 /* La section d'où l'on vient reste soulignée — l'état actif du design. */
@@ -331,6 +379,33 @@ onBeforeUnmount(() => {
   text-decoration: underline;
   text-decoration-thickness: 0.06em;
   text-underline-offset: 0.16em;
+}
+
+/* Le panneau descend de sous la barre, les entrées le suivent une à une. */
+.panneau-enter-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.panneau-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.panneau-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.panneau-leave-to {
+  opacity: 0;
+}
+
+@keyframes lien-entree {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /* Sous 720 px, compacte d'office : le HTML prérendu sort déjà juste, sans
@@ -350,8 +425,21 @@ onBeforeUnmount(() => {
   }
 }
 
+/* Le menu s'ouvre et se ferme d'un coup : ni glissement, ni cascade, ni bascule
+   du nuage — seules restent les couleurs, qui portent l'information. */
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__panneau {
+  .site-nav__nuage-corps,
+  .site-nav__nuage-traits,
+  .site-nav__trait {
+    transition: none;
+  }
+
+  .panneau-enter-active,
+  .panneau-leave-active {
+    transition: none;
+  }
+
+  .site-nav__liens a {
     animation: none;
   }
 }

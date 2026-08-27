@@ -53,24 +53,33 @@
      dans main.css.
      — balayage : un texte cliquable reste pâle et une fenêtre de lettres
        pleines le parcourt en boucle, de gauche à droite, à la place du
-       soulignement. Le pâle est le magenta à 45 % ; le cycle est le temps
-       d'un aller complet : c'est le seul réglage de vitesse du balayage, et
-       il ne concerne que le texte (les cartes ont leur --vague-cycle). Parti
-       de 3,5 s, Pierre l'a voulu plus rapide — deux crans, jusqu'à 2 s.
+       soulignement. Le pâle est le magenta à 30 % — celui des années
+       inactives du Figma ; le design le veut plus pâle encore, pour que la
+       fenêtre pleine ressorte. Le cycle est le temps d'un aller
+       complet : c'est le seul réglage de vitesse du balayage, et il ne
+       concerne que le texte (les cartes ont leur --vague-cycle). Parti de
+       3,5 s, il a été accéléré en deux crans, jusqu'à 2 s.
        Au survol, une bande de surligneur (--c-surligne) envahit le texte.
-     — vague : les cartes s'allument une à une en ordre de lecture, d'un voile
-       rose ; le survol reprend la même teinte. */
-  --c-balayage-pale: rgba(255, 0, 255, 0.45);
+     — vague : un reflet diagonal traverse les cartes une à une, en ordre de
+       lecture ; le survol reprend la même teinte. */
+  --c-balayage-pale: rgba(255, 0, 255, 0.3);
   --balayage-cycle: 2s;
   --c-surligne: var(--c-cloud);
   /* Rose atténué pour teinter une surface entière (créneau de la grille au
      survol et au passage de la vague) sans rendre son texte illisible. */
   --c-surligne-doux: rgba(255, 125, 255, 0.4);
-  /* Voile de la vague sur une photo (affiche, recto de carte). */
+  /* Teinte du reflet de la vague sur une photo (affiche, recto de carte) :
+     c'est le cœur de la bande, ses deux bords s'y fondent dans le transparent. */
   --c-vague: rgba(255, 125, 255, 0.55);
 
   /* Typo */
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+
+  /* Interligne du corps de texte. Les styles Figma sont en interligne 100 % ;
+     le design demande plus d'air pour la lecture — on est passé de 1,12 à
+     1,25. Vaut pour le corps de page et le verso des cartes ; la nav,
+     le pied et les légendes gardent leur 1,3. */
+  --lh-body: 1.25;
 
   /* Échelle de corps : mobile @375 → desktop @1280 */
   --fs-h1: clamp(37px, calc(32.86px + 1.105vw), 47px); /* 37 → 47 */

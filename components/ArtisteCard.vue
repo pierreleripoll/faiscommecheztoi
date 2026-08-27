@@ -331,9 +331,9 @@ const representationAilleurs = computed(() => {
   z-index: 4;
 }
 
-/* Retournée, la carte cache son recto : inutile d'allumer une face qu'on ne
-   voit pas. */
-.carte--retournee .carte__vague {
+/* Retournée, la carte cache son recto : inutile de faire passer un reflet sur
+   une face qu'on ne voit pas. L'animation vit dans le ::before de .vague. */
+.carte--retournee .carte__vague::before {
   animation-play-state: paused;
 }
 
@@ -516,7 +516,9 @@ const representationAilleurs = computed(() => {
   z-index: 1;
   padding: var(--card-pad);
   font-size: var(--fs-card);
-  line-height: 1.15;
+  /* Même air que le corps de page : c'est du texte suivi, la hauteur de la
+     fiche ouverte se mesurant de toute façon au clic. */
+  line-height: var(--lh-body);
   color: var(--c-ink);
   /* Masqué et non défilant par défaut : la fiche se dimensionne sur son texte,
      et la mesure au clic doit se faire sans barre de défilement — présente, elle
