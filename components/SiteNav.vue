@@ -22,7 +22,11 @@
            plus les traits ≡ à l'intérieur ; on les garde quand même — sans eux
            rien ne dit que ce nuage ouvre le menu — et ils se ferment en croix
            à l'ouverture, la croix ayant quitté le panneau. Trois tracés
-           séparés pour pouvoir les animer un à un. -->
+           séparés pour pouvoir les animer un à un. Ils sont posés dans le
+           corps plat du nuage, sous les bosses : le creux de droite du tracé
+           descend jusqu'à y=112 (x=312), et le ≡ y touchait presque le
+           contour — d'où les 138→290 en x, et les 140/181/222 en y, qui
+           laissent de l'air en haut comme en bas. -->
       <button
         ref="nuage"
         class="site-nav__nuage"
@@ -37,15 +41,15 @@
           <g class="site-nav__nuage-traits">
             <path
               class="site-nav__trait site-nav__trait--haut"
-              d="M132 112H296"
+              d="M138 140H290"
             />
             <path
               class="site-nav__trait site-nav__trait--milieu"
-              d="M132 158H296"
+              d="M138 181H290"
             />
             <path
               class="site-nav__trait site-nav__trait--bas"
-              d="M132 204H296"
+              d="M138 222H290"
             />
           </g>
         </svg>
@@ -283,10 +287,11 @@ onBeforeUnmount(() => {
     opacity 0.3s ease;
 }
 
-/* Les trois traits pivotent autour du centre du nuage, en unités de la boîte
-   de dessin (transform-box: view-box). La translation vient AVANT la rotation
-   — écrite à droite : le trait rejoint d'abord la ligne médiane, puis bascule
-   à 45°, et la croix se referme sur elle-même. */
+/* Les trois traits pivotent autour de leur propre centre (214, 181 — le trait
+   du milieu), en unités de la boîte de dessin (transform-box: view-box) : la
+   translation vaut donc l'écart entre deux traits, 41. Elle vient AVANT la
+   rotation — écrite à droite : le trait rejoint d'abord la ligne médiane, puis
+   bascule à 45°, et la croix se referme sur elle-même. */
 .site-nav__trait {
   /* L'épaisseur en pixels d'écran doit être posée sur les tracés eux-mêmes :
      vector-effect ne s'hérite pas, et sur le groupe elle ne descendait pas —
@@ -294,7 +299,7 @@ onBeforeUnmount(() => {
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   transform-box: view-box;
-  transform-origin: 214px 158px;
+  transform-origin: 214px 181px;
   transition:
     transform 0.3s ease,
     opacity 0.3s ease;
@@ -325,7 +330,7 @@ onBeforeUnmount(() => {
 }
 
 .site-nav--ouverte .site-nav__trait--haut {
-  transform: rotate(45deg) translateY(46px);
+  transform: rotate(45deg) translateY(41px);
 }
 
 .site-nav--ouverte .site-nav__trait--milieu {
@@ -334,7 +339,7 @@ onBeforeUnmount(() => {
 }
 
 .site-nav--ouverte .site-nav__trait--bas {
-  transform: rotate(-45deg) translateY(-46px);
+  transform: rotate(-45deg) translateY(-41px);
 }
 
 /* Le panneau ouvert : toute la fenêtre aux couleurs de la barre, la barre
