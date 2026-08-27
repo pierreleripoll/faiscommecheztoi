@@ -65,7 +65,11 @@
             class="soutiens__logo"
           >
             <img
-              :src="apercu ? logo.src : img(logo.src, { quality: 90 })"
+              :src="
+                apercu || logo.src.endsWith('.svg')
+                  ? logo.src
+                  : img(logo.src, { quality: 90 })
+              "
               :alt="logo.alt || ''"
               :width="logo.width"
               :height="logo.height"
@@ -221,9 +225,10 @@ const soutiens = await useContenu("soutiens", () =>
   /* Rangée de 82 px de haut dans la maquette, les logos y sont centrés. */
   height: clamp(38px, 4.5vw, 61px);
   width: auto;
-  /* Les logos arrivent sur fond blanc ; en multiplication le blanc prend la
-     couleur de la page et disparaît (Siméon, 25.08.2026). Un logo déjà rose
-     s'assombrit un peu — Siméon envoie les versions officielles. */
+  /* Les logos officiels (Siméon, 27.08.2026) sont des SVG noirs à fond
+     transparent : la multiplication ne leur fait rien. On la garde pour un
+     PNG à fond blanc qui arriverait un jour par le CMS — le blanc prend alors
+     la couleur de la page et disparaît. */
   mix-blend-mode: multiply;
 }
 </style>

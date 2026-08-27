@@ -1,62 +1,62 @@
 ---
 title: Soutiens
 logos:
-  - src: /uploads/logo-spot.png
+  - src: /uploads/logo-spot.svg
     alt: Le Spot Sion
     url: 'https://spot-sion.ch'
-    width: 500
-    height: 262
-    ratio: 1.9083969465648856
-    thumbhash: NQgOBICnqJeHd3iPdnhYd1CgBw==
-    thumbhashRatio: 1.75
-  - src: /uploads/logo-culture-valais.png
+    width: 228
+    height: 92
+    ratio: 2.4782608695652173
+    thumbhash: wfeBAoAlEHGad5aFb1j4hol2aYlweDc=
+    thumbhashRatio: 2.5
+  - src: /uploads/logo-culture-valais.svg
     alt: La Culture du Valais — Etat du Valais
-    width: 500
-    height: 450
-    ratio: 1.1111111111111112
-    thumbhash: /hcCDoKX9aqId4h/l3WHuHeHl4iPdgc=
-    thumbhashRatio: 1.1666666666666667
-  - src: /uploads/logo-sion.png
+    width: 69
+    height: 45
+    ratio: 1.5333333333333334
+    thumbhash: CAiCA4ASnVWfRY18vs+l9gt16mnapqc=
+    thumbhashRatio: 1.6666666666666667
+  - src: /uploads/logo-sion.svg
     alt: Sion Capitale suisse des Alpes
-    width: 500
-    height: 252
-    ratio: 1.9841269841269842
-    thumbhash: PAgGDIS3qHd4h4ePdYdLd7B0Bw==
-    thumbhashRatio: 1.75
-  - src: /uploads/logo-loterie-romande.png
+    width: 461
+    height: 293
+    ratio: 1.5733788395904438
+    thumbhash: CAiCA4ATKYF/gncHStegNT+ZmpWrdkU=
+    thumbhashRatio: 1.6666666666666667
+  - src: /uploads/logo-loterie-romande.svg
     alt: Loterie Romande
-    width: 500
-    height: 224
-    ratio: 2.232142857142857
-    thumbhash: vTcCC4Z2p6l3d/h4dnefiAg=
-    thumbhashRatio: 2.3333333333333335
-  - src: /uploads/logo-fondation-gianadda.png
+    width: 567
+    height: 198
+    ratio: 2.8636363636363638
+    thumbhash: CAiCAoAWzXWPeEqrmzD2pct7mYlwx1o=
+    thumbhashRatio: 2.5
+  - src: /uploads/logo-fondation-gianadda.svg
     alt: Fondation Léonard Gianadda Mécénat
-    width: 500
-    height: 177
-    ratio: 2.824858757062147
-    thumbhash: /wcCAoLXiId2ifho13aPkgg=
-    thumbhashRatio: 3.5
-  - src: /uploads/logo-ernst-gohner.png
+    width: 125
+    height: 30
+    ratio: 4.166666666666667
+    thumbhash: BgiCAYARKwJ3iYwAAAAAADiHi4aDlPc=
+    thumbhashRatio: 5
+  - src: /uploads/logo-ernst-gohner.svg
     alt: Ernst Göhner Stiftung
-    width: 500
-    height: 174
-    ratio: 2.8735632183908044
-    thumbhash: t+cJCoKliKh4d/dppXhfivc=
-    thumbhashRatio: 3.5
-  - src: /uploads/logo-fiduciaire-bender.png
+    width: 213
+    height: 55
+    ratio: 3.8727272727272726
+    thumbhash: BAiCAYAUb7oXmHH3hQ8AAF+ohJdiiUg=
+    thumbhashRatio: 5
+  - src: /uploads/logo-fiduciaire-bender.svg
     alt: Fiduciaire Bender SA
-    width: 500
-    height: 307
-    ratio: 1.6286644951140066
-    thumbhash: /hcCDIKZtoa2Z3mfh3eZtm+WBA==
-    thumbhashRatio: 1.75
-  - src: /uploads/logo-ferme-asile.png
+    width: 342
+    height: 195
+    ratio: 1.7538461538461538
+    thumbhash: FQiGA4ATcB18l6qAe/pISXIOK7hxqOY=
+    thumbhashRatio: 1.6666666666666667
+  - src: /uploads/logo-ferme-asile.svg
     alt: Ferme-Asile
-    width: 500
-    height: 124
-    ratio: 4.032258064516129
-    thumbhash: NwgKAoB2ZaZ1ePd3qnkA1xQ=
-    thumbhashRatio: 3.5
+    width: 184
+    height: 29
+    ratio: 6.344827586206897
+    thumbhash: CAiCAYAUqvFGVRdfaAlUHavNiHfAe3c=
+    thumbhashRatio: 5
 ---
 
