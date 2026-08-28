@@ -3,8 +3,7 @@ import { apostrophes } from "~/utils/typo.js";
 // Les apostrophes droites du contenu deviennent des apostrophes courbes, juste
 // avant que @nuxt/content ne parse le fichier — en dev comme au prerender, et
 // pour tout ce que l'admin écrira ensuite. Voir utils/typo.js : dans Vevey,
-// l'apostrophe droite est dessinée comme un prime (le signe des minutes), ce
-// que Siméon a repéré le 27.08.2026.
+// l'apostrophe droite est dessinée comme un prime (le signe des minutes).
 //
 // Le hook reçoit le fichier entier, frontmatter compris : les titres, la ligne
 // du pied de page et les champs des fiches y passent aussi. Rien à corriger

@@ -42,7 +42,10 @@
   --glow-nav: 0 7px 10px rgba(255, 0, 255, 0.35);
   --glow-pied: 0 -7px 10px rgba(255, 0, 255, 0.35); /* la même, vers le haut */
   --glow-photo: rgba(255, 0, 255, 0.5);
-  --glow-cloud: 10px 10px 10px rgba(255, 0, 255, 0.6);
+  /* La lueur du nuage : 10/10, flou 20, magenta à 60 % — relevé sur le groupe
+     CLOUD du Figma (FCCT_2). Elle vit sur le nuage entier ; à l'intérieur, une
+     ombre blanche lui donne son volume (filtre SVG dans AppelCloud.vue). */
+  --glow-cloud: 10px 10px 20px rgba(255, 0, 255, 0.6);
   /* Invitation au clic (hors Figma) : halo symétrique, plus large que
      --glow-card, qui s'allume au survol des affiches. Assez dense pour se
      détacher du fond rose de la page — à 0.55 sur 18 px il s'y noyait. */
@@ -54,11 +57,11 @@
      — balayage : un texte cliquable reste pâle et une fenêtre de lettres
        pleines le parcourt en boucle, de gauche à droite, à la place du
        soulignement. Le pâle est le magenta à 30 % — celui des années
-       inactives du Figma ; Siméon l'a voulu plus pâle encore (27.08.2026)
-       pour que la fenêtre pleine ressorte. Le cycle est le temps d'un aller
+       inactives du Figma ; le design le veut plus pâle encore, pour que la
+       fenêtre pleine ressorte. Le cycle est le temps d'un aller
        complet : c'est le seul réglage de vitesse du balayage, et il ne
        concerne que le texte (les cartes ont leur --vague-cycle). Parti de
-       3,5 s, Pierre l'a voulu plus rapide — deux crans, jusqu'à 2 s.
+       3,5 s, il a été accéléré en deux crans, jusqu'à 2 s.
        Au survol, une bande de surligneur (--c-surligne) envahit le texte.
      — vague : un reflet diagonal traverse les cartes une à une, en ordre de
        lecture ; le survol reprend la même teinte. */
@@ -76,8 +79,8 @@
   --font-sans: "Vevey", "Quicksand", "Trebuchet MS", system-ui, sans-serif;
 
   /* Interligne du corps de texte. Les styles Figma sont en interligne 100 % ;
-     Siméon a demandé plus d'air pour la lecture (27.08.2026) — on est passé de
-     1,12 à 1,25. Vaut pour le corps de page et le verso des cartes ; la nav,
+     le design demande plus d'air pour la lecture — on est passé de 1,12 à
+     1,25. Vaut pour le corps de page et le verso des cartes ; la nav,
      le pied et les légendes gardent leur 1,3. */
   --lh-body: 1.25;
 

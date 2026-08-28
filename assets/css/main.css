@@ -34,8 +34,8 @@ body {
   font-family: var(--font-sans);
   font-size: var(--fs-body);
   /* Les styles Figma sont en interligne 100 % ; on desserre (--lh-body) pour la
-     lisibilité — les accents et les points médians ont besoin d'air, et Siméon
-     en a demandé davantage encore le 27.08.2026. */
+     lisibilité — les accents et les points médians ont besoin d'air, et le
+     design en demande davantage encore. */
   line-height: var(--lh-body);
 }
 
@@ -129,7 +129,7 @@ a {
    pause et repart du début. Elle dit « ça se clique » sur les affiches, les
    fiches artistes et les créneaux de la grille.
    Ce n'est plus un voile plein qui s'allume et s'éteint : trop « carré », il
-   faisait clignoter des rectangles (Siméon, 27.08.2026). C'est un REFLET —
+   faisait clignoter des rectangles. C'est un REFLET —
    une bande diagonale à bords fondus qui balaie la carte, comme la fenêtre du
    balayage balaie le texte. La bande vit dans un ::before qui traverse de
    gauche à droite ; .vague la rogne aux coins arrondis de la carte

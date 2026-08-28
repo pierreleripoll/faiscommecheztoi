@@ -85,7 +85,7 @@ collections:
         default: "2026"
         hint: "L'édition à laquelle la fiche appartient — elle apparaît sous cet onglet dans la section Artistes."
       - { label: "Titre du spectacle", name: "title", widget: "string" }
-      - { label: "Durée", name: "duration", widget: "string", hint: "Ex. 35’" }
+      - { label: "Durée", name: "duration", widget: "string", hint: "Ex. 35'" }
       - { label: "Format", name: "format", widget: "string", hint: "Ex. étape de travail/work in progress" }
       - label: "Collaboration"
         name: "collaboration"
