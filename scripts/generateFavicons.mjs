@@ -17,7 +17,7 @@ const racine = join(dirname(fileURLToPath(import.meta.url)), "..");
 const C_FOND = "#ffbfff"; // --c-bg
 const C_NUAGE = "#ff00ff"; // --c-ink
 const COTE = 32; // côté de la boîte de dessin du SVG
-const MARGE = 1.5; // air autour du nuage, en unités de cette boîte
+const MARGE = 0.5; // air autour du nuage, en unités de cette boîte
 
 // Le tracé vit dans le composant : une seule source, pas de copie à resynchroniser.
 const nav = readFileSync(join(racine, "components/SiteNav.vue"), "utf8");
@@ -72,25 +72,29 @@ const echelle = (COTE - 2 * MARGE) / (x1 - x0);
 const tx = MARGE - x0 * echelle;
 const ty = (COTE - (y1 - y0) * echelle) / 2 - y0 * echelle;
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${COTE} ${COTE}">
-  <rect width="${COTE}" height="${COTE}" fill="${C_FOND}"/>
-  <g transform="translate(${tx.toFixed(3)} ${ty.toFixed(3)}) scale(${echelle.toFixed(5)})">
+// Le favicon est le nuage seul, sur fond transparent : dans une barre
+// d'onglets il se détache mieux qu'une tuile rose, qui n'aurait dit que
+// « carré ». L'icône iOS, elle, garde le rose : le système la pose sur une
+// tuile opaque, et une transparence y virerait au noir.
+const dessin = (fond) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${COTE} ${COTE}">
+${fond ? `  <rect width="${COTE}" height="${COTE}" fill="${C_FOND}"/>\n` : ""}  <g transform="translate(${tx.toFixed(3)} ${ty.toFixed(3)}) scale(${echelle.toFixed(5)})">
     <path d="${d}" fill="${C_NUAGE}"/>
   </g>
 </svg>
 `;
-writeFileSync(join(racine, "public/favicon.svg"), svg);
 
-const png = (taille) =>
-  sharp(Buffer.from(svg)).resize(taille, taille).png().toBuffer();
+writeFileSync(join(racine, "public/favicon.svg"), dessin(false));
 
-writeFileSync(join(racine, "public/apple-touch-icon.png"), await png(180));
+const png = (taille, fond) =>
+  sharp(Buffer.from(dessin(fond))).resize(taille, taille).png().toBuffer();
+
+writeFileSync(join(racine, "public/apple-touch-icon.png"), await png(180, true));
 
 // ICO : un en-tête de 6 octets, un répertoire de 16 octets par image, puis les
 // PNG bruts (l'ICO les accepte depuis Vista, et c'est plus léger qu'un BMP).
 const tailles = [16, 32, 48];
 const images = [];
-for (const t of tailles) images.push(await png(t));
+for (const t of tailles) images.push(await png(t, false));
 
 const entete = Buffer.alloc(6);
 entete.writeUInt16LE(0, 0);
