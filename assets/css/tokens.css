@@ -62,15 +62,17 @@
        complet : c'est le seul réglage de vitesse du balayage, et il ne
        concerne que le texte (les cartes ont leur --vague-cycle). Parti de
        3,5 s, il a été accéléré en deux crans, jusqu'à 2 s.
-       Au survol, une bande de surligneur (--c-surligne) envahit le texte.
+       Au survol le texte passe en magenta plein et le balayage s'arrête : c'est
+       toute la réponse au geste. La bande de surligneur qui l'envahissait a
+       été retirée le 29.08.2026 — un rectangle rose plein, qui se lisait comme
+       un carré et restait collé après une tape sur écran tactile.
      — vague : un reflet diagonal traverse les cartes une à une, en ordre de
-       lecture ; le survol reprend la même teinte. */
+       lecture. */
   --c-balayage-pale: rgba(255, 0, 255, 0.3);
   --balayage-cycle: 2s;
-  --c-surligne: var(--c-cloud);
-  /* Rose atténué pour teinter une surface entière (créneau de la grille au
-     survol et au passage de la vague) sans rendre son texte illisible. */
-  --c-surligne-doux: rgba(255, 125, 255, 0.4);
+  /* Rose atténué pour le reflet de la vague sur un créneau de la grille : il
+     passe sous le texte de la fiche dépliée, que le rose plein noierait. */
+  --c-vague-creneau: rgba(255, 125, 255, 0.4);
   /* Teinte du reflet de la vague sur une photo (affiche, recto de carte) :
      c'est le cœur de la bande, ses deux bords s'y fondent dans le transparent. */
   --c-vague: rgba(255, 125, 255, 0.55);

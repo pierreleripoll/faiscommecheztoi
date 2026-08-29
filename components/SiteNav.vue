@@ -17,14 +17,17 @@
          (HTML prérendu), au-dessus dès que la ligne déborde (mesuré). -->
     <div class="site-nav__mobile">
       <a class="site-nav__brand" href="#top">Fais comme chez toi</a>
-      <!-- Le tracé est celui du nuage « Appel à projet » (nœud CLOUD du Figma),
-           ici en contour et non rempli (FCCT_2, 27.08.2026). Pas de ≡ à
-           l'intérieur : la maquette n'en prévoit pas, un nuage posé là où
-           presque tous les sites mettent leur menu se lisant sans icône. Ce
-           qui dit « bouton », c'est le balayage : le même que sur les textes
-           cliquables, une fenêtre de plein qui parcourt le trait en boucle.
-           D'où le tracé en double — l'un pâle, l'autre plein, celui-ci
-           découpé par la fenêtre. -->
+      <!-- Le tracé est celui exporté du design pour ce bouton (29.08.2026) :
+           un petit nuage dessiné pour la barre, dans sa propre boîte de
+           45 × 27, plus large et plus plat que celui de l'« Appel à projet »
+           qui servait jusqu'ici. Fond et contour en deux tracés superposés
+           comme dans l'export — le fond porte la lueur blanche interne, que le
+           contour ne doit pas subir. Pas de ≡ à l'intérieur : la maquette n'en
+           prévoit pas, un nuage posé là où presque tous les sites mettent leur
+           menu se lisant sans icône. Ce qui dit « bouton », c'est le balayage :
+           le même que sur les textes cliquables, une fenêtre de plein qui
+           parcourt le trait en boucle. D'où un troisième tracé, découpé par
+           la fenêtre. -->
       <button
         ref="nuage"
         class="site-nav__nuage"
@@ -34,9 +37,47 @@
         :aria-expanded="ouvert"
         @click="basculer"
       >
-        <svg viewBox="0 0 428 257" aria-hidden="true">
-          <path class="site-nav__nuage-corps" :d="NUAGE" />
-          <path class="site-nav__nuage-balayage" :d="NUAGE" />
+        <svg viewBox="0 0 45 27" aria-hidden="true">
+          <defs>
+            <!-- Lueur blanche interne de l'export : l'alpha du nuage décalé
+                 vers le bas puis flouté, ce qui laisse le haut du tracé
+                 s'éclaircir. Reprise telle quelle du fichier d'export. -->
+            <filter
+              id="nuage-lueur"
+              x="0"
+              y="0"
+              width="44.024"
+              height="33.935"
+              filterUnits="userSpaceOnUse"
+              color-interpolation-filters="sRGB"
+            >
+              <feFlood flood-opacity="0" result="vide" />
+              <feBlend in="SourceGraphic" in2="vide" result="forme" />
+              <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="alpha"
+              />
+              <feOffset dy="7" />
+              <feGaussianBlur stdDeviation="5" />
+              <feComposite in2="alpha" operator="arithmetic" k2="-1" k3="1" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0"
+              />
+              <feBlend in2="forme" />
+            </filter>
+          </defs>
+          <g class="site-nav__nuage-corps">
+            <path
+              class="site-nav__nuage-fond"
+              :d="NUAGE_MENU"
+              filter="url(#nuage-lueur)"
+            />
+            <path class="site-nav__nuage-contour" :d="NUAGE_MENU" />
+          </g>
+          <path class="site-nav__nuage-balayage" :d="NUAGE_MENU" />
         </svg>
       </button>
     </div>
@@ -69,8 +110,12 @@ const ENTREES = [
   { label: "Contact & Team", href: "#contact" },
 ];
 
-const NUAGE =
-  "M390.481 256.962L37.9204 257C17.8298 257 0.0857717 241.547 0.0643417 221.075L5.17068e-05 167.133C-0.0320933 140.511 14.926 117.084 38.183 104.58C51.7535 97.2822 67.0224 94.2634 82.7359 95.1857C70.3333 53.657 95.6528 11.0667 137.136 1.80112C179.021 -7.55556 220.177 20.5038 226.274 63.6732C262.989 55.5927 299.758 76.3222 311.957 112.103C334.983 96.0972 364.835 94.1133 389.876 107.813C412.41 120.14 428.021 144.339 428 171.331L427.952 221.08C427.936 241.273 410.46 256.957 390.476 256.957L390.481 256.962Z";
+// Le nuage du bouton de menu, tel qu'exporté du design : sa propre boîte de
+// 45 × 27, plus large et plus plate que le nuage de l'« Appel à projet ». Le
+// contour tombe à mi-course du tracé (stroke-width 2 dans une boîte de 45),
+// d'où un dessin qui déborde de 1 unité de chaque côté : la boîte le prévoit.
+const NUAGE_MENU =
+  "M37.4556 25.8146C36.3936 25.8318 35.3316 25.8274 34.2696 25.8012L33.9156 25.7925C32.8536 25.7663 31.7916 25.7883 30.7296 25.8585L30.3756 25.8819C29.3136 25.9521 28.2516 25.9533 27.1896 25.8855L26.8356 25.8629C25.7736 25.7951 24.7116 25.7768 23.6496 25.8079L23.2956 25.8183C22.2336 25.8495 21.1716 25.8441 20.1096 25.8022L19.7556 25.7882C18.6936 25.7463 17.6316 25.7317 16.5696 25.7443L16.2156 25.7485C15.1536 25.7611 14.0916 25.7446 13.0296 25.6988L12.6756 25.6835C11.6136 25.6378 10.5516 25.6436 9.48959 25.7009L9.13559 25.72C8.07359 25.7774 7.00825 25.8106 5.93957 25.8197L5.58334 25.8227C4.51465 25.8319 3.5945 25.4935 2.82289 24.8078L2.56569 24.5792C1.79408 23.8934 1.34232 23.0284 1.21042 21.9842L1.16645 21.6361C1.03455 20.5919 0.981042 19.5382 1.00592 18.4751L1.01422 18.1208C1.0391 17.0577 1.20656 16.0129 1.5166 14.9864L1.61995 14.6443C1.92999 13.6178 2.51468 12.79 3.37402 12.1607L3.66047 11.9509C4.51981 11.3216 5.45359 10.8866 6.46182 10.6458L6.79789 10.5656C7.80612 10.3248 8.38315 9.78803 8.52899 8.95518L8.57761 8.67756C8.72345 7.84471 8.99562 6.94087 9.39413 5.96606L9.52697 5.64113C9.92548 4.66632 10.5088 3.83904 11.277 3.15931L11.5331 2.93273C12.3013 2.25299 13.176 1.74608 14.1571 1.41198L14.4841 1.30061C15.4652 0.96651 16.4695 0.910901 17.4972 1.13378L17.8397 1.20808C18.8674 1.43096 19.8085 1.86539 20.663 2.51138L20.9479 2.72671C21.8025 3.37269 22.4108 4.20744 22.7728 5.23094L22.8934 5.57211C23.2554 6.59562 23.9569 7.10827 24.9979 7.11009L25.3449 7.11069C26.3859 7.1125 27.3395 7.39993 28.2058 7.97296L28.4946 8.16398C29.3609 8.73702 30.123 9.43726 30.781 10.2647L31.0003 10.5405C31.6583 11.368 32.4668 11.6054 33.4257 11.2527L33.7453 11.1352C34.7043 10.7825 35.6967 10.6663 36.7228 10.7866L37.0648 10.8267C38.0908 10.947 39.047 11.2954 39.9333 11.8718L40.2288 12.0639C41.1151 12.6403 41.7707 13.4152 42.1954 14.3886L42.337 14.713C42.7618 15.6864 42.9858 16.7033 43.009 17.7637L43.0168 18.1171C43.04 19.1775 43.0069 20.2283 42.9175 21.2695L42.8877 21.6166C42.7983 22.6578 42.425 23.5677 41.7679 24.3463L41.5488 24.6058C40.8917 25.3844 40.389 25.7751 40.0409 25.7779L39.9248 25.7789C39.5767 25.7817 38.8716 25.7917 37.8096 25.8089L37.4556 25.8146Z";
 
 // La section d'où l'on vient, lue dans l'ancre de l'URL — après montage
 // seulement, le HTML prérendu ne connaît pas l'ancre.
@@ -248,21 +293,27 @@ onBeforeUnmount(() => {
 }
 
 /* Contour magenta sur fond de barre : le nuage est dessiné, plus rempli
-   (FCCT_2). Le trait est donné en pixels d'écran — sans non-scaling-stroke,
-   2 unités de la boîte de 428 ne feraient pas 0,2 px à l'écran. */
-.site-nav__nuage-corps,
+   (FCCT_2). Le trait est donné en pixels d'écran : la boîte fait 45 unités
+   pour 42 px affichés, c'est presque un pour un, mais non-scaling-stroke
+   garantit les 2 px de l'export quelle que soit la taille rendue. */
+.site-nav__nuage-contour,
 .site-nav__nuage-balayage {
+  fill: none;
   stroke: var(--c-ink);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
 }
 
+/* L'opacité de l'export est portée par le groupe ; le fond et le contour, eux,
+   gardent leurs couleurs pleines. */
 .site-nav__nuage-corps {
-  fill: var(--c-bar);
   opacity: 0.5;
-  transition:
-    fill 0.3s ease,
-    opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+.site-nav__nuage-fond {
+  fill: var(--c-bar);
+  transition: fill 0.3s ease;
 }
 
 /* La fenêtre du balayage : le même tracé, en plein, découpé par un masque qui
@@ -272,7 +323,6 @@ onBeforeUnmount(() => {
    Le masque est posé sur le tracé et non sur un calque HTML en double : un
    seul <path> de plus, et le nuage reste un seul objet à mettre à l'échelle. */
 .site-nav__nuage-balayage {
-  fill: none;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 36%,
@@ -310,12 +360,15 @@ onBeforeUnmount(() => {
   opacity: 1;
 }
 
-/* Ouvert : le nuage se remplit de magenta (à 30 %, maquette FCCT_2) — c'est
-   tout ce qui distingue les deux états, la croix n'existe plus. Le balayage
-   s'arrête : il invitait à ouvrir, le menu est ouvert. */
+/* Ouvert : le nuage se remplit de magenta (à 40 %, comme l'export ouvert) —
+   c'est tout ce qui distingue les deux états, la croix n'existe plus. Le
+   balayage s'arrête : il invitait à ouvrir, le menu est ouvert. */
 .site-nav--ouverte .site-nav__nuage-corps {
+  opacity: 0.4;
+}
+
+.site-nav--ouverte .site-nav__nuage-fond {
   fill: var(--c-ink);
-  opacity: 0.3;
 }
 
 .site-nav--ouverte .site-nav__nuage-balayage {
@@ -409,7 +462,8 @@ onBeforeUnmount(() => {
 /* Le menu s'ouvre et se ferme d'un coup : ni glissement, ni cascade, ni bascule
    du nuage — seules restent les couleurs, qui portent l'information. */
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__nuage-corps {
+  .site-nav__nuage-corps,
+  .site-nav__nuage-fond {
     transition: none;
   }
 

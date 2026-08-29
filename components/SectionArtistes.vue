@@ -234,8 +234,7 @@ function eparpillement(i) {
   cursor: pointer;
   /* Chaque année balaie son propre mot : décalées d'un rang à l'autre, la
      fenêtre semble traverser toute la rangée de gauche à droite, comme sur
-     une seule ligne de texte. Par la variable et non animation-delay
-     directement : la bande de survol, elle, doit partir sans attendre. */
+     une seule ligne de texte. */
   --balayage-delai: calc(var(--i, 0) * var(--balayage-cycle) * 0.12);
 }
 

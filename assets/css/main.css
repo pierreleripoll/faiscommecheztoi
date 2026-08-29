@@ -55,21 +55,16 @@ a {
    text), trois fois plus large que le texte, et c'est sa position qui
    défile : de 100 % (bord droit du dégradé) à 0 %, le dégradé glisse vers la
    droite et la fenêtre pleine avec lui. L'édition active se fige en plein.
-   Au survol ou au focus, la réponse au geste : le texte passe en plein et une
-   bande de surligneur rose l'envahit depuis la droite (dégradé uni en image
-   de fond, ancré à droite, dont seule la largeur s'anime). On quitte alors le
-   découpage aux lettres — la bande se peint derrière le texte, pas dedans.
-   La bande déborde un peu du texte, comme un vrai trait de surligneur ; sur
-   un lien qui passe à la ligne, clone plutôt que slice : chaque fragment porte
-   sa propre bande, sinon le second se retrouvait nu. */
+   Au survol ou au focus, la réponse au geste tient en deux choses : le texte
+   passe en magenta plein et le balayage s'arrête. Il n'y a plus de bande de
+   surligneur derrière (29.08.2026) — le rectangle rose se lisait comme
+   un carré, surtout derrière un mot isolé comme une année, et sur écran
+   tactile il restait collé après la tape : le survol ne se retire pas au doigt
+   levé. */
 .balayage,
 .section a {
   text-decoration: none;
   color: transparent;
-  padding-inline: 0.08em;
-  margin-inline: -0.08em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
   background-image: linear-gradient(
     90deg,
     var(--c-balayage-pale) 0%,
@@ -97,14 +92,9 @@ a {
 .balayage:focus-visible,
 .section a:hover,
 .section a:focus-visible {
+  animation: none;
+  background-image: none;
   color: var(--c-ink);
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
-  background-size: 0% 100%;
-  background-position: right center;
-  /* Le raccourci remet aussi le délai à zéro : la bande part tout de suite. */
-  animation: surligne 0.35s ease 0s forwards;
 }
 
 @keyframes balayage {
@@ -116,11 +106,6 @@ a {
   }
 }
 
-@keyframes surligne {
-  to {
-    background-size: 100% 100%;
-  }
-}
 
 /* Vague sur les cartes -----------------------------------------------------------
    Référence de Siméon (vidéo WhatsApp du 24.08.2026, grille de rectangles) :
@@ -189,21 +174,13 @@ a {
     display: none;
   }
 
-  /* Le texte cliquable reste plein, sans balayage ; la bande de surligneur
-     apparaît d'un coup au survol. */
+  /* Le texte cliquable reste plein, sans balayage : le survol n'a alors plus
+     rien à changer. */
   .balayage,
   .section a {
     animation: none;
     background-image: none;
     color: var(--c-ink);
-  }
-
-  .balayage:hover,
-  .balayage:focus-visible,
-  .section a:hover,
-  .section a:focus-visible {
-    background-image: linear-gradient(var(--c-surligne), var(--c-surligne));
-    background-size: 100% 100%;
   }
 }
 

@@ -244,7 +244,7 @@ function ailleurs(creneau) {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: border-color 0.25s ease;
   /* Rang dans la vague selon le nombre de colonnes (voir rangVague). */
   --i: var(--i-4);
 }
@@ -298,14 +298,14 @@ function ailleurs(creneau) {
   margin-top: 12.4px;
 }
 
-/* Le reflet prend la teinte du survol et passe sous le texte : la vague montre
-   l'état que le curseur déclenchera. Il déborde de 6 px à gauche et à droite,
-   comme la bande du survol. La teinte se pose sur la variable, pas sur le fond :
-   c'est la bande du ::before qui la lit (.vague, main.css). */
+/* Le reflet passe sous le texte, dans une teinte atténuée : la fiche dépliée se
+   lit par-dessus, le rose plein y noierait le corps de texte à 17 px. Il tient
+   dans la colonne — le débord de 6 px accompagnait la plaque du survol, qui
+   n'existe plus. La teinte se pose sur la variable, pas sur le fond : c'est la
+   bande du ::before qui la lit (.vague, main.css). */
 .creneau .vague {
   z-index: -1;
-  inset-inline: -6px;
-  --c-vague: var(--c-surligne-doux);
+  --c-vague: var(--c-vague-creneau);
 }
 
 /* Portrait « pas trop grand » : un cadre recadré, pas la photo entière. La
@@ -394,16 +394,16 @@ function ailleurs(creneau) {
   opacity: 1;
 }
 
-/* Au survol (ou au focus clavier du bouton-calque) le créneau se teinte d'un
-   rose atténué et sa ligne se renforce : il répond, comme le texte cliquable.
-   Atténué, car la fiche dépliée se lit sous le curseur — le rose plein du
-   surligneur y noierait le corps de texte à 17 px. La bande déborde un peu à
-   gauche et à droite, façon surligneur, sans décaler la colonne. */
+/* Au survol (ou au focus clavier du bouton-calque) la ligne du créneau se
+   renforce : il répond, comme le texte cliquable.
+   Plus de plaque rose derrière (29.08.2026) : le créneau tout entier
+   s'y peignait en rectangle, et sur écran tactile la plaque restait collée
+   après la tape — le survol ne se retire pas au doigt levé. Le reflet de la
+   vague et la ligne qui passe au magenta plein suffisent à dire que ça se
+   clique. */
 .creneau:hover,
 .creneau:focus-within {
-  background-color: var(--c-surligne-doux);
   border-color: var(--c-ink);
-  box-shadow: -6px 0 0 var(--c-surligne-doux), 6px 0 0 var(--c-surligne-doux);
 }
 
 @media (prefers-reduced-motion: reduce) {
