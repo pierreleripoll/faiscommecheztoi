@@ -59,6 +59,14 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "fr" },
       meta: APERCU ? [{ name: "robots", content: "noindex, nofollow" }] : [],
       link: [
+        // Le nuage-menu sert de favicon (scripts/generateFavicons.mjs le
+        // dessine depuis le tracé de SiteNav.vue). Le SVG est servi aux
+        // navigateurs qui le lisent, l'ICO aux autres — et il doit rester à
+        // /favicon.ico, que les navigateurs demandent d'office même sans
+        // balise. `sizes` sur l'ICO évite qu'il l'emporte sur le SVG.
+        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+        { rel: "icon", sizes: "48x48", href: "/favicon.ico" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
         // Le rideau d'ouverture affiche le titre du festival dès le premier
         // peint : sans préchargement, il s'écrirait en Quicksand puis
         // basculerait en Vevey sous les yeux du visiteur (font-display: swap).

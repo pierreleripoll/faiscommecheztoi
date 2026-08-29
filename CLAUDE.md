@@ -18,6 +18,7 @@ Police : **Vevey**, servie en OTF depuis `public/fonts/` — *Positive* est le r
 npm run dev            # serveur de dev sur 0.0.0.0:3000
 npm run generate       # updateImageDimensions + nuxt generate (prerender statique) — build canonique
 npm run update-images  # régénère width/height/ratio/thumbhash dans les frontmatters
+npm run update-favicons # redessine favicon.svg/.ico + apple-touch-icon depuis le nuage-menu
 npm run preview        # prévisualise un build
 ```
 
@@ -54,6 +55,7 @@ Pas de tests ni de linter configurés.
 - Les images de contenu vivent dans `public/uploads/`.
 - Ajouter une section = un `id` dans `pages/index.vue` **et** son ancre dans `SiteNav.vue`. La hauteur de la nav (66 px) est recopiée dans le `scroll-padding-top` de `assets/css/main.css` : changer son padding oblige à mettre à jour les deux.
 - Après ajout/changement d'images, toujours lancer `npm run update-images` (ou `npm run generate`).
+- Le favicon est le nuage-menu, en magenta sur le rose de la page : `scripts/generateFavicons.mjs` le redessine depuis le tracé de `SiteNav.vue` (source unique) et écrit `public/favicon.svg`, `favicon.ico` (16/32/48) et `apple-touch-icon.png`. Ces fichiers sont commités ; relancer `npm run update-favicons` si le tracé change. Le `.htaccess` ne les touche pas — sa règle attrape-tout épargne les fichiers réels (`!-f`).
 - Les fichiers `content/partenariats/` et `content/programme/` gardent un préfixe numérique dans leur nom, fixé à la création. C'est le champ `order` du frontmatter qui fait foi pour l'affichage : le réordonnancement par glisser-déposer du CMS réécrit `order` sans renommer les fichiers, le préfixe peut donc diverger — ne pas s'y fier. Pour `programme/`, l'ordre est celui de la première représentation, et le champ `year` décide sous quel onglet de la section Artistes la fiche apparaît.
 - Tout tri `queryContent` sur un champ numérique doit passer `$numeric: true` — sinon les valeurs sont comparées comme des chaînes et 10 se retrouve entre 1 et 2.
 - Une fiche artiste porte ses portraits dans un `photos:` **à la racine** du frontmatter (liste : la première s'affiche, les suivantes se feuillettent) : `updateImageDimensions.mjs` ne descend pas dans les objets imbriqués, un portrait rangé ailleurs serait ignoré en silence.
