@@ -58,11 +58,16 @@
     <dialog id="fcct-aide" aria-label="Aide de l'admin">
       <header>
         <span>Aide — comment modifier le site</span>
-        <a href="aide.html" target="_blank" rel="noopener">Ouvrir dans un onglet ↗</a>
+        <a href="/admin/aide.html?v=2" target="_blank" rel="noopener">Ouvrir dans un onglet ↗</a>
         <button type="button" id="fcct-aide-close" aria-label="Fermer l'aide">×</button>
       </header>
-      <!-- src posé à l'ouverture : la page d'aide ne se charge pas tant qu'on n'en a pas besoin. -->
-      <iframe title="Aide" data-src="aide.html"></iframe>
+      <!-- src posé à l'ouverture : la page d'aide ne se charge pas tant qu'on n'en a pas besoin.
+           Chemin absolu : en relatif, une base perdue enverrait « aide.html » à la
+           racine, que le .htaccess redirige vers le site, et c'est le site qui
+           s'affichait dans ce panneau (vu sur Safari, 01.09.2026). Le paramètre
+           de version contourne aussi une redirection 301 gardée en cache par
+           le navigateur pour cette adresse. -->
+      <iframe title="Aide" data-src="/admin/aide.html?v=2"></iframe>
     </dialog>
     <script>
       (function () {
