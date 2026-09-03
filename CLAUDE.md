@@ -16,7 +16,8 @@ Police : **Vevey**, servie en OTF depuis `public/fonts/` — *Positive* est le r
 
 ```bash
 npm run dev            # serveur de dev sur 0.0.0.0:3000
-npm run generate       # updateImageDimensions + nuxt generate (prerender statique) — build canonique
+npm run generate       # updateImageDimensions + generateAgendaIcs + nuxt generate + verifierBuild — build canonique
+npm run verifier-build # recompte les créneaux de la grille dans .output/public/index.html
 npm run update-images  # régénère width/height/ratio/thumbhash dans les frontmatters
 npm run update-favicons # redessine favicon.svg/.ico + apple-touch-icon depuis le nuage-menu
 npm run preview        # prévisualise un build
@@ -41,6 +42,8 @@ Pas de tests ni de linter configurés.
 - **@nuxt/content v2**, pas v3 : l'API est `queryContent()` / `<ContentRenderer :value="…">`, sans `content.config.ts` ni collections. Ne pas écrire de code Content v3 ici.
 
 - **Provider d'images env-driven** (`nuxt.config.ts`) : IPX (sharp au build) par défaut ; `NUXT_IMAGE_PROVIDER=cloudflare` en prod Cloudflare pour transformer à la volée via `/cdn-cgi/image/`. `server/middleware/ipxCache.ts` met en cache les rendus `/_ipx/` dans `.ipx-cache` (ignoré par git), clé = URL : remplacer une image par une autre **sous le même nom** ressert donc l'ancienne — vider `.ipx-cache` dans ce cas.
+
+- **Contrôle du build.** `npm run generate` se termine par `scripts/verifierBuild.mjs` : il recalcule la grille depuis `content/` (même `construireGrille` que le site) et compte les `class="creneau__heure"` dans `.output/public/index.html`. Un écart sort en code 1 et arrête le déploiement. Motif : le 01.09.2026 un build est parti en ligne avec une liste vide pour `queryContent('/programme')` — grille et cartes artistes disparues, aucune erreur, parce que chaque section se protège par un `v-if` ou un `|| []`. Reconstruire le même contenu a tout ramené : la panne est intermittente, pas dans les fichiers. Le workflow rejoue donc `npm run generate` une fois avant d'abandonner.
 
 - **Déploiements.**
   - Infomaniak (seul déploiement) : `.github/workflows/deploy-infomaniak.yml`, déclenché par `dev` — deux `npm run generate` puis deux rsync de `.output/public` via SSH vers l'hébergement mutualisé Infomaniak (secrets `INFOMANIAK_*` dans GitHub ; le job se saute tant qu'ils manquent). **`faiscommecheztoi.ch`** (`INFOMANIAK_SITE_PATH`) reçoit le build public, dossier `admin/` retiré ; **`nouveau.faiscommecheztoi.ch`** (`INFOMANIAK_SITE_PATH_NOUVEAU`) reçoit le build d'édition, `NUXT_PUBLIC_APERCU=1` — admin + plugin d'aperçu + meta noindex. En production depuis la bascule d'août 2026 — le domaine a été repointé dans le Manager du dossier WordPress vers ce dossier (rollback = repointer l'ancien dossier tant qu'il existe). Servi à la racine, provider d'images IPX (build-time) — ne pas mettre `NUXT_IMAGE_PROVIDER=cloudflare`. `public/.htaccess` porte les 301 depuis les anciennes URLs WordPress, renvoie `/admin` vers `nouveau.` et pose `X-Robots-Tag: noindex` sur `nouveau.` (il branche sur l'hôte : un seul fichier pour les deux sites).

@@ -4,11 +4,12 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "node scripts/generateAgendaIcs.mjs && nuxt dev",
-    "generate": "node scripts/updateImageDimensions.mjs && node scripts/generateAgendaIcs.mjs && nuxt generate",
+    "generate": "node scripts/updateImageDimensions.mjs && node scripts/generateAgendaIcs.mjs && nuxt generate && node scripts/verifierBuild.mjs",
     "preview": "nuxt preview",
     "update-agenda": "node scripts/generateAgendaIcs.mjs",
     "update-favicons": "node scripts/generateFavicons.mjs",
-    "update-images": "node scripts/updateImageDimensions.mjs"
+    "update-images": "node scripts/updateImageDimensions.mjs",
+    "verifier-build": "node scripts/verifierBuild.mjs"
   },
   "dependencies": {
     "@fontsource/quicksand": "^5.1.0",

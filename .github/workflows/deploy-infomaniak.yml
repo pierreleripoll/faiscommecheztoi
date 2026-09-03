@@ -60,7 +60,15 @@ jobs:
       # Servi à la racine du domaine : pas de NUXT_APP_BASE_URL, et le provider
       # d'images reste IPX (variantes générées par sharp au build — hébergement
       # 100 % statique, ne pas mettre NUXT_IMAGE_PROVIDER=cloudflare ici).
-      - run: npm run generate
+      #
+      # Second essai si le premier échoue : `npm run generate` se termine par
+      # scripts/verifierBuild.mjs, qui refuse une page sans la grille horaire.
+      # Cette panne-là est intermittente (vue le 01.09.2026, disparue en
+      # reconstruisant le même contenu) — la rejouer une fois évite de bloquer
+      # une publication du CMS pour rien. Un vrai problème de contenu échoue
+      # deux fois et arrête le déploiement, le site en ligne ne bouge pas.
+      - name: Construire le site public
+        run: npm run generate || npm run generate
 
       # Garantit la présence du .htaccess (redirections 301 depuis l'ancien
       # WordPress) même si la copie des dotfiles de public/ changeait.
@@ -106,7 +114,7 @@ jobs:
         env:
           NUXT_PUBLIC_APERCU: "1"
         run: |
-          npm run generate
+          npm run generate || npm run generate
           cp public/.htaccess .output/public/.htaccess
 
       - name: Déployer le site d'édition via rsync
