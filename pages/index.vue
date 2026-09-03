@@ -9,14 +9,10 @@
     </header>
     <!-- La maquette mobile d'origine enchaînait l'intro et Artistes sans la
          photo ; la maquette « Améliorations » (août 2026) la remet sur tous
-         les gabarits — l'intro seule faisait une page d'entrée sans image. -->
-    <figure v-if="hero?.photo?.src" class="hero__photo">
-      <ThumbhashImage
-        :image="hero.photo"
-        sizes="100vw sm:100vw lg:1280px xl:1440px"
-        priority
-      />
-    </figure>
+         les gabarits — l'intro seule faisait une page d'entrée sans image.
+         Depuis septembre 2026 ce sont plusieurs photos qui défilent
+         (components/HeroCarrousel.vue, liste `photos` de hero.md). -->
+    <HeroCarrousel v-if="hero?.photos?.length" :photos="hero.photos" />
 
     <div class="page">
       <SectionArtistes :years="years || []" :artistes="artistes || []" />
@@ -140,54 +136,6 @@ const soutiens = await useContenu("soutiens", () =>
 
 .hero__text {
   font-size: var(--fs-h1);
-}
-
-.hero__photo {
-  margin: 0;
-  width: 100%;
-  position: relative;
-  /* Sans isolation, le plus-lighter du calque de teinte se mélangerait aussi
-     au fond de page et déborderait de la photo. */
-  isolation: isolate;
-}
-
-.hero__photo :deep(img) {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Deux calques se superposent à la photo, dans cet ordre :
-   1. la teinte magenta, mélangée à l'image ;
-   2. la lueur des bords, posée par-dessus.
-   Un box-shadow: inset ne conviendrait pas : il serait peint sous l'image. */
-.hero__photo::after,
-.hero__photo::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-/* La photo source est neutre ; le design la teinte d'un magenta additif à
-   28 %. En plus-lighter, la lueur des projecteurs reste lumineuse au lieu
-   d'être noyée sous un voile opaque. */
-.hero__photo::after {
-  z-index: 1;
-  background: var(--c-ink);
-  opacity: 0.28;
-  mix-blend-mode: plus-lighter;
-}
-
-/* Lueur projetée par les blocs roses au-dessus et en dessous de la photo. */
-.hero__photo::before {
-  z-index: 2;
-  background: linear-gradient(
-      to bottom,
-      var(--glow-photo),
-      transparent 35px
-    ),
-    linear-gradient(to top, var(--glow-photo), transparent 35px);
 }
 
 /* Partenariats -------------------------------------------------------------- */
