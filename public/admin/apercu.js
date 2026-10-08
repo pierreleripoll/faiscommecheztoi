@@ -16,7 +16,7 @@
   // on enregistre le même sous tous, et la section réelle se lit dans le chemin
   // de l'entrée.
   var NOMS = [
-    "_singletons", "hero", "appel", "infos", "participer", "team", "soutiens", "pied",
+    "_singletons", "hero", "appel", "infos", "participer", "team", "soutiens", "pied", "ordre",
     "artistes", "programme", "partenariats",
   ];
   // Dimensions mesurées des images fraîchement choisies, par chemin.

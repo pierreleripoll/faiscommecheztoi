@@ -101,14 +101,15 @@
 </template>
 
 <script setup>
-const ENTREES = [
-  { label: "Artistes", href: "#artistes" },
-  { label: "Grille", href: "#grille" },
-  { label: "Infos", href: "#infos" },
-  { label: "Partenariats", href: "#partenariats" },
-  { label: "Participer", href: "#participer" },
-  { label: "Contact & Team", href: "#contact" },
-];
+// Les liens suivent l'ordre des sections réglé dans l'admin
+// (composables/useSections.js).
+const ordreSections = await useOrdreSections();
+const ENTREES = computed(() =>
+  ordreSections.value
+    .map((id) => SECTIONS_PAGE.find((s) => s.id === id))
+    .filter((s) => s.nav)
+    .map((s) => ({ label: s.nav, href: `#${s.id}` }))
+);
 
 // Le nuage du bouton de menu, tel qu'exporté du design : sa propre boîte de
 // 45 × 27, plus large et plus plate que le nuage de l'« Appel à projet ». Le

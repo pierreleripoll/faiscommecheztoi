@@ -21,6 +21,7 @@ const SECTIONS = {
   team: { cle: "team", ancre: "contact" },
   soutiens: { cle: "soutiens", ancre: "soutiens" },
   pied: { cle: "pied", ancre: "pied" },
+  ordre: { cle: "ordre", ancre: "contenu" },
   artistes: { cle: "artistes", ancre: "artistes", dossier: "artistes" },
   programme: { cle: "artistes-fiches", ancre: "artistes", dossier: "programme" },
   partenariats: { cle: "partenariats", ancre: "partenariats", dossier: "partenariats" },

@@ -192,6 +192,34 @@ collections:
 # Les sections de la page, chacune en accès direct dans la colonne de gauche
 # (groupe « Fichiers »), dans l'ordre où elles apparaissent sur le site.
 singletons:
+  # L'ordre des sections entre l'intro et le pied de page, lu par
+  # composables/useSections.js. Les ids sont fixes : on ne fait que glisser.
+  # Une section absente de la liste revient quand même à la fin sur le site.
+  - name: "ordre"
+    label: "Ordre des sections"
+    icon: "reorder"
+    file: "content/ordre.md"
+    fields:
+      - label: "Sections"
+        name: "sections"
+        widget: "list"
+        allow_add: false
+        allow_remove: false
+        allow_duplicate: false
+        hint: "L'ordre de la liste est l'ordre de la page (et des liens du menu). Glisser une section par sa poignée ≡ pour la déplacer (flèches ▲▼ sur tablette)."
+        field:
+          label: "Section"
+          name: "section"
+          widget: "select"
+          options:
+            - { label: "Artistes", value: "artistes" }
+            - { label: "Grille horaire", value: "grille" }
+            - { label: "Infos pratiques", value: "infos" }
+            - { label: "Partenariats", value: "partenariats" }
+            - { label: "Participer", value: "participer" }
+            - { label: "Contact & Team", value: "contact" }
+            - { label: "Soutiens (logos)", value: "soutiens" }
+
   - name: "hero"
     label: "Intro (haut de page)"
     icon: "waving_hand"

@@ -15,65 +15,97 @@
     <HeroCarrousel v-if="hero?.photos?.length" :photos="hero.photos" />
 
     <div class="page">
-      <SectionArtistes :years="years || []" :artistes="artistes || []" />
+      <!-- L'ordre des sections se règle dans l'admin (content/ordre.md,
+           composables/useSections.js). -->
+      <template v-for="id in ordreSections" :key="id">
+        <SectionArtistes
+          v-if="id === 'artistes'"
+          :years="years || []"
+          :artistes="artistes || []"
+        />
 
-      <SectionGrille :artistes="artistes || []" :annee="anneeCourante" />
+        <SectionGrille
+          v-else-if="id === 'grille'"
+          :artistes="artistes || []"
+          :annee="anneeCourante"
+        />
 
-      <section id="infos" class="section">
-        <h2 class="section__title">{{ infos?.title }}</h2>
-        <ContentRenderer v-if="infos" :value="infos" />
-      </section>
-
-      <section id="partenariats" class="section">
-        <h2 class="section__title">Partenariats</h2>
-        <div
-          v-for="partenaire in partenaires"
-          :key="partenaire._path"
-          class="partenaire"
+        <section
+          v-else-if="id === 'infos'"
+          id="infos"
+          class="section"
         >
-          <h3 class="partenaire__title">{{ partenaire.title }}</h3>
-          <ContentRenderer :value="partenaire" />
-        </div>
-      </section>
+          <h2 class="section__title">{{ infos?.title }}</h2>
+          <ContentRenderer v-if="infos" :value="infos" />
+        </section>
 
-      <section id="participer" class="section section--participer">
-        <h2 class="section__title">{{ participer?.title }}</h2>
-        <ContentRenderer v-if="participer" :value="participer" />
-        <template v-if="appel?.visible">
-          <AppelCloud :appel="appel" variant="participer" :scale="0.75" />
-          <AppelCloud variant="puff" :scale="0.375" decorative />
-        </template>
-      </section>
-
-      <section id="contact" class="section section--team">
-        <h2 class="section__title">{{ team?.title }}</h2>
-        <ContentRenderer v-if="team" :value="team" />
-      </section>
-
-      <section id="soutiens" class="section">
-        <h2 class="section__title">{{ soutiens?.title }}</h2>
-        <div class="soutiens">
-          <component
-            :is="logo.url ? 'a' : 'span'"
-            v-for="logo in soutiens?.logos || []"
-            :key="logo.src"
-            :href="logo.url"
-            class="soutiens__logo"
+        <section
+          v-else-if="id === 'partenariats'"
+          id="partenariats"
+          class="section"
+        >
+          <h2 class="section__title">Partenariats</h2>
+          <div
+            v-for="partenaire in partenaires"
+            :key="partenaire._path"
+            class="partenaire"
           >
-            <img
-              :src="
-                apercu || logo.src.endsWith('.svg')
-                  ? logo.src
-                  : img(logo.src, { quality: 90 })
-              "
-              :alt="logo.alt || ''"
-              :width="logo.width"
-              :height="logo.height"
-              loading="lazy"
-            />
-          </component>
-        </div>
-      </section>
+            <h3 class="partenaire__title">{{ partenaire.title }}</h3>
+            <ContentRenderer :value="partenaire" />
+          </div>
+        </section>
+
+        <section
+          v-else-if="id === 'participer'"
+          id="participer"
+          class="section section--participer"
+        >
+          <h2 class="section__title">{{ participer?.title }}</h2>
+          <ContentRenderer v-if="participer" :value="participer" />
+          <template v-if="appel?.visible">
+            <AppelCloud :appel="appel" variant="participer" :scale="0.75" />
+            <AppelCloud variant="puff" :scale="0.375" decorative />
+          </template>
+        </section>
+
+        <section
+          v-else-if="id === 'contact'"
+          id="contact"
+          class="section section--team"
+        >
+          <h2 class="section__title">{{ team?.title }}</h2>
+          <ContentRenderer v-if="team" :value="team" />
+        </section>
+
+        <section
+          v-else-if="id === 'soutiens'"
+          id="soutiens"
+          class="section"
+        >
+          <h2 class="section__title">{{ soutiens?.title }}</h2>
+          <div class="soutiens">
+            <component
+              :is="logo.url ? 'a' : 'span'"
+              v-for="logo in soutiens?.logos || []"
+              :key="logo.src"
+              :href="logo.url"
+              class="soutiens__logo"
+            >
+              <img
+                :src="
+                  apercu || logo.src.endsWith('.svg')
+                    ? logo.src
+                    : img(logo.src, { quality: 90 })
+                "
+                :alt="logo.alt || ''"
+                :width="logo.width"
+                :height="logo.height"
+                loading="lazy"
+              />
+            </component>
+          </div>
+        </section>
+      </template>
     </div>
   </main>
 </template>
@@ -86,6 +118,7 @@ const apercu = useApercuActif();
 
 // useContenu = useAsyncData + queryContent, avec l'aperçu de l'admin par-dessus
 // (composables/useContenu.js) ; chaque constante s'utilise comme `data`.
+const ordreSections = await useOrdreSections();
 const hero = await useContenu("hero", () => queryContent("/hero").findOne());
 const appel = await useContenu("appel", () =>
   queryContent("/appel").findOne()
