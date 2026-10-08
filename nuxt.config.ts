@@ -3,9 +3,24 @@
 // ne contient ni ce plugin ni /admin (retiré par le workflow avant le rsync).
 const APERCU = !!process.env.NUXT_PUBLIC_APERCU;
 
+const DOSSIERS_LOCAUX = [
+  ".claude",
+  "archive-word-press-faiscommecheztoi",
+  "formulaires",
+  "photo_carousel_entrée",
+];
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxt/content", "@nuxt/image"],
+
+  // Dossiers locaux hors dépôt, que les watchers de dev (Nuxt et Vite) ne
+  // doivent pas suivre : les worktrees (avec leur node_modules) et l'archive
+  // WordPress épuisent la limite inotify.
+  ignore: DOSSIERS_LOCAUX.map((d) => `${d}/**`),
+  vite: {
+    server: { watch: { ignored: DOSSIERS_LOCAUX.map((d) => `**/${d}/**`) } },
+  },
 
   // Hors du dossier plugins/ pour ne pas être scanné : il n'entre dans le
   // bundle que si on le demande.
